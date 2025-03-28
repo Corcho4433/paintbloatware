@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
+import jacko from './assets/foo.jpg'
 import './App.css'
 
 function App() {
@@ -18,12 +19,13 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+        <button onClick={() => setCount((count) => count + 100)}>
+          numero de veces que me la garche a tu madre {count}
         </button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
+        <img src={jacko} height="160" width="160" alt="" />
       </div>
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
