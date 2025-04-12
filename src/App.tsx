@@ -3,6 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import jacko from './assets/foo.jpg'
 import './App.css'
+import { Button } from './boton'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -19,11 +20,11 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 100)}>
-          numero de veces que me la garche a tu madre {count}
-        </button>
+        <Button count={count} handleClick={() => {
+          setCount(count + 1)
+        }} ></Button>
         <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
+          Edit <code>src/App.tsx</code> and save to test Malva
         </p>
         <img src={jacko} height="160" width="160" alt="" />
       </div>
