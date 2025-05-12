@@ -2,13 +2,15 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import jacko from './assets/foo.jpg'
-import Basic from './login'
+import Basic from './login/login'
 import './App.css'
 import { Button } from './boton'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 
 function App() {
   const [count, setCount] = useState(0)
-
+  const LoginFormClient = new QueryClient();
   
 
   return (
@@ -34,7 +36,9 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
-      <div><Basic></Basic></div>
+      <QueryClientProvider client={LoginFormClient}>
+        <Basic />
+      </QueryClientProvider>
       
     </>
   )
