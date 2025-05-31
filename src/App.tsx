@@ -1,45 +1,19 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import jacko from './assets/foo.jpg'
-import Basic from './login/login'
+import FastDraws from './fastdraws/fastdraws'
 import './App.css'
-import { Button } from './boton'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 
 function App() {
-  const [count, setCount] = useState(0)
   const LoginFormClient = new QueryClient();
   
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="page-container">
+        <QueryClientProvider client={LoginFormClient}> 
+          <FastDraws />
+        </QueryClientProvider>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <Button count={count} handleClick={() => {
-          setCount(count + 1)
-        }} ></Button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test Malva
-        </p>
-        <img src={jacko} height="160" width="160" alt="" />
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-      <QueryClientProvider client={LoginFormClient}>
-        <Basic />
-      </QueryClientProvider>
-      
     </>
   )
 }
