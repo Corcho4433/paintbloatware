@@ -1,7 +1,9 @@
-import FastDraws from './fastdraws/fastdraws'
+import FastDraws from './pages/fastdraws'
 import './App.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
+import ReactDom from 'react-dom/client'
+import { BrowserRouter,Routes,Route } from 'react-router-dom'
+import RegisterPage from './pages/login'
 
 function App() {
   const LoginFormClient = new QueryClient();
@@ -11,8 +13,17 @@ function App() {
     <>
       <div className="page-container">
         <QueryClientProvider client={LoginFormClient}> 
-          <FastDraws />
+          <BrowserRouter>
+            <Routes>
+              <Route path='/' element={<FastDraws></FastDraws>} />
+              <Route path='/login' element={<RegisterPage></RegisterPage>} />
+
+            </Routes>
+
+          </BrowserRouter>
+          
         </QueryClientProvider>
+        
       </div>
     </>
   )
