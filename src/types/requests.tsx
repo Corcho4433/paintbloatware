@@ -1,5 +1,6 @@
 
 export interface PostResponse {
+    id: string,
     image_json: string,
     title: string,
     user: {
