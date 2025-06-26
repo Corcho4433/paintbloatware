@@ -19,11 +19,13 @@ import {
   Bomb,
 } from "lucide-react";
 import { serverPath } from "../utils/servers";
-import { PostPage } from "../types/requests";
+import { PostPage, PostResponse } from "../types/requests";
 import { useEffect, useState } from "react";
+import { DrawImage } from "../components/drawimage";
 
 const FastDraws = () => {
   const [posts, setPosts] = useState<PostPage | null>(null);
+  const [post, setCurrentPost] = useState<PostResponse | null>(null);
   let photoIcon =
     "opacity-50 ease-in-out group-focus:opacity-100 group-hover:scale-116  group-focus:scale-116 group-hover:opacity-100 transition-all duration-600";
   const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -37,19 +39,18 @@ const FastDraws = () => {
 
       const data = await response.json();
       const pages: PostPage = data as PostPage;
-      console.log("Fetched posts:", pages);
       return pages;
     } catch (error) {
       console.error("Error fetching posts:", error);
       throw error;
     }
   };
-  
+
   useEffect(() => {
     postMutation()
       .then((data) => {
         setPosts(data);
-        console.log("Posts set:", data);
+        setCurrentPost(data.posts[0]);
       })
       .catch((err) => console.error("Error fetching posts:", err));
   }, []);
@@ -58,9 +59,9 @@ const FastDraws = () => {
     <section className=" w-full h-full bg-gray-300 dark:bg-gray-900 min-h-screen flex items-center justify-center px-6 py-8 flex-col space-y-4">
       <Sidebar className="absolute left-0 h-full rounded-2xl">
         <div className="flex justify-center"> <Bomb size={100}></Bomb></div>
-          
+
         <SidebarItemGroup>
-          
+
           <SidebarItem>
             <Link to={"/home"} className="flex flex-row">
               <House className="mr-4"></House>
@@ -76,15 +77,11 @@ const FastDraws = () => {
         </SidebarItemGroup>
       </Sidebar>
       <div className="flex relative">
-        <section className="bg-black w-[400px] h-[400px] rounded-xl relative">
-          <canvas className="w-1/1 h-1/1"></canvas>
-          prueba
-          {posts && posts.length > 0 && (
-            <div className="absolute text-white top-2 left-2 text-xs">
-              dop dop
-              {posts[0].id}
-            </div>
+        <section className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
+          {post && post.image_json && (
+            <DrawImage image_json={post.image_json} />
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </section>
         <section className="absolute right-[0px] translate-x-3/2 translate-y-2/4 h-[200px] justify-around flex flex-col bg-gray-800 p-2 rounded-xl">
           <Button className="group focus:outline-none focus:ring-0 !bg-white  dark:!bg-black !border-2 focus:!border-white hover:!border-white  aspect-square !p-0 h-12">

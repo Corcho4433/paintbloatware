@@ -22,4 +22,4 @@ export interface LoginUserRequest {
     password:string
 }
 
-export type PostPage = PostResponse[]
+export type PostPage = {posts: PostResponse[]}
