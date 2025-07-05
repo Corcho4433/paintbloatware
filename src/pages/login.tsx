@@ -132,7 +132,7 @@ const RegisterForm = () => {
 const LoginForm = () => {
   const LoginMutation = useMutation({
     mutationFn: async (loginUser: LoginUserRequest) => {
-      const response = await fetch(serverPath + "/api/login", {
+      const response = await fetch(serverPath + "/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginUser),
