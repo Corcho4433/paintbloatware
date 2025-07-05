@@ -21,7 +21,7 @@ import {
 import { serverPath } from "../utils/servers";
 import { PostPage, PostResponse } from "../types/requests";
 import { useEffect, useState } from "react";
-import { DrawImage } from "../components/drawimage";
+import { DrawImage } from "../components/DrawImage";
 
 const FastDraws = () => {
   const [posts, setPosts] = useState<PostPage | null>(null);
@@ -31,7 +31,13 @@ const FastDraws = () => {
   const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   const postMutation = async (): Promise<PostPage> => {
     try {
-      const response = await fetch(serverPath + "/api/posts");
+      const response = await fetch(serverPath + "/api/posts", {
+        method: "GET", // o POST si es necesario
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Esto es crucial para enviar las cookies
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -45,6 +51,7 @@ const FastDraws = () => {
       throw error;
     }
   };
+
 
   useEffect(() => {
     postMutation()

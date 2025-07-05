@@ -3,7 +3,8 @@ import { Formik, Field, Form } from "formik";
 import { useState } from "react";
 import { LoginUserRequest, UserRegistrationRequest } from "../types/requests";
 import { serverPath } from "../utils/servers";
-import {   } from "flowbite-react";
+import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
 
 const RegisterPage = () => {
   const [isRegistering, setRegisteringState] = useState(false);
@@ -136,21 +137,29 @@ const LoginForm = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginUser),
+        credentials: "include", // ✅ Necesario para enviar y recibir cookies
       });
       if (!response.ok) {
         throw new Error("Login failed");
       }
-      const { data } = await response.json();
-      return data.session_token;
+      const responseJSON = await response.json();
+      Cookies.get("session_token");
+      Cookies.get("refresh_token");
+      return responseJSON.success
     },
   });
+  const navigate = useNavigate();
   return (
     <Formik
       initialValues={{ mail: "", password: "" }}
       onSubmit={async (values, { setSubmitting }) => {
         try {
-          const response = await LoginMutation.mutateAsync(values);
-          alert(response.data);
+          const success = await LoginMutation.mutateAsync(values);
+          if (!success) {
+            throw new Error("Login failed :c");
+          }
+
+          navigate("/");
         } catch (error) {
           if (error instanceof Error) {
             alert(error.message);

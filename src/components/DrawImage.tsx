@@ -17,7 +17,7 @@ export const DrawImage = ({ image_json }: DrawImageProps) => {
         ? JSON.parse(image_json)
         : image_json as number[][];
       console.log("Parsed image_json", arr);
-      
+
       // Set canvas size to 512x512 for the images
       canvasRef.current.width = 512;
       canvasRef.current.height = 512;
