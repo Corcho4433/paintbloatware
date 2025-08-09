@@ -1,4 +1,4 @@
-import FastDraws from './pages/fastdraws'
+import FastDraws from './pages/FastDraws'
 import './App.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReactDom from 'react-dom/client'
@@ -22,9 +22,9 @@ function App() {
             </Routes>
 
           </BrowserRouter>
-          
+
         </QueryClientProvider>
-        
+
       </div>
     </>
   )
