@@ -1,10 +1,7 @@
 import {
   Button,
-  Sidebar,
-  SidebarItem,
-  SidebarItemGroup,
 } from "flowbite-react";
-import { Link } from "react-router-dom";
+import PaintSidebar from "../components/paintsidebar";
 import {
   Laugh,
   Smile,
@@ -14,9 +11,6 @@ import {
   MessageCircle,
   Send,
   EllipsisVertical,
-  LogInIcon,
-  House,
-  Bomb,
 } from "lucide-react";
 import { serverPath } from "../utils/servers";
 import { PostPage, PostResponse } from "../types/requests";
@@ -57,25 +51,7 @@ const FastDraws = () => {
 
   return (
     <section className=" w-full h-full bg-gray-300 dark:bg-gray-900 min-h-screen flex items-center justify-center px-6 py-8 flex-col space-y-4">
-      <Sidebar className="absolute left-0 h-full rounded-2xl">
-        <div className="flex justify-center"> <Bomb size={100}></Bomb></div>
-
-        <SidebarItemGroup>
-
-          <SidebarItem>
-            <Link to={"/home"} className="flex flex-row">
-              <House className="mr-4"></House>
-              Home
-            </Link>
-          </SidebarItem>
-          <SidebarItem>
-            <Link to={"/login"} className="flex flex-row">
-              <LogInIcon className="mr-4"></LogInIcon>
-              Login
-            </Link>
-          </SidebarItem>
-        </SidebarItemGroup>
-      </Sidebar>
+      <PaintSidebar />
       <div className="flex relative">
         <section className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
           {post && post.image_json && (
