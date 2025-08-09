@@ -22,10 +22,15 @@ import { serverPath } from "../utils/servers";
 import { PostPage, PostResponse } from "../types/requests";
 import { useEffect, useState } from "react";
 import { DrawImage } from "../components/DrawImage";
+import { useAuthStore } from "../store/useAuthStore";
 
 const FastDraws = () => {
   const [posts, setPosts] = useState<PostPage | null>(null);
   const [post, setCurrentPost] = useState<PostResponse | null>(null);
+  const user = useAuthStore((state) => state);
+  const handleLogout = () => {
+    useAuthStore.logout();
+  };
   let photoIcon =
     "opacity-50 ease-in-out group-focus:opacity-100 group-hover:scale-116  group-focus:scale-116 group-hover:opacity-100 transition-all duration-600";
   const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -75,11 +80,20 @@ const FastDraws = () => {
               Home
             </Link>
           </SidebarItem>
+
           <SidebarItem>
-            <Link to={"/login"} className="flex flex-row">
-              <LogInIcon className="mr-4"></LogInIcon>
-              Login
-            </Link>
+            {/* TODO: Setear el usuario a null antes de redirigir a login */}
+            {user ? (
+              <Link onClick={() => setUser(null)} to={"/login"} className="flex flex-row">
+                <LogInIcon className="mr-4"></LogInIcon>
+                Logout
+              </Link>
+            ) : (
+              <Link to={"/login"} className="flex flex-row">
+                <LogInIcon className="mr-4"></LogInIcon>
+                Login
+              </Link>
+            )}
           </SidebarItem>
         </SidebarItemGroup>
       </Sidebar>

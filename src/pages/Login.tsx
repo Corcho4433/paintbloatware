@@ -4,7 +4,8 @@ import { useState } from "react";
 import { LoginUserRequest, UserRegistrationRequest } from "../types/requests";
 import { serverPath } from "../utils/servers";
 import { useNavigate } from "react-router-dom";
-import Cookies from 'js-cookie';
+import { useAuthStore, User } from "../store/useAuthStore";
+
 
 const RegisterPage = () => {
   const [isRegistering, setRegisteringState] = useState(false);
@@ -44,17 +45,20 @@ const RegisterForm = () => {
       if (!response.ok) {
         throw new Error("Registration failed");
       }
-      console.log(response.json());
-      return response.json();
+      const responseJSON = await response.json();
+      return responseJSON as { data: string; success: boolean };
     },
   });
+  const navigate = useNavigate();
   return (
     <Formik
       initialValues={{ name: "", email: "", password: "" }}
       onSubmit={async (values, { setSubmitting }) => {
         try {
           const response = await registerMutation.mutateAsync(values);
-          alert(response.data);
+          if (response.success) {
+            navigate("/login");
+          }
         } catch (error) {
           if (error instanceof Error) {
             alert(error.message);
@@ -131,21 +135,20 @@ const RegisterForm = () => {
 };
 
 const LoginForm = () => {
+  const setUser = useAuthStore((state) => state.setUser);
   const LoginMutation = useMutation({
     mutationFn: async (loginUser: LoginUserRequest) => {
       const response = await fetch(serverPath + "/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginUser),
-        credentials: "include", // ✅ Necesario para enviar y recibir cookies
+        credentials: "include", // ✅ Necesario para enviar y recibir cookies 
       });
       if (!response.ok) {
         throw new Error("Login failed");
       }
       const responseJSON = await response.json();
-      Cookies.get("session_token");
-      Cookies.get("refresh_token");
-      return responseJSON.success
+      return { success: responseJSON.success, data: responseJSON.data };
     },
   });
   const navigate = useNavigate();
@@ -154,11 +157,11 @@ const LoginForm = () => {
       initialValues={{ mail: "", password: "" }}
       onSubmit={async (values, { setSubmitting }) => {
         try {
-          const success = await LoginMutation.mutateAsync(values);
+          const { success, data } = await LoginMutation.mutateAsync(values);
           if (!success) {
             throw new Error("Login failed :c");
           }
-
+          setUser(data as User); // I don't understand why this is necessary but it works :)
           navigate("/");
         } catch (error) {
           if (error instanceof Error) {
