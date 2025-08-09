@@ -2,17 +2,17 @@ import FastDraws from './pages/FastDraws'
 import './App.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReactDom from 'react-dom/client'
-import { BrowserRouter,Routes,Route } from 'react-router-dom'
-import RegisterPage from './pages/login'
-import HomePage from './pages/home' 
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import RegisterPage from './pages/Login'
+import HomePage from './pages/Home'
 function App() {
   const PaintQueryClient = new QueryClient();
-  
+
 
   return (
     <>
       <div className="page-container">
-        <QueryClientProvider client={PaintQueryClient}> 
+        <QueryClientProvider client={PaintQueryClient}>
           <BrowserRouter>
             <Routes>
               <Route path='/' element={<FastDraws></FastDraws>} />

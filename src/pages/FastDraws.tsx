@@ -28,9 +28,9 @@ const FastDraws = () => {
   const [posts, setPosts] = useState<PostPage | null>(null);
   const [post, setCurrentPost] = useState<PostResponse | null>(null);
   const user = useAuthStore((state) => state);
-  const handleLogout = () => {
-    useAuthStore.logout();
-  };
+  /*   const handleLogout = () => {
+      useAuthStore.logout();
+    }; */
   let photoIcon =
     "opacity-50 ease-in-out group-focus:opacity-100 group-hover:scale-116  group-focus:scale-116 group-hover:opacity-100 transition-all duration-600";
   const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -95,6 +95,7 @@ const FastDraws = () => {
               </Link>
             )}
           </SidebarItem>
+
         </SidebarItemGroup>
       </Sidebar>
       <div className="flex relative">
