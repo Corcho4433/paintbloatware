@@ -21,7 +21,7 @@ import {
 import { serverPath } from "../utils/servers";
 import { PostPage, PostResponse } from "../types/requests";
 import { useEffect, useState } from "react";
-import { DrawImage } from "../components/DrawImage";
+import { DrawImage } from "../components/drawimage";
 import { useAuthStore } from "../store/useAuthStore";
 
 const FastDraws = () => {
