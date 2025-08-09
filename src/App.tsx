@@ -5,6 +5,7 @@ import ReactDom from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import RegisterPage from './pages/Login'
 import HomePage from './pages/Home'
+import Drawing from './pages/drawing'
 function App() {
   const PaintQueryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ function App() {
               <Route path='/login' element={<RegisterPage></RegisterPage>} />
               <Route path='/home' element={<HomePage></HomePage>} />
               <Route path='/fastdraws' element={<FastDraws></FastDraws>} />
+              <Route path='/draw' element={<Drawing></Drawing>} />
             </Routes>
 
           </BrowserRouter>
