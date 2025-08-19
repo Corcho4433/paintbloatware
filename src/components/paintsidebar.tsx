@@ -1,16 +1,16 @@
 import {
-  Sidebar,
-  SidebarItem,
-  SidebarItemGroup,
+    Sidebar,
+    SidebarItem,
+    SidebarItemGroup,
 } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import {
-  LogInIcon,
-  House,
-  Bomb,
-  PencilIcon
-} from "lucide-react";    
+    LogInIcon,
+    House,
+    Cat,
+    PencilIcon
+} from "lucide-react";
 
 const PaintSidebar = () => {
     const user = useAuthStore((state) => state.user);
@@ -18,7 +18,7 @@ const PaintSidebar = () => {
 
     return (
         <Sidebar className="absolute left-0 h-full rounded-2xl">
-            <div className="flex justify-center"> <Bomb size={100}></Bomb></div>
+            <div className="flex justify-center"> <img src="/logo2.png" className="w-50 h-50" alt="logo" /> </div>
             <SidebarItemGroup>
                 <SidebarItem>
                     <Link to={"/home"} className="flex flex-row">
@@ -28,8 +28,8 @@ const PaintSidebar = () => {
                 </SidebarItem>
                 <SidebarItem>
                     <Link to={"/fastdraws"} className="flex flex-row">
-                        <Bomb className="mr-4"></Bomb>
-                        Fast Draws
+                        <Cat className="mr-4"></Cat>
+                        FastDraws
                     </Link>
                 </SidebarItem>
                 <SidebarItem>
