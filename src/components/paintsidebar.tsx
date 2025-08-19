@@ -8,7 +8,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import {
     LogInIcon,
     House,
-    Cat,
+    FastForward,
     PencilIcon
 } from "lucide-react";
 
@@ -28,7 +28,7 @@ const PaintSidebar = () => {
                 </SidebarItem>
                 <SidebarItem>
                     <Link to={"/fastdraws"} className="flex flex-row">
-                        <Cat className="mr-4"></Cat>
+                        <FastForward className="mr-4"></FastForward>
                         FastDraws
                     </Link>
                 </SidebarItem>
