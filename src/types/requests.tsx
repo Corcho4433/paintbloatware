@@ -3,6 +3,8 @@ export interface PostResponse {
     id: string,
     image_json: string,
     title: string,
+    size: string,
+    version: number,
     user: {
         name: string,
         id: number,
