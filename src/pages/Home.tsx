@@ -1,13 +1,16 @@
 import PaintSidebar from "../components/paintsidebar";
 import HomeDraw from "../components/homedraw";
+import { usePosts } from "../hooks/posts";
 const HomePage = () => {
-    
+  const { posts, loading, error } = usePosts(); 
   return (
-    <div className="w-full h-full bg-gray-300 dark:bg-gray-900 min-h-screen flex items-center justify-center px-6 py-8 flex-col space-y-4">
+    <div className="flex">
         <PaintSidebar />
-        
-        <HomeDraw />
+        <main className="flex-1 ml-0 min-h-screen bg-gray-900">
+            <HomeDraw />
+        </main>
     </div>
+
   );
 }
 

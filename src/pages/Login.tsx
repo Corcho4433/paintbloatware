@@ -22,7 +22,7 @@ const RegisterPage = () => {
           ) : (
             <LoginForm></LoginForm>
           )}
-          <a onClick={() => setRegisteringState(!isRegistering)} className="font-medium text-blue-600 underline dark:text-blue-500 hover:no-underline cursor-pointer"> {isRegistering ? "No tienes una cuenta todavia?" : "Ya tienes cuenta?"} </a>
+          <a onClick={() => setRegisteringState(!isRegistering)} className="font-medium text-blue-600 underline dark:text-blue-500 hover:no-underline cursor-pointer"> {isRegistering ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?"} </a>
         </div>
       </div>
     </section>
