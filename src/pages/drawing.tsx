@@ -2,9 +2,24 @@ import { useEffect, useRef, useState } from 'react';
 
 const GRID_SIZE = 32;
 const PIXEL_SIZE = 8;
+const INITIAL_FRAME = 1;
+const FRAME_RATE = 60;
+
+
+const MS_TIME = (1/FRAME_RATE) * 10000;
+
+type Frame = {
+    frame_id: number;
+    frame_data: number[][];
+}
+
 
 const Drawing = () => {
-
+    const fullFrameAnimation: Map<number, Frame> = new Map();
+    let currentFrame = INITIAL_FRAME;
+    let currentInterval: number = 0;
+    let isRunning = true;
+    
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [ws, setWs] = useState<WebSocket | null>(null);
     const [source, setSource] = useState("");
@@ -18,12 +33,13 @@ const Drawing = () => {
         };
 
         socket.onerror = (error) => {
-            console.error('WebSocket Error:', error);
+            console.error('WebSocket Connection Error:', error);
         };
 
         socket.onmessage = (event) => {
             const newData = JSON.parse(event.data);
-            drawGrid(newData);
+
+            saveFrame(newData);
         };
 
         setWs(socket);
@@ -33,7 +49,51 @@ const Drawing = () => {
         };
     }, []);
 
-    const drawGrid = (gridData: number[][]) => {
+
+    const drawFrameAnimation = () => {
+        if (fullFrameAnimation.size <= 0) return; 
+        if (!isRunning) return;
+
+        console.log("Is running?", isRunning);
+
+        nextFrame();
+    }
+
+    useEffect(() => {
+        currentInterval = setInterval(drawFrameAnimation, MS_TIME);
+    })
+
+    const togglePause = () => {
+        if (currentInterval) {
+            clearInterval(currentInterval);
+        }
+
+        isRunning = false;
+        console.log("Paused", isRunning);
+    }
+
+    const saveFrame = (frame: Frame) => {
+        if (frame.frame_id == INITIAL_FRAME) {
+            fullFrameAnimation.clear();
+        }
+
+        fullFrameAnimation.set(frame.frame_id, frame);
+    }
+
+    const nextFrame = () => {
+        if (fullFrameAnimation.size > 0) {
+            currentFrame++;
+
+            if (currentFrame > fullFrameAnimation.size) {
+                currentFrame = INITIAL_FRAME;
+            }
+
+            if (!fullFrameAnimation.has(currentFrame)) return;
+            drawFrame(fullFrameAnimation.get(currentFrame) as Frame);
+        }
+    }
+
+    const drawFrame = (Frame: Frame) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -45,7 +105,7 @@ const Drawing = () => {
         for (let y = 0; y < GRID_SIZE; y++) {
             for (let x = 0; x < GRID_SIZE; x++) {
                 const index = y * GRID_SIZE + x;
-                const pixel = gridData[index];
+                const pixel = Frame.frame_data[index];
 
                 const r = pixel[0];
                 const g = pixel[1];
@@ -100,6 +160,10 @@ const Drawing = () => {
 
             <button id="run" onClick={handleRun}>
                 Run code
+            </button>
+
+            <button id="step" onClick={nextFrame}>
+                Step (+1)
             </button>
         </div>
     );
