@@ -1,7 +1,7 @@
 import {
-  Sidebar,
-  SidebarItem,
-  SidebarItemGroup,
+    Sidebar,
+    SidebarItem,
+    SidebarItemGroup,
 } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
