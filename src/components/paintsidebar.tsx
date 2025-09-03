@@ -6,12 +6,12 @@ import {
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import {
-  LogInIcon,
-  House,
-  Bomb,
-  PencilIcon,
-  Menu
-} from "lucide-react";    
+    LogInIcon,
+    House,
+    Cat,
+    PencilIcon,
+    Menu
+} from "lucide-react";
 import { useState } from 'react';
 
 const PaintSidebar = () => {
@@ -21,14 +21,14 @@ const PaintSidebar = () => {
 
     return (
         <>
-            <button 
+            <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="fixed top-4 left-4 z-50 md:hidden bg-gray-800 p-2 rounded-lg"
             >
                 <Menu className="text-white" />
             </button>
 
-            <Sidebar 
+            <Sidebar
                 className={`
                     fixed top-0 left-0 h-screen w-64
                     md:sticky md:top-0 md:h-screen
@@ -39,8 +39,8 @@ const PaintSidebar = () => {
                     bg-gray-800
                 `}
             >
-                <div className="flex justify-center p-4"> 
-                    <Bomb size={64} className="md:w-24 md:h-24" />
+                <div className="flex justify-center p-4">
+                    <img src="/logo2.png" alt="logo-sidebar" className="w-50 h-50" />
                 </div>
                 <SidebarItemGroup className="space-y-2">
                     <SidebarItem className="hover:bg-gray-700 rounded-lg transition-colors">
@@ -51,7 +51,7 @@ const PaintSidebar = () => {
                     </SidebarItem>
                     <SidebarItem className="hover:bg-gray-700 rounded-lg transition-colors">
                         <Link to={"/fastdraws"} className="flex items-center w-full p-2">
-                            <Bomb className="w-5 h-5 md:w-6 md:h-6 mr-3" />
+                            <Cat className="w-5 h-5 md:w-6 md:h-6 mr-3" />
                             <span className="text-sm md:text-base">Fast Draws</span>
                         </Link>
                     </SidebarItem>
@@ -63,17 +63,17 @@ const PaintSidebar = () => {
                     </SidebarItem>
                     <SidebarItem className="hover:bg-gray-700 rounded-lg transition-colors">
                         {user ? (
-                            <Link 
-                                onClick={logout} 
-                                to={"/login"} 
+                            <Link
+                                onClick={logout}
+                                to={"/login"}
                                 className="flex items-center w-full p-2"
                             >
                                 <LogInIcon className="w-5 h-5 md:w-6 md:h-6 mr-3" />
                                 <span className="text-sm md:text-base">Logout</span>
                             </Link>
                         ) : (
-                            <Link 
-                                to={"/login"} 
+                            <Link
+                                to={"/login"}
                                 className="flex items-center w-full p-2"
                             >
                                 <LogInIcon className="w-5 h-5 md:w-6 md:h-6 mr-3" />

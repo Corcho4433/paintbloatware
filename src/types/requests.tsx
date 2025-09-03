@@ -1,9 +1,10 @@
 
 export interface PostResponse {
     id: string,
-    image_json: string,
+    url_bucket: string,
     title: string,
-    size: string,
+    height: number,
+    width: number,
     version: number,
     user: {
         name: string,
@@ -15,13 +16,13 @@ export interface PostResponse {
 }
 
 export interface UserRegistrationRequest {
-  name: string,
-  email: string,
-  password: string
+    name: string,
+    email: string,
+    password: string
 };
 export interface LoginUserRequest {
     mail: string,
-    password:string
+    password: string
 }
 
-export type PostPage = {posts: PostResponse[]}
+export type PostPage = { posts: PostResponse[] }

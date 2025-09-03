@@ -16,7 +16,15 @@ const HomeDraw = () => {
           <div key={index} className="mb-4">
             <div className="bg-gray-800 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 w-[512px] hover:scale-[1.02]">
               <div className="aspect-square w-full relative">
-                <DrawImage image_json={post.image_json} />
+                <img
+                  src={posts?.posts[index].url_bucket}
+                  alt="Post Image"
+                  width={512}
+                  height={512}
+                  style={{
+                    imageRendering: 'pixelated'
+                  }}
+                />
               </div>
               <div className="p-4">
                 <div className="flex items-center justify-between">
