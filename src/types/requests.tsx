@@ -21,8 +21,20 @@ export interface UserRegistrationRequest {
     password: string
 };
 export interface LoginUserRequest {
-    mail: string,
+    email: string,
     password: string
+}
+
+export interface LoginUserResponse {
+    id: string,
+    name: string,
+    email: string
+}
+
+export interface RegisterUserResponse {
+    id: string,
+    name: string,
+    email: string
 }
 
 export type PostPage = { posts: PostResponse[] }

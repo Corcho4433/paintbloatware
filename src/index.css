@@ -1,3 +1,59 @@
+@import "tailwindcss";
+
+
+@layer utilities {
+  @layer utilities {
+    @keyframes slide-in {
+      0% { 
+        transform: translateY(100%); 
+        opacity: 0; 
+        pointer-events: none; /* prevent interaction during animation */
+        box-shadow: none; /* remove focus/active shadow */
+        outline: none; /* remove focus outline */
+        hover: none; /* remove hover effect */
+        focus: none; /* remove focus effect */
+      }
+      100% { 
+        transform: translateY(0); 
+        opacity: 1; 
+        pointer-events: auto; /* enable interaction when done */
+      }
+    }
+
+    @keyframes slide-out {
+      0% { 
+        transform: translateY(0); 
+        opacity: 1; 
+        pointer-events: auto;
+      }
+      100% { 
+        transform: translateY(-100%); 
+        opacity: 0;  
+        pointer-events: none; /* prevent interaction during slide-out */
+      }
+    }
+
+    .animate-slide-in {
+      animation: slide-in 0.5s ease-in-out forwards;
+    }
+
+    .animate-slide-out {
+      animation: slide-out 0.5s ease-in-out forwards;
+    }
+  } 
+
+  .animate-slide-in *[disabled],
+  .animate-slide-out *[disabled] {
+    opacity: 1 !important;
+    cursor: pointer !important;
+    filter: none !important;
+    background-color: inherit !important;
+  }
+}
+
+
+
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

@@ -5,5 +5,6 @@
   "prefix": "",
   "path": "src/components",
   "tsx": true,
-  "rsc": true
+  "rsc": true,
+  "version": 4
 }

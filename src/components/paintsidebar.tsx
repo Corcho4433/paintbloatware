@@ -18,7 +18,7 @@ const PaintSidebar = () => {
     const user = useAuthStore((state) => state.user);
     const logout = useAuthStore((state) => state.logout);
     const [isOpen, setIsOpen] = useState(false);
-
+    console.log("User in sidebar:", user);
     return (
         <>
             <button

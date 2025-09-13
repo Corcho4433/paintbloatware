@@ -1,17 +1,20 @@
 import { useMutation } from "@tanstack/react-query";
 import { Formik, Field, Form } from "formik";
 import { useState } from "react";
-import { LoginUserRequest, UserRegistrationRequest } from "../types/requests";
+import { LoginUserRequest, UserRegistrationRequest, LoginUserResponse, RegisterUserResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore, User } from "../store/useAuthStore";
+import PaintSidebar from "../components/paintsidebar";
 
 
 const RegisterPage = () => {
   const [isRegistering, setRegisteringState] = useState(false);
 
   return (
-    <section className="bg-gray-50 w-full dark:bg-gray-900 min-h-screen flex items-center justify-center px-6 py-8">
+    <div className="flex overflow-y-hidden">
+      <PaintSidebar />
+    <section className="flex-1 ml-0 min-h-screen w-full h-full bg-gray-300 dark:bg-gray-900 flex items-center justify-center px-6 flex-col space-y-4">
       <div className="w-1/3 min-w-[300px] bg-white rounded-lg shadow dark:border xl:p-0 dark:bg-gray-800 dark:border-gray-700">
         <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
           <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
@@ -26,6 +29,7 @@ const RegisterPage = () => {
         </div>
       </div>
     </section>
+    </div>
   );
 };
 
@@ -142,31 +146,41 @@ const LoginForm = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginUser),
-        credentials: "include", // ✅ Necesario para enviar y recibir cookies 
+        credentials: "include",
       });
       if (!response.ok) {
         throw new Error("Login failed");
       }
-      const responseJSON = await response.json();
-      return { success: responseJSON.success, data: responseJSON.data };
+      return response.json();
     },
   });
   const navigate = useNavigate();
   return (
     <Formik
-      initialValues={{ mail: "", password: "" }}
+      initialValues={{ email: "", password: "" }}
       onSubmit={async (values, { setSubmitting }) => {
         try {
-          const { success, data } = await LoginMutation.mutateAsync(values);
-          if (!success) {
-            throw new Error("Login failed :c");
+          const response = await LoginMutation.mutateAsync(values);
+          console.log("Full response:", response);
+
+          if (!response.success) {
+            throw new Error("Login failed");
           }
-          setUser(data as User); // I don't understand why this is necessary but it works :)
+
+          // Create user object directly from response
+          const user: User = {
+            id: response.id,
+            name: response.name,
+            email: response.email
+          };
+
+          setUser(user);
           navigate("/");
         } catch (error) {
           if (error instanceof Error) {
             alert(error.message);
           }
+          console.error("Login error:", error);
         } finally {
           setSubmitting(false);
         }
