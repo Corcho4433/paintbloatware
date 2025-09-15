@@ -15,7 +15,49 @@ export interface PostResponse {
     }
 }
 
-export interface UserRegistrationRequest {
+// Base Comment interface
+export interface Comment {
+  id: string;
+  id_user: string;
+  id_post: string;
+  content: string;
+  created_at?: string;
+  // Add other comment fields based on your database schema
+}
+export interface Post {
+  id: string;
+  id_user: string;
+  title?: string;
+  content?: string;
+  created_at?: string;
+  updated_at?: string;
+  // Add other post fields based on your database schema
+}
+
+export interface CreatePostRequest {
+  title?: string;
+  content?: string;
+  // Add other fields that can be sent in post body
+}
+
+export interface CreatePostResponse extends Post {
+  // This returns the created post object directly based on your router
+}
+// GET /comments/:id - Get single comment
+export interface GetCommentByIdResponse extends Comment {
+  // This returns the comment object directly based on your router
+}
+export interface GetCommentsByPostResponse {
+  comments: Comment[];
+}
+
+
+
+export interface CommentRequest {
+    postId: string,
+    content: string,
+}
+export interface RegisterUserRequest {
     name: string,
     email: string,
     password: string

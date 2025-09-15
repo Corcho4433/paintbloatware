@@ -1,8 +1,6 @@
 import PaintSidebar from "../components/paintsidebar";
 import HomeDraw from "../components/homedraw";
-import { usePosts } from "../hooks/posts";
 const HomePage = () => {
-  const { posts, loading, error } = usePosts(); 
   return (
     <div className="flex">
         <PaintSidebar />

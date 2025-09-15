@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Formik, Field, Form } from "formik";
 import { useState } from "react";
-import { LoginUserRequest, UserRegistrationRequest, LoginUserResponse, RegisterUserResponse } from "../types/requests";
+import { LoginUserRequest, RegisterUserRequest, LoginUserResponse, RegisterUserResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore, User } from "../store/useAuthStore";
@@ -37,7 +37,7 @@ export default RegisterPage;
 
 const RegisterForm = () => {
   const registerMutation = useMutation({
-    mutationFn: async (newUser: UserRegistrationRequest) => {
+    mutationFn: async (newUser: RegisterUserRequest) => {
       const response = await fetch(serverPath + "/api/auth/register", {
         method: "POST",
         headers: {
