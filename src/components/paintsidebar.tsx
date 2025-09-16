@@ -10,15 +10,16 @@ import {
     House,
     Cat,
     PencilIcon,
-    Menu
+    Menu,
+    CircleUser
 } from "lucide-react";
 import { useState } from 'react';
 
 const PaintSidebar = () => {
-    const user = useAuthStore((state) => state.user);
+    const current_user = useAuthStore((state) => state.user);
     const logout = useAuthStore((state) => state.logout);
     const [isOpen, setIsOpen] = useState(false);
-    console.log("User in sidebar:", user);
+    console.log("User in sidebar:", current_user);
     return (
         <>
             <button
@@ -61,8 +62,16 @@ const PaintSidebar = () => {
                             <span className="text-sm md:text-base">Draw</span>
                         </Link>
                     </SidebarItem>
+                    {current_user ? (
+                        <SidebarItem className="hover:bg-gray-700 rounded-lg transition-colors">
+                        <Link to={"/user/" + current_user.id} className="flex items-center w-full p-2">
+                            <CircleUser className="w-5 h-5 md:w-6 md:h-6 mr-3" />
+                            <span className="text-sm md:text-base">User</span>
+                        </Link>
+                    </SidebarItem>
+                    ) : null}
                     <SidebarItem className="hover:bg-gray-700 rounded-lg transition-colors">
-                        {user ? (
+                        {current_user ? (
                             <Link
                                 onClick={logout}
                                 to={"/login"}
