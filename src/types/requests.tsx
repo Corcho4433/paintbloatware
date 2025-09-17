@@ -6,6 +6,7 @@ export interface PostResponse {
     height: number,
     width: number,
     version: number,
+    content: string,
     user: {
         name: string,
         id: number,
@@ -27,6 +28,10 @@ export interface Comment {
 export interface Post {
   id: string;
   id_user: string;
+  url_bucket: string;
+  version: number;
+  height: number;
+  width: number;
   title?: string;
   content?: string;
   created_at?: string;

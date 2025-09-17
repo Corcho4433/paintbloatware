@@ -19,12 +19,13 @@ const animations = {
 };
 
 const FastDraws = () => {
-  const { posts, loading, error } = usePosts();
+  const { posts, loading, error, prefetch, loadMore, hasNextPage, isLoadingMore } = usePosts();
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [currentPostIndex, setCurrentPostIndex] = useState<number | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  
   // Effect to handle initial load and URL params
   useEffect(() => {
     // Only proceed if posts are loaded and not empty
@@ -59,14 +60,34 @@ const FastDraws = () => {
   }, [currentPostIndex, posts, loading, setSearchParams, error]);
 
   const handleReactionClick = () => {
-    if (isAnimating || !posts?.posts?.length || currentPostIndex === null) return;
-    setIsAnimating(true);
-    setTimeout(() => {
-      setCurrentPostIndex((prev) => (prev !== null ? (prev + 1) % posts.posts.length : 0));
-      setIsAnimating(false);
-    }, 500);
-  };
+  if (isAnimating || !posts?.posts?.length || currentPostIndex === null) return;
+  setIsAnimating(true);
 
+  setTimeout(() => {
+   
+    const isLastPost = currentPostIndex === posts.posts.length - 2; // -1 es el ultimo post, -2 e es el penultimo post
+    console.log(currentPostIndex, posts.posts.length);
+    if (isLastPost) {
+      if (hasNextPage) {
+        // Prefetch next page if available
+        prefetch(currentPageIndex + 1);
+        console.log("Prefetching next page...");
+      }
+
+      if (!isLoadingMore) {
+        // Load more posts only if not already loading
+        loadMore();
+        console.log("Loading next page...");
+      }
+    }
+
+    // Move to next post (loop around if necessary)
+    setCurrentPostIndex((prev) =>
+      prev !== null ? (prev + 1) : 0
+    );
+    setIsAnimating(false);
+  }, 500);
+};
   useEffect(() => {
     if (isAnimating) {
       // Remove focus from all buttons in the container
@@ -127,7 +148,6 @@ const FastDraws = () => {
           width={512}
           height={512}
           style={{
-            imageRendering: 'pixelated',
             width: '100%',
             height: '100%',
             objectFit: 'cover',
