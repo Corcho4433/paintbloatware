@@ -7,7 +7,7 @@ const UserPage = () => {
   const { posts, loading, error } = usePosts();
   const emptyArray = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
 
-  let photoIcon =
+  const photoIcon =
     "opacity-50 ease-in-out group-focus:opacity-100 group-hover:scale-116  group-focus:scale-116 group-hover:opacity-100 transition-all duration-600";
 
   const renderContent = (postID: number) => {
