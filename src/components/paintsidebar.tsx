@@ -11,7 +11,8 @@ import {
     Cat,
     PencilIcon,
     Menu,
-    CircleUser
+    CircleUser,
+    LibraryIcon
 } from "lucide-react";
 import { useState } from 'react';
 
@@ -43,6 +44,7 @@ const PaintSidebar = () => {
                 <div className="flex justify-center p-4">
                     <img src="/logo2.png" alt="logo-sidebar" className="w-50 h-50" />
                 </div>
+                
                 <SidebarItemGroup className="space-y-2">
                     <SidebarItem className="hover:bg-gray-700 rounded-lg transition-colors">
                         <Link to={"/home"} className="flex items-center w-full p-2">
@@ -60,6 +62,12 @@ const PaintSidebar = () => {
                         <Link to={"/draw"} className="flex items-center w-full p-2">
                             <PencilIcon className="w-5 h-5 md:w-6 md:h-6 mr-3" />
                             <span className="text-sm md:text-base">Draw</span>
+                        </Link>
+                    </SidebarItem>
+                    <SidebarItem className="hover:bg-gray-700 rounded-lg transition-colors">
+                        <Link to={"/wiki"} className="flex items-center w-full p-2">
+                            <LibraryIcon className="w-5 h-5 md:w-6 md:h-6 mr-3" />
+                            <span className="text-sm md:text-base">How to draw</span>
                         </Link>
                     </SidebarItem>
                     {current_user ? (

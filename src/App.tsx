@@ -8,6 +8,8 @@ import HomePage from './pages/Home'
 import Drawing from './pages/Drawing'
 import UserPage from './pages/User';
 import Upload from './pages/Upload';
+import WikiPage from './pages/wiki';
+
 function App() {
   const PaintQueryClient = new QueryClient();
 
@@ -23,6 +25,7 @@ function App() {
               <Route path='/home' element={<HomePage></HomePage>} />
               <Route path='/fastdraws' element={<FastDraws></FastDraws>} />
               <Route path='/draw' element={<Drawing></Drawing>} />
+              <Route path='/wiki' element={<WikiPage></WikiPage>} />
               <Route path='/user' element={<UserPage></UserPage>} />
               <Route path='/post/:' element={<Upload></Upload>} />
             </Routes>
