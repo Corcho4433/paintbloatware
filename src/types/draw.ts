@@ -17,13 +17,13 @@ export enum processorServerResponse {
 }
 
 export interface processorResponse {
-    action : processorServerResponse,
+    action : string,
     data : {
         frame : Frame,
         error: string,
         errorCode: number,
         previewReady: boolean,
-        postUrl: string,
+        urlBucket: string,
     }
 }
 

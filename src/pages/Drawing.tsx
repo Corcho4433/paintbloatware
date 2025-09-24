@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import PaintSidebar from '../components/paintsidebar';
-import { processorRequest, processorResponse, processorServerResponse, processorAction, Frame } from '../types/draw';
+import { processorResponse, processorAction, Frame } from '../types/draw';
+
 const GRID_SIZE = 32;
 const PIXEL_SIZE = 8;
 const INITIAL_FRAME = 1;
@@ -32,8 +33,16 @@ const Drawing = () => {
 
         socket.onmessage = (event) => {
             const newData = JSON.parse(event.data) as processorResponse;
-            if (newData.action === processorServerResponse.FrameData) {
+
+            if (newData.action === "FrameData") {
                 saveFrame(newData.data.frame);
+            } else if (newData.action === "Error") {
+                console.error("Error:", newData.data.error);
+            } else if (newData.action === "UploadSuccess") {
+                // TODO: Redirect to post page
+
+                const urlToUpload = newData.data.urlBucket;
+                window.location.href = `/post?url=${encodeURIComponent(urlToUpload)}`;
             }
         };
 
@@ -55,17 +64,10 @@ const Drawing = () => {
     }
 
     useEffect(() => {
-        currentInterval = setInterval(drawFrameAnimation, MS_TIME);
+        setInterval(drawFrameAnimation, MS_TIME);
     })
 
-    const togglePause = () => {
-        if (currentInterval) {
-            clearInterval(currentInterval);
-        }
 
-        isRunning = false;
-        console.log("Paused", isRunning);
-    }
 
     const saveFrame = (frame: Frame) => {
         if (frame.frame_id == INITIAL_FRAME) {
@@ -120,7 +122,28 @@ const Drawing = () => {
 
     const handleRun = () => {
         if (ws && ws.readyState === WebSocket.OPEN) {
-            const packet = { action: processorAction.ProcessSourceCode, data: { source: source } } as processorRequest;
+            const packet = {
+                action: processorAction.ProcessSourceCode,
+                data: {
+                    source: source,
+                },
+            };
+
+            ws.send(JSON.stringify(packet));
+        } else {
+            console.warn("WebSocket no está conectado.");
+        }
+    };
+
+    const handlePost = () => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            const packet = {
+                action: processorAction.PostToBucket,
+                data: {
+                    source: source,
+                },
+            };
+
             ws.send(JSON.stringify(packet));
         } else {
             console.warn("WebSocket no está conectado.");
@@ -161,6 +184,10 @@ const Drawing = () => {
 
                     <button id="step" onClick={nextFrame}>
                         Step (+1)
+                    </button>
+
+                    <button id="Post" onClick={handlePost}>
+                        Post
                     </button>
                 </div>
             </div>
