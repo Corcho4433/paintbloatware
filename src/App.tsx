@@ -27,7 +27,7 @@ function App() {
               <Route path='/draw' element={<Drawing></Drawing>} />
               <Route path='/wiki' element={<WikiPage></WikiPage>} />
               <Route path='/user' element={<UserPage></UserPage>} />
-              <Route path='/post/:' element={<Upload></Upload>} />
+              <Route path='/upload' element={<Upload></Upload>} />
             </Routes>
 
           </BrowserRouter>

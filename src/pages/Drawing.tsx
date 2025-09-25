@@ -34,15 +34,16 @@ const Drawing = () => {
         socket.onmessage = (event) => {
             const newData = JSON.parse(event.data) as processorResponse;
 
+            // switch to enum later
             if (newData.action === "FrameData") {
                 saveFrame(newData.data.frame);
             } else if (newData.action === "Error") {
                 console.error("Error:", newData.data.error);
             } else if (newData.action === "UploadSuccess") {
-                // TODO: Redirect to post page
-
                 const urlToUpload = newData.data.urlBucket;
-                window.location.href = `/post?url=${encodeURIComponent(urlToUpload)}`;
+                sessionStorage.setItem("post_bucket_url", urlToUpload);
+                sessionStorage.setItem("post_source_code", source);
+                window.location.href = `/upload`;
             }
         };
 
@@ -151,7 +152,7 @@ const Drawing = () => {
         <div className="flex flex-col items-center">
           <canvas
             id="gridCanvas"
-            ref={canvasRef}
+            ref={canvasRef}     
             width={GRID_SIZE * PIXEL_SIZE}
             height={GRID_SIZE * PIXEL_SIZE}
             className="border-2 border-gray-700 rounded-lg mb-4 bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]"
