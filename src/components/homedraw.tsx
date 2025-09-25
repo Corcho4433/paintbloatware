@@ -234,7 +234,7 @@ const HomeDraw = () => {
   });
 
   const [selectedPost, setSelectedPost] = useState<any>(null);
-  const emptyArray = Array(6).fill(-1);
+  const emptyArray = Array(3).fill(-1);
 
   const handlePostPreview = (postIndex: number) => {
     if (posts?.posts?.[postIndex]) {
@@ -310,14 +310,14 @@ const HomeDraw = () => {
       );
     }
   };
-
+  //return (null)
   return (
-    <div className="p-4">
+    <div className="py-4">
       {/* Post Preview Modal */}
       {selectedPost && <PostModal post={selectedPost} onClose={closeModal} />}
 
       {/* Masonry Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center mt-7">
+      <div className="flex flex-wrap justify-evenly  w-full overflow-x-hidden mt-7">
         {!loading && posts?.posts ? !error && posts?.posts.map((_, index) => (
           <div
             onClick={() => handlePostPreview(index)}
@@ -330,7 +330,7 @@ const HomeDraw = () => {
           </div>
         )) : (
           emptyArray.map((_, index) => (
-            <div key={index} className="bg-gray-800 rounded-xl overflow-hidden hover:shadow-xl duration-300 w-[512px]">
+            <div key={index} className="bg-gray-800 rounded-xl hover:shadow-xl duration-300">
               <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
                 {renderContent(index)}
               </div>

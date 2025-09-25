@@ -4,7 +4,7 @@ const HomePage = () => {
   return (
     <div className="flex">
         <PaintSidebar />
-        <main className="flex-1 ml-0 min-h-screen bg-gray-900">
+        <main className="flex-1  ml-0 min-h-screen bg-gray-900">
             <HomeDraw />
         </main>
     </div>
