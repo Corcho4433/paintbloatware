@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { PostPage, Post, CreatePostRequest, PostResponse } from "../types/requests";
+import { PostPage, CreatePostRequest, PostResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
 
 interface UsePostsOptions {
@@ -205,10 +205,20 @@ export function usePosts(options: UsePostsOptions = {}) {
 
       // Add to current posts optimistically
       setPosts(prev => {
-        if (!prev) return { posts: [newPostResponse] };
+        if (!prev) {
+          // Provide default values for required PostPage properties
+          return {
+            posts: [newPostResponse],
+            totalPages: 1,
+            total: 1,
+            page: 1,
+            limit: 10,
+          };
+        }
         return {
           ...prev,
-          posts: [newPostResponse, ...prev.posts]
+          posts: [newPostResponse, ...prev.posts],
+          total: prev.total + 1,
         };
       });
 
