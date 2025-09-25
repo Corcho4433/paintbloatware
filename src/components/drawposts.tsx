@@ -171,7 +171,7 @@ const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () => void 
           </div>
 
           <div className="px-4 py-4 border-t border-gray-500 flex-1 overflow-y-auto">
-            <div className="space-y-1 overflow-scroll">
+            <div className="space-y-1 overflow-hidden">
               <div className="flex items-start space-x-3 mb-3">
                 <div className="w-8 h-8 shrink-0 bg-gray-600 rounded-full flex items-center justify-center">
                   <span className="text-white font-semibold text-sm">
