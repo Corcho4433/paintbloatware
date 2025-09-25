@@ -3,6 +3,7 @@ import { usePosts } from '../hooks/posts';
 import useInfiniteScroll from '../hooks/infinetescroll';
 import { PostResponse } from '../types/requests';
 import { Link } from 'react-router-dom';
+import { drawPosts } from './drawposts';
 
 // Modal component for post preview
 const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () => void }) => {
@@ -227,120 +228,10 @@ const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () => void 
 };
 
 const HomeDraw = () => {
-  const { posts, loading, error, loadMore, isLoadingMore } = usePosts();
-  const sentinelRef = useInfiniteScroll({
-    loadMore,
-    isLoading: isLoadingMore
-  });
 
-  const [selectedPost, setSelectedPost] = useState<any>(null);
-  const emptyArray = Array(3).fill(-1);
-
-  const handlePostPreview = (postIndex: number) => {
-    if (posts?.posts?.[postIndex]) {
-      setSelectedPost(posts.posts[postIndex]);
-    }
-  };
-
-  useEffect(() => {
-    if (selectedPost) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-
-    // Cleanup function to reset overflow when component unmounts
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [selectedPost]);
-
-  const closeModal = () => {
-    setSelectedPost(null);
-  };
-
-  const renderContent = (postID: number) => {
-    const currentPostIndex = postID;
-    if (loading) {
-      return (
-        <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700">
-          <div className="w-full h-full flex items-center justify-center text-white">
-            Loading...
-          </div>
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
-          {error instanceof Error ? error.message : "An error occurred while loading posts"}
-        </div>
-      );
-    }
-
-    if (currentPostIndex === null || !posts?.posts?.length) {
-      return (
-        <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white">
-          Loading post...
-        </div>
-      );
-    }
-
-    const currentPost = posts.posts[currentPostIndex];
-    if (!currentPost) {
-      return (
-        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
-          Post not found
-        </div>
-      );
-    } else {
-      return (
-        <img
-          src={currentPost.url_bucket}
-          alt="Post Image"
-          width={512}
-          height={512}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
-        />
-      );
-    }
-  };
+  
   //return (null)
-  return (
-    <div className="py-4">
-      {/* Post Preview Modal */}
-      {selectedPost && <PostModal post={selectedPost} onClose={closeModal} />}
-
-      {/* Masonry Grid */}
-      <div className="flex flex-wrap justify-evenly  w-full overflow-x-hidden mt-7">
-        {!loading && posts?.posts ? !error && posts?.posts.map((_, index) => (
-          <div
-            onClick={() => handlePostPreview(index)}
-            key={index}
-            className="bg-gray-800 rounded-xl overflow-hidden hover:shadow-xl duration-300 w-[512px] cursor-pointer"
-          >
-            <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
-              {renderContent(index)}
-            </div>
-          </div>
-        )) : (
-          emptyArray.map((_, index) => (
-            <div key={index} className="bg-gray-800 rounded-xl hover:shadow-xl duration-300">
-              <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
-                {renderContent(index)}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-      <div ref={sentinelRef}></div>
-    </div>
-  );
+  return drawPosts(usePosts);
 }
 
 export default HomeDraw;

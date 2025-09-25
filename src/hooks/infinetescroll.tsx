@@ -3,6 +3,7 @@ import { useEffect, useCallback, useRef } from 'react';
 interface UseInfiniteScrollProps {
   loadMore: () => void;
   isLoading: boolean;
+  max_pages?: number; // Optional maximum number of pages to load
   rootMargin?: string; // How far from the viewport to trigger (e.g., '200px')
 }
 
@@ -30,13 +31,7 @@ const useInfiniteScroll = ({
     if (entry.isIntersecting && !isLoading) {
 
       loadMoreRef.current();
-    } else {
-      const reasons = [];
-      if (!entry.isIntersecting) reasons.push('sentinel not visible');
-      if (isLoading) reasons.push('already loading');
-      
-      
-    }
+    } 
   }, [ isLoading]);
 
   useEffect(() => {
