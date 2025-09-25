@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import PaintSidebar from '../components/paintsidebar';
 import { processorResponse, processorAction, Frame } from '../types/draw';
+import styles from '../styles/drawing.module.css'; // Import the CSS module
 
 const GRID_SIZE = 32;
 const PIXEL_SIZE = 8;
@@ -31,21 +32,21 @@ const Drawing = () => {
       console.error("WebSocket Connection Error:", error);
     };
 
-        socket.onmessage = (event) => {
-            const newData = JSON.parse(event.data) as processorResponse;
+    socket.onmessage = (event) => {
+      const newData = JSON.parse(event.data) as processorResponse;
 
-            // switch to enum later
-            if (newData.action === "FrameData") {
-                saveFrame(newData.data.frame);
-            } else if (newData.action === "Error") {
-                console.error("Error:", newData.data.error);
-            } else if (newData.action === "UploadSuccess") {
-                const urlToUpload = newData.data.urlBucket;
-                sessionStorage.setItem("post_bucket_url", urlToUpload);
-                sessionStorage.setItem("post_source_code", source);
-                window.location.href = `/upload`;
-            }
-        };
+      // switch to enum later
+      if (newData.action === "FrameData") {
+        saveFrame(newData.data.frame);
+      } else if (newData.action === "Error") {
+        console.error("Error:", newData.data.error);
+      } else if (newData.action === "UploadSuccess") {
+        const urlToUpload = newData.data.urlBucket;
+        sessionStorage.setItem("post_bucket_url", urlToUpload);
+        sessionStorage.setItem("post_source_code", source);
+        window.location.href = `/upload`;
+      }
+    };
 
     setWs(socket);
 
@@ -63,11 +64,9 @@ const Drawing = () => {
     nextFrame();
   };
 
-    useEffect(() => {
-        setInterval(drawFrameAnimation, MS_TIME);
-    })
-
-
+  useEffect(() => {
+    setInterval(drawFrameAnimation, MS_TIME);
+  })
 
   const saveFrame = (frame: Frame) => {
     if (frame.frame_id == INITIAL_FRAME) {
@@ -115,78 +114,73 @@ const Drawing = () => {
     }
   };
 
-    const handleRun = () => {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            const packet = {
-                action: processorAction.ProcessSourceCode,
-                data: {
-                    source: source,
-                },
-            };
+  const handleRun = () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      const packet = {
+        action: processorAction.ProcessSourceCode,
+        data: {
+          source: source,
+        },
+      };
 
-            ws.send(JSON.stringify(packet));
-        } else {
-            console.warn("WebSocket no está conectado.");
-        }
-    };
+      ws.send(JSON.stringify(packet));
+    } else {
+      console.warn("WebSocket no está conectado.");
+    }
+  };
 
-    const handlePost = () => {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            const packet = {
-                action: processorAction.PostToBucket,
-                data: {
-                    source: source,
-                },
-            };
+  const handlePost = () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      const packet = {
+        action: processorAction.PostToBucket,
+        data: {
+          source: source,
+        },
+      };
 
-            ws.send(JSON.stringify(packet));
-        } else {
-            console.warn("WebSocket no está conectado.");
-        }
-    };
+      ws.send(JSON.stringify(packet));
+    } else {
+      console.warn("WebSocket no está conectado.");
+    }
+  };
 
   return (
-    <div className="flex">
+    <div className={styles.container}>
       <PaintSidebar />
-      <div className="flex-1 min-h-screen bg-gray-900">
-        <div className="flex flex-col items-center">
+      <div className={styles.content}>
+        <div className={styles.canvasContainer}>
           <canvas
             id="gridCanvas"
             ref={canvasRef}     
             width={GRID_SIZE * PIXEL_SIZE}
             height={GRID_SIZE * PIXEL_SIZE}
-            className="border-2 border-gray-700 rounded-lg mb-4 bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]"
+            className={styles.canvas}
           />
 
           <textarea
             id="source"
             value={source}
             onChange={(e) => setSource(e.target.value)}
-            className="bg-gray-800 rounded-lg p-2 mb-4"
-            style={{
-              width: "500px",
-              height: "200px",
-              display: "block",
-              marginBottom: "1rem",
-            }}
+            className={styles.textarea}
           />
 
-          <button id="run" onClick={handleRun}>
-            Run code
-          </button>
+          <div className={styles.buttonsContainer}>
+            <button id="run" onClick={handleRun} className={styles.runButton}>
+              Run code
+            </button>
 
-                    <button id="step" onClick={nextFrame}>
-                        Step (+1)
-                    </button>
+            <button id="step" onClick={nextFrame} className={styles.stepButton}>
+              Step (+1)
+            </button>
 
-                    <button id="Post" onClick={handlePost}>
-                        Post
-                    </button>
-                </div>
-            </div>
+            <button id="Post" onClick={handlePost} className={styles.postButton}>
+              Post
+            </button>
+          </div>
         </div>
-    );
-
+      </div>
+    </div>
+  );
 }
 
 export default Drawing;
