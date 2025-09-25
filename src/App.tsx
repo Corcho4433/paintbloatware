@@ -26,7 +26,7 @@ function App() {
               <Route path='/fastdraws' element={<FastDraws></FastDraws>} />
               <Route path='/draw' element={<Drawing></Drawing>} />
               <Route path='/wiki' element={<WikiPage></WikiPage>} />
-              <Route path='/user' element={<UserPage></UserPage>} />
+              <Route path='/user/:id' element={<UserPage></UserPage>} />
               <Route path='/upload' element={<Upload></Upload>} />
             </Routes>
 

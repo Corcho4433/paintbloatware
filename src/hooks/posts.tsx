@@ -1,18 +1,20 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { PostPage, Post, CreatePostRequest, PostResponse } from "../types/requests";
+import { PostPage, CreatePostRequest, PostResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
 
 interface UsePostsOptions {
   initialPage?: number;
   autoRefresh?: boolean;
   refreshInterval?: number; // in milliseconds
+  userId?: string; 
 }
 
 export function usePosts(options: UsePostsOptions = {}) {
   const { 
     initialPage = 1, 
     autoRefresh = false, 
-    refreshInterval = 30000 // 30 seconds default
+    refreshInterval = 30000, // 30 seconds default
+    userId = null
   } = options;
 
   const [posts, setPosts] = useState<PostPage | null>(null);
@@ -39,8 +41,13 @@ export function usePosts(options: UsePostsOptions = {}) {
     }
     
     abortControllerRef.current = new AbortController();
-
-    const res = await fetch(serverPath + `/api/posts?page=${page}`, {
+    
+    // Add userId to URL if provided
+    const url = userId 
+      ? `${serverPath}/api/posts/user/${userId}?page=${page}`
+      : `${serverPath}/api/posts?page=${page}`;
+    
+    const res = await fetch(url, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -54,7 +61,7 @@ export function usePosts(options: UsePostsOptions = {}) {
     pageCache.set(page, data);
     
     return data;
-  }, [pageCache]);
+  }, [pageCache, userId]); // Add userId to dependencies
 
   const load = useCallback(async (page: number = currentPage, isRefresh: boolean = false) => {
     try {
@@ -198,10 +205,20 @@ export function usePosts(options: UsePostsOptions = {}) {
 
       // Add to current posts optimistically
       setPosts(prev => {
-        if (!prev) return { posts: [newPostResponse] };
+        if (!prev) {
+          // Provide default values for required PostPage properties
+          return {
+            posts: [newPostResponse],
+            totalPages: 1,
+            total: 1,
+            page: 1,
+            limit: 10,
+          };
+        }
         return {
           ...prev,
-          posts: [newPostResponse, ...prev.posts]
+          posts: [newPostResponse, ...prev.posts],
+          total: prev.total + 1,
         };
       });
 
