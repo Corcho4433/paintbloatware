@@ -10,6 +10,12 @@ const INITIAL_FRAME = 1;
 const FRAME_RATE = 60;
 
 const MS_TIME = (1 / FRAME_RATE) * 10000;
+const example_text = `local max = 31
+for x = 0, max do
+    for y = 0, max do
+      grid:set_pixel(x, y, 0, 255 - x*8, y*8)
+    end
+end\n`;
 
 const Drawing = () => {
   const fullFrameAnimation: Map<number, Frame> = new Map();
@@ -20,7 +26,7 @@ const Drawing = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ws, setWs] = useState<WebSocket | null>(null);
-  const [source, setSource] = useState("");
+  const [source, setSource] = useState(example_text);
 
   // Establece conexión WebSocket
   useEffect(() => {
