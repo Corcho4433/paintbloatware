@@ -10,14 +10,36 @@
 
 .canvasContainer {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  align-items: top;
   padding-top: 3vh;
+}
+
+.previewContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+    margin-left: 3rem;
+}
+
+.editorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+    margin-left: 3rem;
+}
+
+.sectionTitle {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.25;
+  font-size: 3vh;
+  color: #ffffff;
+  font-weight: 600;
+  padding-bottom: 3vh;
 }
 
 .canvas {
   border: 1px solid #374151;
-  margin-bottom: 1rem;
   background: #111111;
   width: 512px;
   height: 512px;
@@ -25,17 +47,24 @@
 
 .textarea {
   background-color: #1f2937;
-  border-radius: 0.5rem;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
+  border-radius: 0.1rem;
   width: 500px;
-  height: 200px;
+  height: 256px;
   display: block;
+}
+
+canvas {
+    image-rendering: optimizeSpeed;            
+    image-rendering: -moz-crisp-edges;          
+    image-rendering: -webkit-optimize-contrast; 
+    image-rendering: -o-crisp-edges;            
+    image-rendering: crisp-edges;               
 }
 
 .buttonsContainer {
   display: flex;
   gap: 0.5rem;
+  padding-top: 5vh;
 }
 
 .button {
@@ -47,6 +76,7 @@
   cursor: pointer;
   transition: color 0.3s ease-out;
   transition: transform 0.41s cubic-bezier(0.05,0.38,0.00,1.55);
+  transition: padding 0.41s ease-out;
 }
 
 .button:hover {
@@ -54,6 +84,8 @@
   transform: scale(1.1);
   transition: background-color 0.3s ease-out;
   transition: transform 0.41s cubic-bezier(0.05,0.38,0.00,1.76);
+  transition: padding 0.41s cubic-bezier(0.05,0.38,0.00,2.5);
+  padding: 0.5rem 1.25rem;
 }
 
 .runButton {
