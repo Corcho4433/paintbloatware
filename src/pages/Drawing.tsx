@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import PaintSidebar from '../components/paintsidebar';
 import { processorResponse, processorAction, Frame } from '../types/draw';
-import styles from '../styles/drawing.module.css'; // Import the CSS module
-import { textareaTheme } from 'flowbite-react';
+import styles from '../styles/drawing.module.css';
 
 const GRID_SIZE = 32;
 const PIXEL_SIZE = 8;
 const INITIAL_FRAME = 1;
-const FRAME_RATE = 60;
+const FRAME_RATE = 24;
 
-const MS_TIME = (1 / FRAME_RATE) * 10000;
+const MS_TIME = (1 / FRAME_RATE) * 1000; // Fixed: should be 1000, not 10000
 const example_text = `local max = 31
 for x = 0, max do
     for y = 0, max do
@@ -18,19 +17,19 @@ for x = 0, max do
 end\n`;
 
 const Drawing = () => {
-  const fullFrameAnimation: Map<number, Frame> = new Map();
-  let currentFrame = INITIAL_FRAME;
-  let currentInterval: number = 0;
-  let isRunning = true;
+  const fullFrameAnimation = useRef<Map<number, Frame>>(new Map());
+  const currentFrame = useRef(INITIAL_FRAME);
+  const animationInterval = useRef<NodeJS.Timeout | null>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [source, setSource] = useState(example_text);
+  const [isRunning, setIsRunning] = useState(false);
 
-  // Establece conexión WebSocket
+  // WebSocket connection
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8080/ws"); // Cambiar por tu URL
+    const socket = new WebSocket("ws://localhost:8080/ws");
 
     socket.onopen = () => {
       console.log("Connected to server");
@@ -43,7 +42,6 @@ const Drawing = () => {
     socket.onmessage = (event) => {
       const newData = JSON.parse(event.data) as processorResponse;
 
-      // switch to enum later
       if (newData.action === "FrameData") {
         saveFrame(newData.data.frame);
       } else if (newData.action === "Error") {
@@ -56,69 +54,122 @@ const Drawing = () => {
       }
     };
 
+    drawFrame();
     setWs(socket);
 
     return () => {
       socket.close();
+      stopAnimation(); // Clean up interval on unmount
     };
   }, []);
 
-  
-
-  const handleAlternativeInputs = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Tab') {
-          e.preventDefault();
-
-          const textarea = textareaRef.current;
-          if (!textarea) return;
-
-          const start = textarea.selectionStart;
-          const end = textarea.selectionEnd;
-          const currentValue = textarea.value;
-
-          const editedSource = currentValue.substring(0, start) + '    ' +        currentValue.substring(end);
-        
-          setSource(editedSource);
-
-          if (textareaRef.current) {
-            const newPos = start + 2;
-            textareaRef.current.selectionStart = newPos;
-            textareaRef.current.selectionEnd = newPos;
-          }
-      }
-  };
-
-  const drawFrameAnimation = () => {
-    if (fullFrameAnimation.size <= 0) return;
-    if (!isRunning) return;
-
-    console.log("Is running?", isRunning);
-
-    nextFrame();
-  };
-
+  // Fix: Proper interval management
   useEffect(() => {
-    setInterval(drawFrameAnimation, MS_TIME);
-  })
-
-  const saveFrame = (frame: Frame) => {
-    if (frame.frame_id == INITIAL_FRAME) {
-      fullFrameAnimation.clear();
+    if (isRunning) {
+      startAnimation();
+    } else {
+      stopAnimation();
     }
 
-    fullFrameAnimation.set(frame.frame_id, frame);
+    return () => {
+      stopAnimation();
+    };
+  }, [isRunning]);
+
+  const startAnimation = () => {
+    stopAnimation(); // Clear any existing interval
+    animationInterval.current = setInterval(nextFrame, MS_TIME);
+  };
+
+  const stopAnimation = () => {
+    if (animationInterval.current) {
+      clearInterval(animationInterval.current);
+      animationInterval.current = null;
+    }
+  };
+
+  const handleAlternativeInputs = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+
+      const textarea = textareaRef.current;
+      if (!textarea) return;
+
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const currentValue = textarea.value;
+
+      const editedSource = currentValue.substring(0, start) + '    ' + currentValue.substring(end);
+      
+      setSource(editedSource);
+
+      // Fix: Use setTimeout to ensure DOM is updated
+      setTimeout(() => {
+        if (textareaRef.current) {
+          const newPos = start + 4; // Fixed: 4 spaces for tab
+          textareaRef.current.selectionStart = newPos;
+          textareaRef.current.selectionEnd = newPos;
+        }
+      }, 0);
+    }
+  };
+
+  const saveFrame = (frame: Frame) => {
+    if (frame.frame_id === INITIAL_FRAME) {
+      fullFrameAnimation.current.clear();
+    }
+
+    fullFrameAnimation.current.set(frame.frame_id, frame);
   };
 
   const nextFrame = () => {
-    if (fullFrameAnimation.size > 0) {
-      currentFrame++;
+    if (fullFrameAnimation.current.size > 0) {
+      currentFrame.current++;
 
-      if (currentFrame > fullFrameAnimation.size) {
-        currentFrame = INITIAL_FRAME;
+      if (currentFrame.current > fullFrameAnimation.current.size) {
+        currentFrame.current = INITIAL_FRAME;
       }
+      
+      console.log("current frame: ", currentFrame.current);
 
-      if (!fullFrameAnimation.has(currentFrame)) return;
-      drawFrame(fullFrameAnimation.get(currentFrame) as Frame);
+      if (!fullFrameAnimation.current.has(currentFrame.current)) return;
+      drawFrame(fullFrameAnimation.current.get(currentFrame.current) as Frame);
+    }
+  };
+
+  const handleRun = () => {
+    setIsRunning(true); // Start animation when running code
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      const packet = {
+        action: processorAction.ProcessSourceCode,
+        data: {
+          source: source,
+        },
+      };
+
+      ws.send(JSON.stringify(packet));
+    } else {
+      console.warn("WebSocket no está conectado.");
+    }
+  };
+
+  const handleStep = () => {
+    setIsRunning(false); // Stop automatic animation
+    nextFrame(); // Manual step
+  };
+
+  const handlePost = () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      const packet = {
+        action: processorAction.PostToBucket,
+        data: {
+          source: source,
+        },
+      };
+
+      ws.send(JSON.stringify(packet));
+    } else {
+      console.warn("WebSocket no está conectado.");
     }
   };
 
@@ -151,38 +202,6 @@ const Drawing = () => {
     }
   };
 
-  const handleRun = () => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      const packet = {
-        action: processorAction.ProcessSourceCode,
-        data: {
-          source: source,
-        },
-      };
-
-      ws.send(JSON.stringify(packet));
-    } else {
-      console.warn("WebSocket no está conectado.");
-    }
-  };
-
-  const handlePost = () => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      const packet = {
-        action: processorAction.PostToBucket,
-        data: {
-          source: source,
-        },
-      };
-
-      ws.send(JSON.stringify(packet));
-    } else {
-      console.warn("WebSocket no está conectado.");
-    }
-  };
-
-  drawFrame();
-
   return (
     <div className={styles.container}>
       <PaintSidebar />
@@ -203,7 +222,7 @@ const Drawing = () => {
                 Run code
               </button>
 
-              <button id="step" onClick={nextFrame} className={styles.stepButton}>
+              <button id="step" onClick={handleStep} className={styles.stepButton}>
                 Step
               </button>
 
