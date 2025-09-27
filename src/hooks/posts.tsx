@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { PostPage, Post, CreatePostRequest, PostResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
+import { NoMoreDataAvailableError } from "../types/errors";
 
 interface UsePostsOptions {
   initialPage?: number;
@@ -54,9 +55,16 @@ export function usePosts(options: UsePostsOptions = {}) {
       signal: abortControllerRef.current.signal,
     });
 
+    
+
     if (!res.ok) throw new Error(`Failed to fetch posts: ${res.statusText}`);
     const data: PostPage = await res.json();
     
+    console.log("data.maxPages", data);
+    if (data.currentPage >= data.maxPages) {
+      console.log("No more pages available");
+      throw new NoMoreDataAvailableError("No more pages available");
+    }
     // Cache the result
     pageCache.set(page, data);
     
@@ -170,7 +178,12 @@ export function usePosts(options: UsePostsOptions = {}) {
         setCurrentPage(prev => prev + 1);
       }
     } catch (err) {
-      setError(err as Error);
+      if (err instanceof NoMoreDataAvailableError) {
+        // Don't set this as an error state, it's expected behavior
+        console.log("Reached end of posts");
+      } else {
+        setError(err as Error);
+      }
     } finally {
       setIsLoadingMore(false);
     }
@@ -205,10 +218,18 @@ export function usePosts(options: UsePostsOptions = {}) {
 
       // Add to current posts optimistically
       setPosts(prev => {
-        if (!prev) return { posts: [newPostResponse] };
+        if (!prev) {
+          return {
+            posts: [newPostResponse],
+            maxPages: 1,
+            currentPage: 1,
+            totalCount: 1,
+          };
+        }
         return {
           ...prev,
-          posts: [newPostResponse, ...prev.posts]
+          posts: [newPostResponse, ...prev.posts],
+          totalCount: prev.totalCount + 1,
         };
       });
 

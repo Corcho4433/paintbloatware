@@ -84,4 +84,4 @@ export interface RegisterUserResponse {
     email: string
 }
 
-export type PostPage = { posts: PostResponse[] }
+export type PostPage = {maxPages : number, currentPage: number,totalCount : number, posts: PostResponse[] }

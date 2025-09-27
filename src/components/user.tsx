@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 const UserPage = () => {
   const { id } = useParams<{ id: string }>();
   const {user,loading,error} = useUser(id || "");
-  const renderedPosts = drawPosts(usePosts, id);
+  const renderedPosts = drawPosts({ userId: id });
 
   const renderSkeleton = () => (
     <div className="p-4">
