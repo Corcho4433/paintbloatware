@@ -30,8 +30,9 @@ export default function Upload() {
         }
     };
 
+
     return (
-        <div>
+        <div className='flex'>
             <p>Image URL: {savedUrl}</p>
             <p>Source Code: {sourceCode}</p>
             <button onClick={handlePost} disabled={!savedUrl}>

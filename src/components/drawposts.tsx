@@ -111,25 +111,26 @@ export const drawPosts = (options : UsePostsOptions, userId : string | undefined
 
       {/* Masonry Grid */}
       <div className="flex flex-wrap justify-evenly  w-full overflow-x-hidden mt-7">
-        {!loading && posts?.posts ? !error && posts?.posts.map((_, index) => (
-          <div
-            onClick={() => handlePostPreview(index)}
-            key={index}
-            className="bg-gray-800 rounded-xl overflow-hidden hover:shadow-xl duration-300 w-[512px] cursor-pointer"
-          >
-            <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
-              {renderContent(index)}
-            </div>
-          </div>
-        )) : (
-          emptyArray.map((_, index) => (
-            <div key={index} className="bg-gray-800 rounded-xl hover:shadow-xl duration-300">
+        {!loading && !error && posts?.posts?.length ? 
+          posts.posts.map((_, index) => (
+            <div
+              onClick={() => handlePostPreview(index)}
+              key={index}
+              className="bg-gray-800 rounded-xl overflow-hidden hover:shadow-xl duration-300 w-[512px] cursor-pointer"
+            >
               <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
                 {renderContent(index)}
               </div>
             </div>
-          ))
-        )}
+          )) : (
+            emptyArray.map((_, index) => (
+              <div key={index} className="bg-gray-800 rounded-xl hover:shadow-xl duration-300">
+                <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
+                  {renderContent(index)}
+                </div>
+              </div>
+            ))
+          )}
       </div>
       <div ref={sentinelRef}></div>
     </div>

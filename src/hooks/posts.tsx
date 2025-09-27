@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { PostPage, Post, CreatePostRequest, PostResponse } from "../types/requests";
+import { PostPage, CreatePostRequest, PostResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
 import { NoMoreDataAvailableError } from "../types/errors";
 
