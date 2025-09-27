@@ -167,7 +167,7 @@ const FastDraws = () => {
     <div className="flex overflow-y-hidden">
       <PaintSidebar />
 
-      <section className="flex-1 ml-0 min-h-screen w-full h-full bg-gray-300 dark:bg-gray-900 flex items-center justify-center px-6 flex-col space-y-4">
+      <section className="flex-1 ml-0 min-h-screen w-full h-full bg-gray-900 flex items-center justify-center px-6 flex-col space-y-4">
         <div className="flex relative">
           <div className={`flex flex-col ${animations[isAnimating ? 'out' : 'in']}`}>
             <section className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
@@ -177,18 +177,18 @@ const FastDraws = () => {
             </section>
 
             <div className="flex w-[30%] mt-3 gap-2 bg-gray-700 p-2 rounded-xl justify-center mx-auto">
-              <Button onClick={isAnimating ? undefined : handleReactionClick} className="group px-6 !bg-white dark:!bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-green-500 hover:!border-green-500">
+              <Button onClick={isAnimating ? undefined : handleReactionClick} className="group px-6 !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-green-500 hover:!border-green-500">
                 <Laugh color={"white"} className={photoIcon} />
               </Button>
 
-              <Button onClick={isAnimating ? undefined : handleReactionClick} className="group !bg-white dark:!bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-red-800 hover:!border-red-800">
+              <Button onClick={isAnimating ? undefined : handleReactionClick} className="group  !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-red-800 hover:!border-red-800">
                 <Angry color={"white"} className={photoIcon} />
               </Button>
             </div>
           </div>
 
           <section className="absolute right-[0px] translate-x-3/2 translate-y-2/4 h-[200px] justify-around flex flex-col bg-gray-800 p-2 rounded-xl">
-            <Button className="group focus:outline-none focus:ring-0 !bg-white  dark:!bg-black !border-2 focus:!border-white hover:!border-white  aspect-square !p-0 h-12">
+            <Button className="group focus:outline-none focus:ring-0   !bg-black !border-2 focus:!border-white hover:!border-white  aspect-square !p-0 h-12">
               <MessageCircle
                 color={"white"}
                 className={photoIcon}
@@ -196,11 +196,11 @@ const FastDraws = () => {
             </Button>
             <Button
               onClick={handleShareClick}
-              className="group focus:outline-none !bg-white dark:!bg-black !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12"
+              className="group focus:outline-none !bg-black !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12"
             >
               <Send color={"white"} className={photoIcon} />
             </Button>
-            <Button className="group focus:outline-none !bg-white  dark:!bg-black !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12">
+            <Button className="group focus:outline-none !bg-black  !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12">
               <EllipsisVertical
                 color={"white"}
                 className={photoIcon}

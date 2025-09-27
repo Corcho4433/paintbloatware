@@ -1,4 +1,3 @@
-import { usePosts } from '../hooks/posts';
 import { useUser } from '../hooks/user';
 import { drawPosts } from './drawposts';
 import { useParams } from 'react-router-dom';
