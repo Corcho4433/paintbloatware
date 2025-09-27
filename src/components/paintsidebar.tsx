@@ -40,6 +40,7 @@ const PaintSidebar = () => {
           rounded-r-2xl md:rounded-2xl
           z-40 shadow-xl bg-gray-800
           flex flex-col justify-between
+          [&>div]:!bg-gray-800
         `}
       >
         {/* Logo → Clickable to go Home */}
@@ -182,11 +183,11 @@ const PaintSidebar = () => {
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className={`
-              flex items-center justify-center p-2 rounded-lg hover:bg-gray-600 transition
+              flex items-center justify-center p-2 rounded-lg hover:!bg-gray-600 transition
               ${
                 isCollapsed
-                  ? "w-10 h-10 mx-auto bg-gray-700"
-                  : "w-full bg-gray-700"
+                  ? "w-10 h-10 mx-auto !bg-gray-700"
+                  : "w-full !bg-gray-700"
               }
             `}
           >
