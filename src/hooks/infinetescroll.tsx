@@ -1,4 +1,5 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
+import { NoMoreDataAvailableError } from '../types/errors';
 
 interface UseInfiniteScrollProps {
   loadMore: () => void;
@@ -14,6 +15,7 @@ const useInfiniteScroll = ({
 }: UseInfiniteScrollProps) => {
   const loadMoreRef = useRef(loadMore);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const [noMoreData, setNoMoreData] = useState(false);
   
   
   // Update ref when loadMore changes to avoid stale closures
@@ -28,11 +30,20 @@ const useInfiniteScroll = ({
     
     
     // Only load more if sentinel is visible, we have next page, and not currently loading
-    if (entry.isIntersecting && !isLoading) {
-
-      loadMoreRef.current();
-    } 
-  }, [ isLoading]);
+    if (entry.isIntersecting && !isLoading && !noMoreData) {
+      try {
+        loadMoreRef.current();
+      } catch (error) {
+        if (error instanceof NoMoreDataAvailableError) {
+          setNoMoreData(true);
+          loadMoreRef.current = () => {}; // Disable further loading
+          console.error("No more data available:", error);
+        } else {
+          console.error("Error loading more posts:", error);
+        }
+      }
+    }
+  }, [isLoading, noMoreData]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;

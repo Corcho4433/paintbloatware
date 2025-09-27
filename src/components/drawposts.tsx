@@ -1,5 +1,6 @@
 import { PostPage } from "../types/requests";
 import { useState, useEffect } from 'react';
+import { usePosts } from '../hooks/posts';
 import useInfiniteScroll from '../hooks/infinetescroll';
 import { PostResponse } from '../types/requests';
 import { Link } from 'react-router-dom';
@@ -19,7 +20,7 @@ interface UsePostsOptions {
   userId?: string; 
 }
 
-export const drawPosts = (usePosts : (options : UsePostsOptions) => UsePostsResult, userId : string | undefined = "") => {
+export const drawPosts = (options : UsePostsOptions, userId : string | undefined = "") => {
     const { posts, loading, error, loadMore, isLoadingMore } = usePosts({ userId: userId });
     const sentinelRef = useInfiniteScroll({
     loadMore,

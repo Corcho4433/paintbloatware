@@ -1,10 +1,13 @@
-import { usePosts } from '../hooks/posts';
+
 import { drawPosts } from './drawposts';
+// Modal component for post preview
 
 
 const HomeDraw = () => {
-  const renderedPosts = drawPosts(usePosts);
-  return renderedPosts;
+
+  
+  //return (null)
+  return drawPosts({});
 }
 
 export default HomeDraw;
