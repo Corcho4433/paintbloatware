@@ -177,11 +177,11 @@ const FastDraws = () => {
             </section>
 
             <div className="flex w-[30%] mt-3 gap-2 bg-gray-700 p-2 rounded-xl justify-center mx-auto">
-              <Button onClick={isAnimating ? undefined : handleReactionClick} className="group px-6 !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-green-500 hover:!border-green-500">
+              <Button onClick={isAnimating ? undefined : handleReactionClick} className="group cursor-pointer !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-green-500 hover:!border-green-500">
                 <Laugh color={"white"} className={photoIcon} />
               </Button>
 
-              <Button onClick={isAnimating ? undefined : handleReactionClick} className="group  !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-red-800 hover:!border-red-800">
+              <Button onClick={isAnimating ? undefined : handleReactionClick} className="group cursor-pointer  !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-red-800 hover:!border-red-800">
                 <Angry color={"white"} className={photoIcon} />
               </Button>
             </div>

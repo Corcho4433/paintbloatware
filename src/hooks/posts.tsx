@@ -55,21 +55,16 @@ export function usePosts(options: UsePostsOptions = {}) {
       signal: abortControllerRef.current.signal,
     });
 
-    
-
     if (!res.ok) throw new Error(`Failed to fetch posts: ${res.statusText}`);
     const data: PostPage = await res.json();
     
     console.log("data.maxPages", data);
-    if (data.currentPage >= data.maxPages) {
-      console.log("No more pages available");
-      throw new NoMoreDataAvailableError("No more pages available");
-    }
+    
     // Cache the result
     pageCache.set(page, data);
     
     return data;
-  }, [pageCache, userId]); // Add userId to dependencies
+  }, [pageCache, userId]);
 
   const load = useCallback(async (page: number = currentPage, isRefresh: boolean = false) => {
     try {
@@ -167,6 +162,12 @@ export function usePosts(options: UsePostsOptions = {}) {
   const loadMore = useCallback(async () => {
     if (isLoadingMore || !posts?.posts?.length) return;
 
+    // Check if we're already at the last page
+    if (posts && currentPage >= posts.maxPages) {
+      console.log("No more pages available");
+      return;
+    }
+
     setIsLoadingMore(true);
     try {
       const nextPageData = await fetchPosts(currentPage + 1, false);
@@ -178,12 +179,7 @@ export function usePosts(options: UsePostsOptions = {}) {
         setCurrentPage(prev => prev + 1);
       }
     } catch (err) {
-      if (err instanceof NoMoreDataAvailableError) {
-        // Don't set this as an error state, it's expected behavior
-        console.log("Reached end of posts");
-      } else {
-        setError(err as Error);
-      }
+      setError(err as Error);
     } finally {
       setIsLoadingMore(false);
     }
