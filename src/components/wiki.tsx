@@ -16,19 +16,19 @@ const WikiSidebar = ({ selected, setSelected, articles, animateSidebar }) => (
       ${animateSidebar ? "translate-x-0" : "-translate-x-full"}
     `}
   >
-    <Sidebar className="w-64 h-screen rounded-r-2xl z-40 shadow-xl bg-gray-800">
+    <Sidebar className="[&>div]:!bg-gray-800 w-64 h-screen rounded-r-2xl z-40 shadow-xl !bg-gray-800">
       <div className="flex flex-col items-center p-4">
         <BookOpen className="w-10 h-10 text-white mb-2" />
         <h2 className="text-lg font-semibold text-white mb-4 text-center">
           Paintbloat official wiki
         </h2>
       </div>
-      <SidebarItemGroup className="space-y-2">
+      <SidebarItemGroup className="space-y-2 bg-gray-800">
         {Object.keys(articles).map((title) => (
           <SidebarItem
             key={title}
-            className={`hover:bg-gray-600 rounded-lg transition-colors ${
-              selected === title ? "bg-gray-600 text-white" : ""
+            className={`!hover:bg-gray-600 rounded-lg transition-colors ${
+              selected === title ? "!bg-gray-600 text-white" : ""
             }`}
             onClick={() => setSelected(title)}
           >
@@ -77,7 +77,7 @@ const Wiki = () => {
   }, []);
 
   return (
-    <section className="flex gap-6 min-h-screen w-full p-6 bg-gray-800 rounded-lg shadow-md">
+    <section className="flex gap-6 min-h-screen w-full p-6 !bg-gray-800 rounded-lg shadow-md">
       <WikiSidebar
         selected={selected}
         setSelected={setSelected}
@@ -86,7 +86,7 @@ const Wiki = () => {
       />
       <div
         className={`
-          flex-1 text-gray-200 transition-transform duration-500
+          flex-1 text-gray-200 transition-transform duration-500 z-10
           ${
             animateContent
               ? "translate-x-0 opacity-100"

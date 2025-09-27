@@ -38,14 +38,15 @@ const PaintSidebar = () => {
                     ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
                     rounded-r-2xl md:rounded-2xl
                     z-40 shadow-xl
-                    bg-gray-800
+                    !bg-gray-800
+                    [&>div]:!bg-gray-800
                 `}
             >
                 <div className="flex justify-center p-4">
                     <img src="/logo2.png" alt="logo-sidebar" className="w-50 h-50" />
                 </div>
                 
-                <SidebarItemGroup className="space-y-2">
+                <SidebarItemGroup className="space-y-2 !bg-gray-800">
                     <SidebarItem className="hover:bg-gray-700 rounded-lg transition-colors">
                         <Link to={"/home"} className="flex items-center w-full p-2">
                             <House className="w-5 h-5 md:w-6 md:h-6 mr-3" />
