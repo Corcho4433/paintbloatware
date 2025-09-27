@@ -12,6 +12,11 @@ interface AuthStore {
     user: User | null;
     setUser: (user: User) => void;
     logout: () => Promise<void>;
+    // Sidebar state
+    isMobileSidebarOpen: boolean;
+    isDesktopSidebarCollapsed: boolean;
+    setMobileSidebarOpen: (isOpen: boolean) => void;
+    setDesktopSidebarCollapsed: (isCollapsed: boolean) => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -19,6 +24,11 @@ export const useAuthStore = create<AuthStore>()(
         (set) => ({
             user: null,
             setUser: (user: User) => set({ user }),
+            // Sidebar state
+            isMobileSidebarOpen: false,
+            isDesktopSidebarCollapsed: false,
+            setMobileSidebarOpen: (isOpen: boolean) => set({ isMobileSidebarOpen: isOpen }),
+            setDesktopSidebarCollapsed: (isCollapsed: boolean) => set({ isDesktopSidebarCollapsed: isCollapsed }),
             logout: async () => {
                 try {
                     console.log("Logging out user:", useAuthStore.getState().user);
