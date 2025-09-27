@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PaintSidebar from '../components/paintsidebar';
 import styles from "../styles/upload.module.css"
+import { serverPath } from '../utils/servers';
+import Cookies from 'js-cookie';  // Import if not already done
 
 function fetchTags() {
-    return ["Anime", "Fiction", "Landscape", "Linux"]; 
+    return ["Anime", "Fiction", "Landscape", "Linux"];
 }
 
 export default function Upload() {
@@ -32,8 +34,36 @@ export default function Upload() {
 
     const handlePost = async () => {
         if (savedUrl) {
-            // to be edited
-            
+            const sentPacket = {
+                image: savedUrl,
+                description: "",
+                source: sourceCode,
+                tags: selectedTags,
+            }
+
+            const myCookie = await Cookies.get("session_token")?.normalize();
+            console.log(document.cookie, myCookie);
+
+            fetch(serverPath + "/api/posts", {
+                method: 'POST',
+                headers: {
+                    'authorization': "Bearer " + myCookie,
+                    'Content-Type': 'application/json', 
+
+                },
+                body: JSON.stringify(sentPacket),
+                credentials: 'include',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Posted data: ', data);
+                    /*
+                    sessionStorage.removeItem("post_bucket_url");
+                    sessionStorage.removeItem("post_source_code");*/
+                })
+                .catch(error => {
+                    console.error('Error posting data: ', error);
+                });
         }
     };
 
@@ -59,7 +89,7 @@ export default function Upload() {
                     <div className={styles.imgpreview}>
                         <img
                             width={512}
-                            height={512} 
+                            height={512}
                             src={savedUrl}
                             alt="Preview"
                         />
@@ -83,7 +113,7 @@ export default function Upload() {
                 <div className={styles.container}>
                     <p className={styles.edit_post_text_label}>Description</p>
                     <textarea className={styles.post_description_area} />
-                    
+
                     <p className={styles.edit_post_text_label}>Tags</p>
                     <div className={styles.tags_container}>
                         {availableTags.map(tag => (
