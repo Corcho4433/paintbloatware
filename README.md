@@ -4,7 +4,6 @@ Tareas para gazo:
 
 - Hook de comentarios con paginacion e infinite scrolling
 - Hook para los likes y todo eso
-- Hook para los usuarios
 
 Tareas para corsa y malva:
 

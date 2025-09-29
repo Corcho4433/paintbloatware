@@ -188,7 +188,7 @@ const FastDraws = () => {
           </div>
 
           <section className="absolute right-[0px] translate-x-3/2 translate-y-2/4 h-[200px] justify-around flex flex-col bg-gray-800 p-2 rounded-xl">
-            <Button className="group focus:outline-none focus:ring-0   !bg-black !border-2 focus:!border-white hover:!border-white  aspect-square !p-0 h-12">
+            <Button className="cursor-pointer group focus:outline-none focus:ring-0   !bg-black !border-2 focus:!border-white hover:!border-white  aspect-square !p-0 h-12">
               <MessageCircle
                 color={"white"}
                 className={photoIcon}
@@ -196,11 +196,11 @@ const FastDraws = () => {
             </Button>
             <Button
               onClick={handleShareClick}
-              className="group focus:outline-none !bg-black !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12"
+              className="cursor-pointer group focus:outline-none !bg-black !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12"
             >
               <Send color={"white"} className={photoIcon} />
             </Button>
-            <Button className="group focus:outline-none !bg-black  !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12">
+            <Button className="cursor-pointer group focus:outline-none !bg-black  !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12">
               <EllipsisVertical
                 color={"white"}
                 className={photoIcon}

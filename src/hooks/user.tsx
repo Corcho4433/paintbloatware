@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 // Define the type for user response
 type UserResponse = {
   name: string;
+  userPfp?: string;
+  description?: string;
   // Add more fields as they become available from the server
 };
 
