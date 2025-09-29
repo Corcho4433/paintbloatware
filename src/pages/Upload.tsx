@@ -41,13 +41,13 @@ export default function Upload() {
                 tags: selectedTags,
             }
 
-            const myCookie = await Cookies.get("session_token")?.normalize();
-            console.log(document.cookie, myCookie);
+            
+
 
             fetch(serverPath + "/api/posts", {
                 method: 'POST',
                 headers: {
-                    'authorization': "Bearer " + myCookie,
+
                     'Content-Type': 'application/json', 
 
                 },
