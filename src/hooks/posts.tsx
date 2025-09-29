@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { PostPage, CreatePostRequest, PostResponse } from "../types/requests";
+import { PostPage, CreatePostRequest, PostResponse, PostIDResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
 import { NoMoreDataAvailableError } from "../types/errors";
 
@@ -8,6 +8,41 @@ interface UsePostsOptions {
   autoRefresh?: boolean;
   refreshInterval?: number; // in milliseconds
   userId?: string; 
+}
+
+export function UsePostByID(postId: string | null) {
+  const [post, setPost] = useState<PostResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (!postId) return;
+      console.log("Fetching post with ID:", postId);
+      try {
+        setLoading(true);
+        const res = await fetch(`${serverPath}/api/posts/${postId}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
+
+        if (!res.ok) throw new Error(`Failed to fetch post: ${res.statusText}`);
+        const data: PostIDResponse = await res.json();
+        setPost(data.post); // Assuming API returns a PostResponse with one post
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [postId]);
+
+  return { post, loading, error };
 }
 
 export function usePosts(options: UsePostsOptions = {}) {
@@ -303,6 +338,7 @@ export function usePosts(options: UsePostsOptions = {}) {
     // Cache management
     getCacheInfo,
     clearCache,
+    setPosts,
     
     // Computed values
     hasNextPage: posts?.posts ? posts.posts.length >= 10 : false, // Assuming 10 posts per page

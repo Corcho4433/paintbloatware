@@ -1,5 +1,5 @@
 import { useUser } from '../hooks/user';
-import { drawPosts } from './drawposts';
+import { PostGallery } from './postgallery';
 import { useParams } from 'react-router-dom';
 
 
@@ -9,8 +9,7 @@ import { useEffect } from 'react';
 const UserPage = () => {
   const { id } = useParams<{ id: string }>();
   const { user, loading, error } = useUser(id || "");
-  const renderedPosts = drawPosts({ userId: id });
-
+  const renderedPosts = <PostGallery userId={id} />;
   useEffect(() => {
     console.log('User changed:', user);
   }, [user]);

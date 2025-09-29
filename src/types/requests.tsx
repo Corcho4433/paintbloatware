@@ -1,15 +1,14 @@
 
+export interface PostIDResponse { post : PostResponse }
 export interface PostResponse {
     id: string,
     url_bucket: string,
     title: string,
-    height: number,
-    width: number,
-    version: number,
     content: string,
     user: {
         name: string,
         id: number,
+        userPfp?: string,
     },
     _count: {
         comments: number,
