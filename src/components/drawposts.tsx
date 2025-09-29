@@ -1,31 +1,15 @@
-import { PostPage } from "../types/requests";
 import { useState, useEffect } from 'react';
 import { usePosts } from '../hooks/posts';
 import useInfiniteScroll from '../hooks/infinetescroll';
 import { PostResponse } from '../types/requests';
 import { Link } from 'react-router-dom';
 
-type UsePostsResult = {
-  posts: PostPage | null;
-  loading: boolean;
-  error: Error | null;
-  loadMore: () => void;
-  isLoadingMore: boolean;
-};
 
-interface UsePostsOptions {
-  initialPage?: number;
-  autoRefresh?: boolean;
-  refreshInterval?: number; // in milliseconds
-  userId?: string;
-}
 
-export const drawPosts = (options: UsePostsOptions, userId: string | undefined = "") => {
+export const drawPosts = ( userId: string | undefined = "") => {
   const { posts, loading, error, loadMore, isLoadingMore } = usePosts({ userId: userId });
-  const rootElement = document.querySelector("#root > div > div > main");
   const sentinelRef = useInfiniteScroll({
     loadMore,
-    root: rootElement,
     isLoading: isLoadingMore
   });
 
@@ -106,7 +90,7 @@ export const drawPosts = (options: UsePostsOptions, userId: string | undefined =
       {selectedPost && <PostModal post={selectedPost} onClose={closeModal} />}
 
       {/* Masonry Grid */}
-      <div id="scroller" className="flex flex-wrap gap-8 justify-center w-full overflow-y-scroll h-[100%] mt-7">
+      <div className="flex flex-wrap gap-8 justify-center w-full overflow-x-hidden mt-7">
         {!loading && !error && posts?.posts?.length ?
           posts.posts.map((_, index) => (
             <div
@@ -129,7 +113,7 @@ export const drawPosts = (options: UsePostsOptions, userId: string | undefined =
           )}
       </div>
       <div ref={sentinelRef} ></div>
-      <div className="flex items-center justify-center py-6  mt-5 border-t border-gray-700">
+      <div ref={sentinelRef} className="flex items-center justify-center py-6  mt-5 border-t border-gray-700">
         <svg
           aria-hidden="true"
           className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600 mr-3"
