@@ -27,10 +27,11 @@ export const useUser = (userId: string) => {
           throw new Error('Failed to fetch user data');
         }
 
-        const data = await response.json();
-        setUser(data);
-        console.log(data);
-        setError(null);
+  const data = await response.json();
+  // Support both { user: {...} } and flat user object
+  setUser(data.user || data);
+  console.log(data.user || data);
+  setError(null);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Unknown error'));
       } finally {

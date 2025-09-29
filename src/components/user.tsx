@@ -3,10 +3,17 @@ import { drawPosts } from './drawposts';
 import { useParams } from 'react-router-dom';
 
 
+
+import { useEffect } from 'react';
+
 const UserPage = () => {
   const { id } = useParams<{ id: string }>();
-  const {user,loading,error} = useUser(id || "");
+  const { user, loading, error } = useUser(id || "");
   const renderedPosts = drawPosts({ userId: id });
+
+  useEffect(() => {
+    console.log('User changed:', user);
+  }, [user]);
 
   const renderSkeleton = () => (
     <div className="p-4">
@@ -23,17 +30,20 @@ const UserPage = () => {
 
   if (loading) return renderSkeleton();
 
+  // Fallback for missing user name
+  const userName = user?.name || "Unknown User";
+
   return (
     <div className="p-4">
       <div className="flex items-center space-x-6 bg-gray-800 p-6 rounded-xl mb-8">
         <img
-          src={user?.name || "https://www.example.com/your-pfp.jpg"}
+          src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${userName}`}
           alt="User"
           className="w-32 h-32 rounded-full border-4 border-white"
         />
         <div>
-          <h1 className="text-3xl font-bold text-white">{user?.name}</h1>
-          <p className="text-gray-400 mt-2">{user?.name}</p>
+          <h1 className="text-3xl font-bold text-white">{userName}</h1>
+          <p className="text-gray-400 mt-2">{userName}</p>
         </div>
       </div>
 
