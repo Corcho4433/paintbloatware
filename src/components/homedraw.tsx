@@ -7,7 +7,7 @@ const HomeDraw = () => {
 
   
   //return (null)
-  return drawPosts({});
+  return drawPosts();
 }
 
 export default HomeDraw;
