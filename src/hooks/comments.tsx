@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { GetCommentsByPostResponse, Comment } from "../types/requests";
+import { PostPageResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
 
 export function useComments(postId: string) {
-  const [comments, setComments] = useState<Comment[] | null>(null);
+  const [comments, setComments] = useState<PostPageResponse| null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -16,8 +16,9 @@ export function useComments(postId: string) {
           credentials: "include",
         });
         if (!res.ok) throw new Error("Failed to fetch comments");
-        const data: GetCommentsByPostResponse = await res.json();
-        setComments(data.comments);
+        const data: PostPageResponse = await res.json();
+        setComments(data);
+        console.log("Fetched comments:", data);
       } catch (err) {
         setError(err as Error);
       } finally {
@@ -40,8 +41,8 @@ export function useComments(postId: string) {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch comments");
-      const data: GetCommentsByPostResponse = await res.json();
-      setComments(data.comments);
+      const data: PostPageResponse = await res.json();
+      setComments(data);
     } catch (err) {
       setError(err as Error);
     } finally {
@@ -62,9 +63,9 @@ export function useComments(postId: string) {
       
       // Add the new comment to the current comments array
       if (comments) {
-        setComments([...comments, data.new_comment]);
+        setComments({ ...comments, comments: [...comments.comments, data.new_comment] });
       } else {
-        setComments([data.new_comment]);
+        setComments({ comments: [data.new_comment] } as PostPageResponse);
       }
       
       return data.new_comment;

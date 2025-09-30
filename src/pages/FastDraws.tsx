@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import PaintSidebar from "../components/paintsidebar";
-import { usePosts, UsePostByID } from "../hooks/posts";
+import { usePosts, usePostById } from "../hooks/posts";
 
 const animations = {
   in: "animate-slide-in",
@@ -26,7 +26,7 @@ const FastDraws = () => {
 
   // Get postId from URL params
   const postId = searchParams.get('postId');
-  const { post, loading: postLoading, error: postError } = UsePostByID(postId);
+  const { post, loading: postLoading, error: postError } = usePostById(postId);
 
   // Effect to handle URL postId - prioritize fetched post from URL
   useEffect(() => {

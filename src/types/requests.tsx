@@ -18,10 +18,13 @@ export interface PostResponse {
 // Base Comment interface
 export interface Comment {
   id: string;
-  id_user: string;
-  id_post: string;
+  
   content: string;
-  created_at?: string;
+  user: {
+        name: string,
+        id: number,
+        userPfp?: string,
+    },
   // Add other comment fields based on your database schema
 }
 export interface Post {
@@ -51,9 +54,16 @@ export interface CreatePostResponse extends Post {
 export interface GetCommentByIdResponse extends Comment {
   // This returns the comment object directly based on your router
 }
-export interface GetCommentsByPostResponse {
-  comments: Comment[];
+export type PostPageResponse = {
+
+    comments: Comment[];
+    currentPage: number;
+    maxPages: number;
+    totalCount: number;
+
 }
+
+
 
 
 

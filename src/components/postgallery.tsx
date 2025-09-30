@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { usePosts } from '../hooks/posts';
 import useInfiniteScroll from '../hooks/infinetescroll';
 import { PostResponse } from '../types/requests';
+import { useComments } from '../hooks/comments';
 import { Link } from 'react-router-dom';
 
 export const PostGallery = ({ userId }: { userId?: string }) => {
@@ -139,7 +140,8 @@ export const PostGallery = ({ userId }: { userId?: string }) => {
 // Modal component for post preview
 const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () => void }) => {
   if (!post) return null;
-
+  const { comments, loading, error, addComment } = useComments(post.id);
+  console.log("Comments in PostModal:", comments);
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div
@@ -175,30 +177,46 @@ const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () => void 
               <h3 className="font-bold text-lg">{post.user?.name || 'Unknown User'}</h3>
             </div>
           </div>
-
+          {/* Comments List */}
           <div className="px-4 py-4 border-t border-gray-500 flex-1 overflow-y-auto">
-            <div className="space-y-1 overflow-hidden">
+            {loading && (
+              <div className="text-gray-400 text-sm">Loading comments...</div>
+            )}
+            {error && !loading && (
+              <div className="text-red-400 text-sm">Failed to load comments</div>
+            )}
+            {!loading && !error && comments && comments.comments.length === 0 && (
+              <div className="text-gray-500 text-sm">No comments yet. Be the first!</div>
+            )}
+            {!loading && comments && comments.comments.length > 0 && (
+              <ul className="space-y-3">
+                {comments.comments.map(c => (
+                              <div className="space-y-1 overflow-hidden">
 
 
               <div className="flex items-start space-x-3 mb-3">
-                {post.user?.userPfp ? (
+                {c.user?.userPfp ? (
                   <img
-                    src={`${post.user.userPfp}`}
+                    src={`${c.user.userPfp}`}
                     alt="User"
                     className="w-12 h-12 rounded-full border-1 border-white"
                   />) : (
                   <img
-                    src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${post.user?.name || 'User'}`}
+                    src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${c.user?.name || 'User'}`}
                     alt="User"
                     className="w-8 h-8 rounded-full border-1 border-white"
                   />
                 )}
                 <div className=''>
-                  <h3 className="inline-flex text-sm"> <Link to={"/user/" + post.user?.id}>{post.user?.name || 'Unknown User'}</Link></h3>
-                  <div className="inline text-sm ml-1 break-words">Mi adfasdjbhf ajskdlfhjlksadfh kjasdhflkj ashcomentario adfñkjasdfhñjkaadsfasdfjsahlfjdsfhñkj</div>
+                  <h3 className="inline-flex text-sm"> <Link to={"/user/" + c.user?.id}>{c.user?.name || 'Unknown User'}</Link></h3>
+                  <div className="inline text-sm ml-1 break-words">{c.content}</div>
                 </div>
               </div>
             </div>
+
+                ))}
+              </ul>
+            )}
           </div>
 
           {/* Comment Input */}
@@ -208,8 +226,18 @@ const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () => void 
                 type="text"
                 placeholder="Add a comment..."
                 className="flex-1 bg-gray-700 text-white p-2 focus:outline-none"
+                id="comment-input"
               />
-              <button className="bg-blue-500 text-white p-2  hover:bg-blue-600 transition-colors">
+              <button
+                onClick={async () => {
+                  const input = document.getElementById('comment-input') as HTMLInputElement;
+                  if (input && input.value.trim()) {
+                    await addComment(input.value.trim());
+                    input.value = '';
+                  }
+                }}
+                className="bg-blue-500 text-white p-2  hover:bg-blue-600 transition-colors"
+              >
                 Post
               </button>
             </div>

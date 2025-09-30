@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { PostPage, CreatePostRequest, PostResponse, PostIDResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
-import { NoMoreDataAvailableError } from "../types/errors";
+// NOTE: Keep exports stable (hooks only). Avoid adding conditional exports to preserve Fast Refresh compatibility.
 
 interface UsePostsOptions {
   initialPage?: number;
@@ -10,7 +10,7 @@ interface UsePostsOptions {
   userId?: string; 
 }
 
-export function UsePostByID(postId: string | null) {
+export function usePostById(postId: string | null) {
   const [post, setPost] = useState<PostResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
