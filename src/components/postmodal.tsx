@@ -9,6 +9,21 @@ export const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () =
   const { comments, loading, error, addComment, loadMore , isLoadingMore } = useComments(post.id);
   const [liked, setLiked] = useState(false); // added
   const [likePop, setLikePop] = useState(false);
+    const triggerLikePop = () => {
+    setLikePop(true);
+    setTimeout(() => setLikePop(false), 300);
+  };
+
+  const handleToggleLike = () => {
+    setLiked(l => !l);
+    triggerLikePop();
+  };
+
+  const handleImageDoubleClick = () => {
+    // Force like on double click
+    setLiked(true);
+    triggerLikePop();
+  };
   const sentinelRef = useInfiniteScroll({
     loadMore,
     isLoading: isLoadingMore || loading,
@@ -21,12 +36,22 @@ export const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () =
         onClick={e => e.stopPropagation()}
       >
         {/* Image Section */}
-        <div className="bg-gradient-to-br from-gray-900 to-black md:w-[512px] w-full h-[512px]  flex items-center justify-center relative overflow-hidden border-2 border-gray-700">
+        <div onDoubleClick={handleImageDoubleClick} className="bg-gradient-to-br from-gray-900 to-black md:w-[512px] w-full h-[512px]  flex items-center justify-center relative overflow-hidden border-2 border-gray-700">
           <img
             src={post.url_bucket}
             alt="Post Image"
             className="w-full h-full object-cover"
+            draggable={false}
           />
+          {liked && likePop && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <Heart
+                className="w-40 h-40 text-red-500 opacity-80 animate-ping"
+                fill="currentColor"
+              />
+              
+            </div>
+          )}
         </div>
 
         {/* Comments & Description Section */}
@@ -102,13 +127,8 @@ export const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () =
             <div className="flex gap-3 mb-3">
               <button
                 type="button"
-                onClick={() => {
-                  setLiked(l => !l);
-                  setLikePop(true);
-                  setTimeout(() => setLikePop(false), 220); // pop duration
-                }}
-                className={`p-2 rounded transition-colors ${liked ? 'text-red-500' : 'text-white hover:text-gray-400'
-                  }`}
+                onClick={handleToggleLike}
+                className={`p-2 rounded transition-colors ${liked ? 'text-red-500' : 'text-white hover:text-gray-400'}`}
                 aria-pressed={liked}
                 aria-label="Like"
               >
