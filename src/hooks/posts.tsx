@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { PostPage, CreatePostRequest, PostResponse, PostIDResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
+import { NoMoreDataAvailableError } from "../types/errors";
 // NOTE: Keep exports stable (hooks only). Avoid adding conditional exports to preserve Fast Refresh compatibility.
 
 interface UsePostsOptions {
@@ -200,7 +201,7 @@ export function usePosts(options: UsePostsOptions = {}) {
     // Check if we're already at the last page
     if (posts && currentPage >= posts.maxPages) {
       console.log("No more pages available");
-      return;
+      throw new NoMoreDataAvailableError();
     }
 
     setIsLoadingMore(true);
