@@ -1,7 +1,7 @@
 import { PostResponse } from "../types/requests";
 import { useComments } from "../hooks/comments";
 import { Link } from "react-router-dom";
-import { Heart, MessageCircle, Share2 } from "lucide-react";
+import { Heart, MessageCircle, Share2, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import useInfiniteScroll from "../hooks/infinetescroll";
 export const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () => void }) => {
@@ -9,6 +9,7 @@ export const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () =
   const { comments, loading, error, addComment, loadMore , isLoadingMore } = useComments(post.id);
   const [liked, setLiked] = useState(false); // added
   const [likePop, setLikePop] = useState(false);
+  const [eyeOpen, setEyeOpen] = useState(true);
     const triggerLikePop = () => {
     setLikePop(true);
     setTimeout(() => setLikePop(false), 300);
@@ -149,6 +150,21 @@ export const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () =
                 aria-label="Comment"
               >
                 <MessageCircle className="w-6 h-6" strokeWidth={2} />
+              </button>
+              <button
+                type="button"
+                className={`p-2 rounded transition-colors text-white hover:text-gray-400`}
+                aria-label={eyeOpen ? "Disable view" : "Enable view"}
+                aria-pressed={!eyeOpen}
+                onClick={() => setEyeOpen(o => !o)}
+              >
+
+                  {eyeOpen ? (
+                    <Eye className="w-6 h-6" strokeWidth={2} />
+                  ) : (
+                    <EyeOff className="w-6 h-6" strokeWidth={2} />
+                  )}
+                  
               </button>
               <button
                 type="button"
