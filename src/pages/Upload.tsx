@@ -2,12 +2,8 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PaintSidebar from '../components/paintsidebar';
 import styles from "../styles/upload.module.css"
-import { serverPath } from '../utils/servers';
-import Cookies from 'js-cookie';  // Import if not already done
-
-function fetchTags() {
-    return ["Anime", "Fiction", "Landscape", "Linux"];
-}
+import { createPost } from '../hooks/posts';
+import { fetchAllTags } from '../hooks/trending';
 
 export default function Upload() {
     const [savedUrl, setSavedUrl] = useState('');
@@ -16,21 +12,32 @@ export default function Upload() {
     const [availableTags, setAvailableTags] = useState<string[]>([]);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
+    // Effect 1: Only for session storage data
     useEffect(() => {
         const urlFromParams = sessionStorage.getItem("post_bucket_url");
         const sourceFromParams = sessionStorage.getItem("post_source_code");
 
-        console.log("url: ", urlFromParams);
-        console.log("source: ", sourceFromParams);
-
         if (urlFromParams && sourceFromParams) {
             setSourceCode(sourceFromParams);
             setSavedUrl(urlFromParams);
-            console.log('Retrieved data: ', savedUrl, ' and: ', sourceCode);
         }
+    }, [searchParams]); // This can stay if you actually use searchParams
 
-        setAvailableTags(fetchTags());
-    }, [searchParams]);
+    // Effect 2: Only for fetching tags (runs once on mount)
+ // Empty dependency array = runs once
+
+    useEffect(() => {
+        fetchAllTags().then(tags => {
+            console.log("Available tags: ", tags, availableTags.length);
+
+            console.log("Tags: ", tags[0]);
+            if (availableTags.length === 0) {
+                setAvailableTags(tags);
+            } 
+            // setAvailableTags(tags);
+        });
+    }, []);
+
 
     const handlePost = async () => {
         if (savedUrl) {
@@ -41,29 +48,14 @@ export default function Upload() {
                 tags: selectedTags,
             }
 
-            
-
-
-            fetch(serverPath + "/api/posts", {
-                method: 'POST',
-                headers: {
-
-                    'Content-Type': 'application/json', 
-
-                },
-                body: JSON.stringify(sentPacket),
-                credentials: 'include',
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Posted data: ', data);
-                    /*
-                    sessionStorage.removeItem("post_bucket_url");
-                    sessionStorage.removeItem("post_source_code");*/
-                })
-                .catch(error => {
-                    console.error('Error posting data: ', error);
-                });
+            await createPost(sentPacket, () => {
+                sessionStorage.removeItem("post_bucket_url");
+                sessionStorage.removeItem("post_source_code");
+                
+                setSavedUrl('');        
+                setSourceCode('');
+                setSelectedTags([]);
+            });
         }
     };
 
@@ -106,7 +98,7 @@ export default function Upload() {
                     <button className={styles.hidesourcebutton} onClick={handleHideSource} disabled={!savedUrl}>
                         Hide Source
                     </button>
-                </div>
+                </div>  
             </div>
 
             <div className={styles.columncontainer}>
@@ -118,12 +110,12 @@ export default function Upload() {
                     <div className={styles.tags_container}>
                         {availableTags.map(tag => (
                             <button
-                                key={tag}
-                                className={`${styles.tag} ${selectedTags.includes(tag) ? styles.tag_selected : ''}`}
-                                onClick={() => toggleTag(tag)}
+                                key={tag.name}
+                                className={`${styles.tag} ${selectedTags.includes(tag.name) ? styles.tag_selected : ''}`}
+                                onClick={() => toggleTag(tag.name)}
                                 type="button"
                             >
-                                {tag}
+                                {tag.name}
                             </button>
                         ))}
                     </div>
