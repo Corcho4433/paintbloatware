@@ -107,7 +107,7 @@ const FastDraws = () => {
   };
 
   let photoIcon =
-    "opacity-50 ease-in-out group-focus:opacity-100 group-hover:scale-116  group-focus:scale-116 group-hover:opacity-100 transition-all duration-600";
+    "ease-in-out group-hover:scale-116  group-focus:scale-116 group-hover:opacity-100 transition-all duration-600";
 
   const renderContent = () => {
     // If we have a postId but are still loading that specific post
@@ -211,10 +211,9 @@ const FastDraws = () => {
           </div>
 
           <section className="absolute right-[0px] translate-x-3/2 translate-y-2/4 h-[200px] justify-around flex flex-col bg-gray-800 p-2 rounded-xl">
-            <Button className="cursor-pointer group focus:outline-none focus:ring-0   !bg-black !border-2 focus:!border-white hover:!border-white  aspect-square !p-0 h-12">
+            <Button className="cursor-pointer group focus:outline-none focus:ring-0 !bg-black !border-2  aspect-square !p-0 h-12">
               <MessageCircle
-                color={"white"}
-                className={photoIcon}
+                className={`${photoIcon}`}
               />
             </Button>
             <Button
