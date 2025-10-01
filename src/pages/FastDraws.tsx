@@ -33,19 +33,18 @@ const FastDraws = () => {
     if (postId && post && !postLoading && !postError) {
       // Check if this post is already in the posts array
       const existingIndex = posts?.posts?.findIndex(p => p.id === postId);
-      
+
       if (existingIndex !== undefined && existingIndex >= 0) {
         // Post exists in array, just set the index
         setCurrentPostIndex(existingIndex);
       } else if (posts?.posts && !posts.posts.some(p => p.id === postId)) {
         // Post doesn't exist in array, add it to the beginning
-        console.log(posts);
         setPosts(prev => ({
           ...prev!,
           posts: [post, ...prev!.posts],
         }));
         setCurrentPostIndex(0);
-        console.log(posts);
+
       } else if (!posts?.posts) {
         // No posts array yet, create one with just this post
         setPosts({
@@ -69,30 +68,29 @@ const FastDraws = () => {
   }, [postId, loading, posts, currentPostIndex, setSearchParams]);
 
   const handleReactionClick = () => {
-  if (isAnimating || !posts?.posts?.length || currentPostIndex === null) return;
-  setIsAnimating(true);
+    if (isAnimating || !posts?.posts?.length || currentPostIndex === null) return;
+    setIsAnimating(true);
 
-  setTimeout(() => {
-   
-    const isLastPost = currentPostIndex === posts.posts.length - 2; // -1 es el ultimo post, -2 e es el penultimo post
-    console.log(currentPostIndex, posts.posts.length);
-    if (isLastPost) {
-      
+    setTimeout(() => {
 
-      if (!isLoadingMore) {
-        // Load more posts only if not already loading
-        loadMore();
-        console.log("Loading next page...");
+      const isLastPost = currentPostIndex === posts.posts.length - 2; // -1 es el ultimo post, -2 e es el penultimo post
+      if (isLastPost) {
+
+
+        if (!isLoadingMore) {
+          // Load more posts only if not already loading
+          loadMore();
+
+        }
       }
-    }
 
-    // Move to next post (loop around if necessary)
-    setCurrentPostIndex((prev) =>
-      prev !== null ? (prev + 1) : 0
-    );
-    setIsAnimating(false);
-  }, 500);
-};
+      // Move to next post (loop around if necessary)
+      setCurrentPostIndex((prev) =>
+        prev !== null ? (prev + 1) : 0
+      );
+      setIsAnimating(false);
+    }, 500);
+  };
   useEffect(() => {
     if (isAnimating) {
       // Remove focus from all buttons in the container
@@ -201,11 +199,13 @@ const FastDraws = () => {
 
             <div className="flex w-[30%] mt-3 gap-2 bg-gray-700 p-2 rounded-xl justify-center mx-auto">
               <Button onClick={isAnimating ? undefined : handleReactionClick} className="group cursor-pointer !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-green-500 hover:!border-green-500">
-                <Laugh color={"white"} className={photoIcon} />
+                <Laugh className={`${photoIcon}  group-hover:text-green-400 group-focus:text-green-400`} />
               </Button>
 
               <Button onClick={isAnimating ? undefined : handleReactionClick} className="group cursor-pointer  !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-red-800 hover:!border-red-800">
-                <Angry color={"white"} className={photoIcon} />
+                <Angry
+                  className={`${photoIcon}  group-hover:text-red-500 group-focus:text-red-500`}
+                />
               </Button>
             </div>
           </div>

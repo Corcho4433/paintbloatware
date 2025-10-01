@@ -5,6 +5,10 @@ export interface PostResponse {
     url_bucket: string,
     title: string,
     content: string,
+    description: string,
+    created_at: string,
+    edited: boolean,
+    TagsForPost: { tag: { name: string } }[],
     user: {
         name: string,
         id: number,
