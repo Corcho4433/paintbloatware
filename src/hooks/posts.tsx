@@ -346,3 +346,50 @@ export function usePosts(options: UsePostsOptions = {}) {
     hasPreviousPage: currentPage > 1,
   };
 }
+
+async function createRating(post_id: string, rating: number) {
+  return await fetch("localhost:3000/api/ratings/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      post_id: post_id,
+      rating: rating,
+    }), 
+    credentials: "include",
+  })
+}
+
+export async function likePost(post_id: string) {
+  return await createRating(post_id, 1);
+}
+
+export async function dislikePost(post_id: string) {
+  return await createRating(post_id, -1);
+}
+
+interface PostPacket {
+  image: string;
+  description: string;
+  source: string;
+  tags: string[];
+}
+
+export async function createPost(sentPacket: PostPacket, callback: any) {
+  return await fetch(serverPath + "/api/posts", {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json', 
+      },
+      body: JSON.stringify(sentPacket),
+      credentials: 'include',
+  })
+      .then(response => response.json())
+      .then(data => {
+          callback(data);
+      })
+      .catch(error => {
+          console.error('Error posting data: ', error);
+      });
+}
