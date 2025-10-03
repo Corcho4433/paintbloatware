@@ -1,34 +1,34 @@
 
-export interface PostIDResponse { post : PostResponse }
+export interface PostIDResponse { post: PostResponse }
 export interface PostResponse {
-    id: string,
-    url_bucket: string,
-    title: string,
-    content: string,
-    description: string,
-    created_at: string,
-    edited: boolean,
-    TagsForPost: { tag: { name: string } }[],
-    user: {
-        name: string,
-        id: number,
-        userPfp?: string,
-    },
-    _count: {
-        comments: number,
-    }
+  id: string,
+  url_bucket: string,
+  title: string,
+  content: string,
+  description: string,
+  created_at: string,
+  edited: boolean,
+  TagsForPost: { tag: { name: string } }[],
+  user: {
+    name: string,
+    id: number,
+    userPfp?: string,
+  },
+  _count: {
+    comments: number,
+  }
 }
 
 // Base Comment interface
 export interface Comment {
   id: string;
-  
+
   content: string;
   user: {
-        name: string,
-        id: number,
-        userPfp?: string,
-    },
+    name: string,
+    id: number,
+    userPfp?: string,
+  },
   // Add other comment fields based on your database schema
 }
 export interface Post {
@@ -60,10 +60,10 @@ export interface GetCommentByIdResponse extends Comment {
 }
 export type PostPageResponse = {
 
-    comments: Comment[];
-    currentPage: number;
-    maxPages: number;
-    totalCount: number;
+  comments: Comment[];
+  currentPage: number;
+  maxPages: number;
+  totalCount: number;
 
 }
 
@@ -72,29 +72,35 @@ export type PostPageResponse = {
 
 
 export interface CommentRequest {
-    postId: string,
-    content: string,
+  postId: string,
+  content: string,
 }
 export interface RegisterUserRequest {
-    name: string,
-    email: string,
-    password: string
+  name: string,
+  email: string,
+  password: string
 };
 export interface LoginUserRequest {
-    email: string,
-    password: string
+  email: string,
+  password: string
 }
 
 export interface LoginUserResponse {
+  success: boolean,
+  data:
+  {
     id: string,
-    name: string,
-    email: string
+    pfp?: string
+  }
 }
 
 export interface RegisterUserResponse {
+  success: boolean,
+  data:
+  {
     id: string,
-    name: string,
-    email: string
+    pfp?: string
+  }
 }
 
-export type PostPage = {maxPages : number, currentPage: number,totalCount : number, posts: PostResponse[] }
+export type PostPage = { maxPages: number, currentPage: number, totalCount: number, posts: PostResponse[] }

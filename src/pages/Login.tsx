@@ -1,11 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
 import { Formik, Field, Form } from "formik";
 import { useState } from "react";
-import { LoginUserRequest, RegisterUserRequest } from "../types/requests";
-import { serverPath } from "../utils/servers";
-import { useNavigate } from "react-router-dom";
-import { useAuthStore, User } from "../store/useAuthStore";
 import PaintSidebar from "../components/paintsidebar";
+import { useRegisterMutation, useLoginMutation } from "../hooks/authorization";
+import { serverPath } from "../utils/servers";
 
 
 const RegisterPage = () => {
@@ -41,39 +38,27 @@ const oauthProviders = [
 ];
 
 const handleOAuth = (providerId: string) => {
-  // Redirect to backend OAuth start endpoint
-  // Backend should handle redirect_uri internally or accept one via query param
-  window.location.href = `${serverPath}/api/auth/oauth/${providerId}/start`;
+  const width = 500;
+const height = 600;
+const left = window.screenX + (window.innerWidth - width) / 2;
+const top = window.screenY + (window.innerHeight - height) / 2;
+
+window.open(
+  `${serverPath}/api/auth/${providerId}`,
+  "Google Login",
+  `width=${width},height=${height},top=${top},left=${left}`
+);
 };
 
 const RegisterForm = () => {
-  const registerMutation = useMutation({
-    mutationFn: async (newUser: RegisterUserRequest) => {
-      const response = await fetch(serverPath + "/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newUser),
-      });
-
-      if (!response.ok) {
-        throw new Error("Registration failed");
-      }
-      const responseJSON = await response.json();
-      return responseJSON as { data: string; success: boolean };
-    },
-  });
-  const navigate = useNavigate();
+  const registerMutation = useRegisterMutation();
+  
   return (
     <Formik
       initialValues={{ name: "", email: "", password: "" }}
       onSubmit={async (values, { setSubmitting }) => {
         try {
-          const response = await registerMutation.mutateAsync(values);
-          if (response.success) {
-            navigate("/login");
-          }
+          await registerMutation.mutateAsync(values);
         } catch (error) {
           if (error instanceof Error) {
             alert(error.message);
@@ -150,43 +135,14 @@ const RegisterForm = () => {
 };
 
 const LoginForm = () => {
-  const setUser = useAuthStore((state) => state.setUser);
-  const LoginMutation = useMutation({
-    mutationFn: async (loginUser: LoginUserRequest) => {
-      const response = await fetch(serverPath + "/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginUser),
-        credentials: "include",
-      });
-      if (!response.ok) {
-        throw new Error("Login failed");
-      }
-      return response.json();
-    },
-  });
-  const navigate = useNavigate();
+  const loginMutation = useLoginMutation();
+  
   return (
     <Formik
       initialValues={{ email: "", password: "" }}
       onSubmit={async (values, { setSubmitting }) => {
         try {
-          const response = await LoginMutation.mutateAsync(values);
-          console.log("Full response:", response);
-
-          if (!response.success) {
-            throw new Error("Login failed");
-          }
-
-          // Create user object directly from response
-          const user: User = {
-            id: response.id,
-            name: response.name,
-            email: response.email
-          };
-
-          setUser(user);
-          navigate("/");
+          await loginMutation.mutateAsync(values);
         } catch (error) {
           if (error instanceof Error) {
             alert(error.message);

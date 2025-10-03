@@ -1,14 +1,14 @@
 import FastDraws from './pages/FastDraws'
 import './App.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import ReactDom from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import RegisterPage from './pages/Login'
 import HomePage from './pages/Home'
 import Drawing from './pages/Drawing'
 import UserPage from './pages/User';
 import Upload from './pages/Upload';
 import WikiPage from './pages/wiki';
+import OAuthSuccessPopup from './pages/OAuthSuccess';
 import SinglePost from './pages/singlePost';
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
         <QueryClientProvider client={PaintQueryClient}>
           <BrowserRouter>
             <Routes>
-              <Route path='/' element={<FastDraws></FastDraws>} />
+              <Route path='/' element={<Navigate to="/fastdraws" replace />} />
               <Route path='/login' element={<RegisterPage></RegisterPage>} />
               <Route path='/home' element={<HomePage></HomePage>} />
               <Route path='/fastdraws' element={<FastDraws></FastDraws>} />
@@ -30,6 +30,7 @@ function App() {
               <Route path='/user/:id' element={<UserPage></UserPage>} />
               <Route path='/upload' element={<Upload></Upload>} />
               <Route path='/post/:id' element={<SinglePost></SinglePost>} />
+              <Route path='/oauth/success' element={<OAuthSuccessPopup></OAuthSuccessPopup>} />
             </Routes>
 
           </BrowserRouter>
