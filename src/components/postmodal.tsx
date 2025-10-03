@@ -155,9 +155,9 @@ export const PostModal = (
           <div className="p-4 text-white ">
             <div className="flex items-center space-x-3 mb-1">
               {/* User Avatar - Replace with actual user image if available */}
-              {post.user?.userPfp ? (
+              {post.user?.urlPfp ? (
                 <img
-                  src={`${post.user.userPfp}`}
+                  src={`${post.user.urlPfp}`}
                   alt="User"
                   className="w-12 h-12 rounded-full border-1 border-white"
                 />) : (
@@ -188,9 +188,9 @@ export const PostModal = (
                 {comments.comments.map(c => (
                   <div className="space-y-1 overflow-hidden" key={c.id}>
                     <div className="flex items-start space-x-3 mb-2">
-                      {c.user?.userPfp ? (
+                      {c.user?.urlPfp ? (
                         <img
-                          src={`${c.user.userPfp}`}
+                          src={`${c.user.urlPfp}`}
                           alt="User"
                           className="w-8 h-8 rounded-full border-1 border-white flex-shrink-0"
                         />) : (
@@ -203,7 +203,7 @@ export const PostModal = (
                       <div className='flex-1 min-w-0'>
                         <div className="flex items-start gap-1">
                           <h3 className="text-sm font-medium"> <Link to={"/user/" + c.user?.id}>{c.user?.name || 'Unknown User'}</Link></h3>
-                          <div className="text-sm ml-1 wrap-anywhere break-words">{c.content}</div>
+                          <div className="text-sm ml-1 wrap-anywhere">{c.content}</div>
                         </div>
                         <div className="flex items-center gap-3 mt-1">
                           <button

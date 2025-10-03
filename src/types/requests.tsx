@@ -12,7 +12,7 @@ export interface PostResponse {
   user: {
     name: string,
     id: number,
-    userPfp?: string,
+    urlPfp?: string,
   },
   _count: {
     comments: number,
@@ -27,7 +27,7 @@ export interface Comment {
   user: {
     name: string,
     id: number,
-    userPfp?: string,
+    urlPfp?: string,
   },
   // Add other comment fields based on your database schema
 }

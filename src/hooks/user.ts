@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 type UserResponse = {
   id?: string;
   name: string;
-  userPfp?: string;
   urlPfp?: string; // Add this to match backend response
   description?: string;
   // Add more fields as they become available from the server
