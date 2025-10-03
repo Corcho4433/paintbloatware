@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { PostPage, PostResponse, PostIDResponse } from "../types/requests";
+import { PostPage, CreatePostRequest, PostResponse, PostIDResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
-import { NoMoreDataAvailableError } from "../types/errors";
+import { NoMoreDataAvailableError, NoPostsMadeYet } from "../types/errors";
 import fetchWithRefresh from "./authorization";
 // NOTE: Keep exports stable (hooks only). Avoid adding conditional exports to preserve Fast Refresh compatibility.
 
@@ -70,6 +70,7 @@ export function usePosts(options: UsePostsOptions = {}) {
   const fetchPosts = useCallback(async (page: number = 1, useCache: boolean = true) => {
     // Check cache first
     if (useCache && pageCache.has(page)) {
+
       return pageCache.get(page)!;
     }
 
@@ -96,6 +97,10 @@ export function usePosts(options: UsePostsOptions = {}) {
     const data: PostPage = await res.json();
     
     console.log("data.maxPages", data);
+    if (data.totalCount === 0){
+      console.log("h9adsfpadsf")
+      throw new NoPostsMadeYet("No posts made yet")
+    }
     
     // Cache the result
     pageCache.set(page, data);

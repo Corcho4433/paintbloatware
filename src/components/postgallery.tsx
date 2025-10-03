@@ -2,9 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { usePosts  } from '../hooks/posts';
 import useInfiniteScroll from '../hooks/infinetescroll';
 import { PostModal } from './postmodal';
+import { useAuthStore } from '../store/useAuthStore';
 
 export const PostGallery = ({ userId }: { userId?: string }) => {
   const { posts, loading, error, loadMore, isLoadingMore } = usePosts({ userId: userId });
+  const auth = useAuthStore();
+  const id = auth.user?.id; // Adjust this line if your user ID is stored differently
   const sentinelRef = useInfiniteScroll({
     loadMore,
     isLoading: isLoadingMore
@@ -12,7 +15,10 @@ export const PostGallery = ({ userId }: { userId?: string }) => {
 
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const prevUrlRef = useRef<string | null>(null);
-  const emptyArray = Array(6).fill(-1); // Array of 6 elements for loading placeholders
+  
+  // Check if error is "NoPostsMadeYet" to determine array size
+  const isNoPostsError = error && (error.name === "NoPostsMadeYet" || error.message.includes("No posts found"));
+  let emptyArray = Array(isNoPostsError ? 1 : 6).fill(-1); // 1 element for no posts, 6 for loading
 
   const handlePostPreview = (postIndex: number) => {
     if (posts?.posts?.[postIndex]) {
@@ -61,7 +67,66 @@ export const PostGallery = ({ userId }: { userId?: string }) => {
 
   const renderContent = (postID: number) => {
     const currentPostIndex = postID;
-    if (loading || currentPostIndex === null || !posts?.posts?.length) {
+    if (error) {
+      // Check if the error is specifically about no posts being made yet
+      if (error.name === "NoPostsMadeYet" || error.message.includes("No posts found")) {
+        // Check if we're viewing a user profile and if it's the current user's profile
+        const isViewingProfile = !!userId;
+        const isOwnProfile = isViewingProfile && userId === id;
+        
+        if (isViewingProfile && isOwnProfile) {
+          // Viewing own profile with no posts
+          return (
+            <div className="bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-800 w-[350px] h-[350px] flex flex-col items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white p-6 text-center">
+              <div className="text-6xl mb-4">🎨</div>
+              <h3 className="text-xl font-bold mb-2">Your gallery is empty!</h3>
+              <p className="text-sm opacity-90 mb-4">You haven't shared any artwork yet. It's time to show your creativity to the world!</p>
+              <button 
+                onClick={() => window.location.href = '/draw'}
+                className="bg-white cursor-pointer text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
+              >
+                Create my first artwork ✨
+              </button>
+            </div>
+          );
+        } else if (isViewingProfile && !isOwnProfile) {
+          // Viewing someone else's profile with no posts
+          return (
+            <div className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 w-[350px] h-[350px] flex flex-col items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white p-6 text-center">
+              <div className="text-6xl mb-4">🖼️</div>
+              <h3 className="text-xl font-bold mb-2">Empty gallery</h3>
+              <p className="text-sm opacity-90 mb-4">This user hasn't shared any artwork yet.</p>
+              <div className="text-xs opacity-70">
+                Be the first to inspire them to create!
+              </div>
+            </div>
+          );
+        } else {
+          // General feed with no posts
+          return (
+            <div className="bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-800 w-[350px] h-[350px] flex flex-col items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white p-6 text-center">
+              <div className="text-6xl mb-4">🎨</div>
+              <h3 className="text-xl font-bold mb-2">Ready to Create?</h3>
+              <p className="text-sm opacity-90 mb-4">No posts yet! Be the first to share your amazing artwork with the community.</p>
+              <button 
+                onClick={() => window.location.href = '/draw'}
+                className="bg-white cursor-pointer text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
+              >
+                Start Drawing ✨
+              </button>
+            </div>
+          );
+        }
+      }
+      
+      // Default error display for other errors
+      return (
+        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black w-[350px] h-[350px] flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
+          {error instanceof Error ? error.message : "An error occurred while loading posts"}
+        </div>
+      );
+    }
+    if (loading  || !posts?.posts?.length) {
       return (
         <div className="cursor-progress w-[350px] h-[350px] flex items-center justify-center">
           <svg aria-hidden="true" className="w-12 h-12 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -73,13 +138,7 @@ export const PostGallery = ({ userId }: { userId?: string }) => {
       );
     }
 
-    if (error) {
-      return (
-        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black w-[350px] h-[350px] flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
-          {error instanceof Error ? error.message : "An error occurred while loading posts"}
-        </div>
-      );
-    }
+    
 
     const currentPost = posts.posts[currentPostIndex];
     if (!currentPost) {
