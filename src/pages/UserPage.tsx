@@ -1,7 +1,7 @@
 import PaintSidebar from "../components/paintsidebar";
-import User from "../components/user";
+import User from "../components/userDisplay";
 const UserPage = () => {
-
+    
     return (
     <div className="flex">
         <PaintSidebar />

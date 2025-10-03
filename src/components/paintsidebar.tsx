@@ -11,6 +11,7 @@ import {
   LibraryIcon,
   ChevronLeft,
   ChevronRight,
+  Settings,
 } from "lucide-react";
 
 const PaintSidebar = () => {
@@ -115,12 +116,23 @@ const PaintSidebar = () => {
                   className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
                 />
                 {!isDesktopSidebarCollapsed && (
-                  <span className="text-md font-semibold">User</span>
+                  <span className="text-md font-semibold">Profile</span>
                 )}
               </div>
             </SidebarItem>
           )}
-
+          {current_user && 
+          <SidebarItem href="/settings" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } hover:!bg-gray-700 rounded-lg transition-colors`}>
+            <div className="flex items-center">
+              <Settings
+                className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
+              />
+              {!isDesktopSidebarCollapsed && (
+                <span className="text-md font-semibold">Settings</span>
+              )}
+            </div>
+          </SidebarItem>
+          }
           {/* Login / Logout */}
           <SidebarItem href={current_user ? "/login" : "/login"} className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } hover:!bg-gray-700 rounded-lg transition-colors`} onClick={current_user ? logout : undefined}>
             <div className="flex items-center">
@@ -132,6 +144,7 @@ const PaintSidebar = () => {
               )}
             </div>
           </SidebarItem>
+          
         </SidebarItemGroup>
 
         {/* Collapse button (desktop only) */}

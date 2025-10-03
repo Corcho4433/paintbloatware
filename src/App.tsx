@@ -5,11 +5,12 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import RegisterPage from './pages/Login'
 import HomePage from './pages/Home'
 import Drawing from './pages/Drawing'
-import UserPage from './pages/User';
+import UserPage from './pages/UserPage';
 import Upload from './pages/Upload';
 import WikiPage from './pages/wiki';
 import OAuthSuccessPopup from './pages/OAuthSuccess';
 import SinglePost from './pages/singlePost';
+import SettingsPage from './pages/settingsPage';
 
 function App() {
   const PaintQueryClient = new QueryClient();
@@ -31,6 +32,7 @@ function App() {
               <Route path='/upload' element={<Upload></Upload>} />
               <Route path='/post/:id' element={<SinglePost></SinglePost>} />
               <Route path='/oauth/success' element={<OAuthSuccessPopup></OAuthSuccessPopup>} />
+              <Route path='/settings' element={<SettingsPage />}  />
             </Routes>
 
           </BrowserRouter>

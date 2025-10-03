@@ -94,6 +94,14 @@ export interface LoginUserResponse {
   }
 }
 
+export interface UserUpdateInterface {
+	email?: string
+	name?: string
+	description?: string
+}
+
+
+
 export interface RegisterUserResponse {
   success: boolean,
   data:

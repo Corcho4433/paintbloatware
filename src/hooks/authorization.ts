@@ -17,7 +17,13 @@ const fetchWithRefresh = async (input: RequestInfo | URL, init?: RequestInit) =>
     if (refreshRes.ok) {
       // Retry the original request after refreshing
       res = await fetch(input, init);
+      
+      // If still 401 after refresh, don't retry again to avoid infinite loop
+      if (res.status === 401) {
+        throw new Error("Session expired, please log in again");
+      }
     } else {
+      // Refresh failed, session is truly expired
       throw new Error("Session expired, please log in again");
     }
   }

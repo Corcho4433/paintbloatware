@@ -1,19 +1,39 @@
 import { serverPath } from "../utils/servers";
 import { useState, useEffect } from "react";
+import fetchWithRefresh from "./authorization";
+import { useNavigate } from "react-router-dom";
 
 // Define the type for user response
 type UserResponse = {
+  id?: string;
   name: string;
   userPfp?: string;
+  urlPfp?: string; // Add this to match backend response
   description?: string;
   // Add more fields as they become available from the server
+};
+
+type UserInfo = {
+  id: string;
+  email: string;
+  name: string;
+  description: string;
+  urlPfp: string;
+}
+
+// Profile update types
+export type ProfileUpdateData = {
+  id: string;
+  name: string;
+  email: string;
+  description: string;
 };
 
 export const useUser = (userId: string) => {
   const [user, setUser] = useState<UserResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-
+  
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -47,4 +67,86 @@ export const useUser = (userId: string) => {
   }, [userId]);
 
   return { user, loading, error };
+};
+
+export const useUserInfo = (userId: string | undefined) => {
+  const [user, setUser] = useState<UserInfo | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const navigate = useNavigate()
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetchWithRefresh(`${serverPath}/api/users/info/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+        if (response.status === 401) {
+          navigate("/")
+        }
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+
+  const data = await response.json();
+  // Support both { user: {...} } and flat user object
+  setUser(data.user || data);
+  console.log(data.user || data);
+  setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Unknown error'));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (userId) {
+      fetchUser();
+    }
+  }, [userId]);
+
+  return { user, loading, error };
+};
+
+// API function to update profile information (name, email, bio)
+export const updateProfileInfo = async (profileData: ProfileUpdateData): Promise<UserInfo> => {
+  const response = await fetchWithRefresh(`${serverPath}/api/users/info/${profileData.id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    body: JSON.stringify(profileData)
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update profile information');
+  }
+
+  const data = await response.json();
+  return data.user || data;
+};
+
+// API function to upload profile image file
+export const uploadProfileImageFile = async (file: File): Promise<any> => {
+  const formData = new FormData();
+  // The field name should match what your multer uploadSingle expects: "pfp"
+  formData.append('pfp', file);
+
+  const response = await fetchWithRefresh(`${serverPath}/api/pfp`, {
+    method: 'PUT',
+    credentials: 'include',
+    body: formData
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to upload profile image');
+  }
+
+  const data = await response.json();
+  // Your backend returns { message: "Foto de perfil actualizada exitosamente", pfp: updatedPfp }
+  return data.pfp || data;
 };
