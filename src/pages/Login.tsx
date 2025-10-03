@@ -213,7 +213,7 @@ const LoginForm = () => {
                   onClick={() => handleOAuth(p.id)}
                   className={`w-full cursor-pointer text-sm font-medium rounded-lg px-4 py-3 transition-all duration-200 flex items-center justify-center gap-3 border ${
                     isGoogle 
-                      ? 'bg-white hover:bg-gray-200 text-gray-700 border-gray-300 hover:border-gray-400' 
+                      ? 'bg-white hover:bg-gray-300 text-gray-700 border-gray-300 hover:border-gray-400' 
                       : 'bg-gray-900 hover:bg-gray-700 text-white border-gray-600 hover:border-gray-500'
                   }`}
                 >
