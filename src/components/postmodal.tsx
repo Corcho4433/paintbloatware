@@ -1,7 +1,7 @@
 import { PostResponse } from "../types/requests";
 import { useComments } from "../hooks/comments";
 import { Link } from "react-router-dom";
-import { Heart, MessageCircle, Share2, Eye, EyeOff, HeartCrack } from "lucide-react";
+import { Heart, MessageCircle, Share2, Eye, EyeOff, HeartCrack, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import useInfiniteScroll from "../hooks/infinetescroll";
 export const PostModal = (
@@ -17,6 +17,8 @@ export const PostModal = (
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copyMsg, setCopyMsg] = useState<string>('');
   const shareRef = useRef<HTMLDivElement | null>(null); // added
+  const [commentLikes, setCommentLikes] = useState<Record<string, { liked: boolean, count: number }>>({});
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
   useEffect(() => { // added
     const handler = (e: MouseEvent) => {
@@ -71,14 +73,55 @@ export const PostModal = (
     isLoading: isLoadingMore || loading,
     rootMargin: '200px',
   });
+  const CommentSkeleton = () => (
+    <div className="space-y-3">
+      {[...Array(8)].map((_, i) => (
+        <div key={i} className="flex items-start space-x-3 animate-pulse">
+          <div className="w-8 h-8 bg-gray-600 rounded-full flex-shrink-0"></div>
+          <div className="flex-1 space-y-2">
+            <div className="h-3 bg-gray-600 rounded w-1/4"></div>
+            <div className="h-3 bg-gray-600 rounded w-3/4"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+  const handleCommentLike = (commentId: string) => {
+    setCommentLikes(prev => ({
+      ...prev,
+      [commentId]: {
+        liked: !prev[commentId]?.liked,
+        count: prev[commentId]?.liked 
+          ? (prev[commentId]?.count || 0) - 1 
+          : (prev[commentId]?.count || 0) + 1
+      }
+    }));
+  };
+
+  const handleReply = (commentId: string) => {
+    setReplyingTo(replyingTo === commentId ? null : commentId);
+    const input = document.getElementById('comment-input') as HTMLInputElement;
+    if (input) {
+      input.focus();
+    }
+  };
+
   return (
-    <div className={`fixed ${darkenScreen ? 'inset-0 bg-black/70' : ''} flex items-center justify-center z-50 p-4`} onClick={onClose}>
+    <div className={`fixed ${darkenScreen ? 'inset-0 !bg-black/70' : 'inset-0'} flex items-center justify-center z-50 p-0 md:p-4 bg-gray-900`} onClick={onClose}>
       <div
-        className="bg-gray-800 overflow-hidden flex flex-col md:flex-row max-w-4xl w-full max-h-[90vh]"
+        className="bg-gray-800 overflow-hidden flex flex-col md:flex-row max-w-4xl w-full max-h-[100vh] md:max-h-[90vh] relative"
         onClick={e => e.stopPropagation()}
       >
+        {/* Close button for mobile */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 md:hidden bg-black/50 rounded-full p-2 text-white hover:bg-black/70 transition-colors"
+        >
+          <X className="w-6 h-6" />
+        </button>
+
         {/* Image Section */}
-        <div onDoubleClick={handleImageDoubleClick} className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]  flex items-center justify-center relative overflow-hidden border-2 border-gray-700">
+        <div onDoubleClick={handleImageDoubleClick} className="bg-gradient-to-br from-gray-900 to-black w-full md:w-[512px] h-[300px] md:h-[512px] flex items-center justify-center relative overflow-hidden border-2 border-gray-700 flex-shrink-0">
           {eyeOpen ?
           <img
             src={post.url_bucket}
@@ -108,7 +151,7 @@ export const PostModal = (
         </div>
 
         {/* Comments & Description Section */}
-        <div className="flex flex-col w-[512px] h-[512px]">
+        <div className="flex flex-col w-full md:w-[512px] min-h-0 flex-1 md:flex-initial md:h-[512px]">
           <div className="p-4 text-white ">
             <div className="flex items-center space-x-3 mb-1">
               {/* User Avatar - Replace with actual user image if available */}
@@ -133,52 +176,75 @@ export const PostModal = (
           </div>
           {/* Comments List */}
           <div className="px-4 py-4 border-t border-gray-500 flex-1 overflow-y-auto">
-            {loading && (
-              <div className="text-gray-400 text-sm">Loading comments...</div>
-            )}
+            {loading && <CommentSkeleton />}
             {error && !loading && (
               <div className="text-red-400 text-sm">Failed to load comments</div>
             )}
             {!loading && !error && comments && comments.comments.length === 0 && (
-              <div className="text-gray-500 text-sm">No comments yet. Be the first!</div>
+              <div className="text-gray-500 text-sm flex-1 flex items-center justify-center md:block md:flex-none">No comments yet. Be the first!</div>
             )}
             {!loading && comments && comments.comments.length > 0 && (
               <ul className="space-y-3">
                 {comments.comments.map(c => (
-                  <div className="space-y-1 overflow-hidden">
-                    <div className="flex items-start space-x-3 mb-3">
+                  <div className="space-y-1 overflow-hidden" key={c.id}>
+                    <div className="flex items-start space-x-3 mb-2">
                       {c.user?.userPfp ? (
                         <img
                           src={`${c.user.userPfp}`}
                           alt="User"
-                          className="w-12 h-12 rounded-full border-1 border-white"
+                          className="w-8 h-8 rounded-full border-1 border-white flex-shrink-0"
                         />) : (
                         <img
                           src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${c.user?.name || 'User'}`}
                           alt="User"
-                          className="w-8 h-8 rounded-full border-1 border-white"
+                          className="w-8 h-8 rounded-full border-1 border-white flex-shrink-0"
                         />
                       )}
-                      <div className=''>
-                        <h3 className="inline-flex text-sm"> <Link to={"/user/" + c.user?.id}>{c.user?.name || 'Unknown User'}</Link></h3>
-                        <div className="inline text-sm ml-1 wrap-anywhere">{c.content}</div>
+                      <div className='flex-1 min-w-0'>
+                        <div className="flex items-start gap-1">
+                          <h3 className="text-sm font-medium"> <Link to={"/user/" + c.user?.id}>{c.user?.name || 'Unknown User'}</Link></h3>
+                          <div className="text-sm ml-1 wrap-anywhere break-words">{c.content}</div>
+                        </div>
+                        <div className="flex items-center gap-3 mt-1">
+                          <button
+                            onClick={() => handleCommentLike(c.id)}
+                            className={`flex items-center gap-1 text-xs transition-colors ${
+                              commentLikes[c.id]?.liked 
+                                ? 'text-red-500' 
+                                : 'text-gray-400 hover:text-red-400'
+                            }`}
+                          >
+                            <Heart 
+                              className="w-3 h-3" 
+                              fill={commentLikes[c.id]?.liked ? 'currentColor' : 'none'}
+                            />
+                            {commentLikes[c.id]?.count || 0}
+                          </button>
+                          <button
+                            onClick={() => handleReply(c.id)}
+                            className={`text-xs transition-colors ${
+                              replyingTo === c.id 
+                                ? 'text-blue-400' 
+                                : 'text-gray-400 hover:text-blue-400'
+                            }`}
+                          >
+                            Reply
+                          </button>
+                        </div>
                       </div>
                     </div>
                     <div ref={sentinelRef}></div>
-                    
                   </div>
-                  
-
                 ))}
-                  {!loading && isLoadingMore && (
-                    <div className="flex items-center gap-2 text-gray-400 text-xs">
-                      <svg aria-hidden="true" className="w-4 h-4 animate-spin text-gray-600 fill-blue-500" viewBox="0 0 100 101" fill="none">
-                        <path d="M100 50.59c0 27.614-22.386 50-50 50s-50-22.386-50-50 22.386-50 50-50 50 22.386 50 50ZM9.08 50.59c0 22.598 18.32 40.919 40.92 40.919 22.598 0 40.919-18.321 40.919-40.919C90.919 27.992 72.598 9.672 50 9.672 27.401 9.672 9.081 27.992 9.081 50.59Z" fill="currentColor"/>
-                        <path d="M93.968 39.04c2.425-.637 3.895-3.129 3.04-5.486-1.715-4.731-4.137-9.185-7.191-13.206-3.972-5.229-8.934-9.624-14.605-12.935C69.541 4.101 63.275 1.94 56.77 1.051 51.767.368 46.698.447 41.734 1.279c-2.473.415-3.922 2.919-3.285 5.344.637 2.426 3.119 3.849 5.6 3.485 3.801-.559 7.669-.58 11.49-.057 5.324.727 10.453 2.496 15.093 5.205 4.64 2.71 8.701 6.307 11.951 10.586 2.332 3.071 4.214 6.45 5.595 10.035.902 2.34 3.361 3.803 5.787 3.165Z" fill="currentFill"/>
-                      </svg>
-                      <span>Loading more...</span>
-                    </div>
-                  )}
+                {!loading && isLoadingMore && (
+                  <div className="flex items-center gap-2 text-gray-400 text-xs">
+                    <svg aria-hidden="true" className="w-4 h-4 animate-spin text-gray-600 fill-blue-500" viewBox="0 0 100 101" fill="none">
+                      <path d="M100 50.59c0 27.614-22.386 50-50 50s-50-22.386-50-50 22.386-50 50-50 50 22.386 50 50ZM9.08 50.59c0 22.598 18.32 40.919 40.92 40.919 22.598 0 40.919-18.321 40.919-40.919C90.919 27.992 72.598 9.672 50 9.672 27.401 9.672 9.081 27.992 9.081 50.59Z" fill="currentColor"/>
+                      <path d="M93.968 39.04c2.425-.637 3.895-3.129 3.04-5.486-1.715-4.731-4.137-9.185-7.191-13.206-3.972-5.229-8.934-9.624-14.605-12.935C69.541 4.101 63.275 1.94 56.77 1.051 51.767.368 46.698.447 41.734 1.279c-2.473.415-3.922 2.919-3.285 5.344.637 2.426 3.119 3.849 5.6 3.485 3.801-.559 7.669-.58 11.49-.057 5.324.727 10.453 2.496 15.093 5.205 4.64 2.71 8.701 6.307 11.951 10.586 2.332 3.071 4.214 6.45 5.595 10.035.902 2.34 3.361 3.803 5.787 3.165Z" fill="currentFill"/>
+                    </svg>
+                    <span>Loading more...</span>
+                  </div>
+                )}
               </ul>
             )}
           </div>
@@ -287,7 +353,7 @@ export const PostModal = (
             <div className="flex items-center">
               <input
                 type="text"
-                placeholder="Add a comment..."
+                placeholder={replyingTo ? `Replying to comment...` : "Add a comment..."}
                 className="flex-1 bg-gray-700 text-white p-2 focus:outline-none"
                 id="comment-input"
                 autoComplete="off"
@@ -298,6 +364,7 @@ export const PostModal = (
                   if (input && input.value.trim()) {
                     await addComment(input.value.trim());
                     input.value = '';
+                    setReplyingTo(null);
                   }
                 }}
                 className="bg-blue-500 text-white px-4 py-2 ml-2 hover:bg-blue-600 transition-colors text-sm font-medium"
@@ -305,6 +372,17 @@ export const PostModal = (
                 Post
               </button>
             </div>
+            {replyingTo && (
+              <div className="mt-2 text-xs text-gray-400">
+                Replying to comment 
+                <button 
+                  onClick={() => setReplyingTo(null)}
+                  className="ml-1 text-blue-400 hover:text-blue-300"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
