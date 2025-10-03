@@ -1,28 +1,69 @@
 import { PostResponse } from "../types/requests";
 import { useComments } from "../hooks/comments";
 import { Link } from "react-router-dom";
-import { Heart, MessageCircle, Share2, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { Heart, MessageCircle, Share2, Eye, EyeOff, HeartCrack } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import useInfiniteScroll from "../hooks/infinetescroll";
-export const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () => void }) => {
+export const PostModal = (
+  { post, onClose, darkenScreen = true }: { post: PostResponse; onClose: () => void; darkenScreen?: boolean }
+) => {
   if (!post) return null;
   const { comments, loading, error, addComment, loadMore , isLoadingMore } = useComments(post.id);
   const [liked, setLiked] = useState(false); // added
+  const [disliked, setDisliked] = useState(false); // added
   const [likePop, setLikePop] = useState(false);
+  const [dislikePop, setDislikePop] = useState(false);
   const [eyeOpen, setEyeOpen] = useState(true);
-    const triggerLikePop = () => {
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const [copyMsg, setCopyMsg] = useState<string>('');
+  const shareRef = useRef<HTMLDivElement | null>(null); // added
+
+  useEffect(() => { // added
+    const handler = (e: MouseEvent) => {
+      if (showShareMenu && shareRef.current && !shareRef.current.contains(e.target as Node)) {
+        setShowShareMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showShareMenu]);
+
+  const handleCopy = (text: string, label: string) => { // added
+    if (!navigator?.clipboard) return;
+    navigator.clipboard.writeText(text).then(() => {
+      setCopyMsg(label + ' copied');
+      setTimeout(() => setCopyMsg(''), 1500);
+      setShowShareMenu(false);
+    });
+  };
+  const triggerLikePop = () => {
     setLikePop(true);
     setTimeout(() => setLikePop(false), 300);
+  };
+  const triggerDislikePop = () => {
+    setDislikePop(true);
+    setTimeout(() => setDislikePop(false), 300);
+  };
+  const handleToggleDislike = ( ) => {
+    setDisliked(d => !d);
+    if (liked && !disliked) {
+      setLiked(false);
+    }
+    triggerDislikePop();
   };
 
   const handleToggleLike = () => {
     setLiked(l => !l);
+    if (disliked && !liked) {
+      setDisliked(false);
+    }
     triggerLikePop();
   };
 
   const handleImageDoubleClick = () => {
     // Force like on double click
     setLiked(true);
+    setDisliked(false); 
     triggerLikePop();
   };
   const sentinelRef = useInfiniteScroll({
@@ -31,19 +72,30 @@ export const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () =
     rootMargin: '200px',
   });
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div className={`fixed ${darkenScreen ? 'inset-0 bg-black/70' : ''} flex items-center justify-center z-50 p-4`} onClick={onClose}>
       <div
         className="bg-gray-800 overflow-hidden flex flex-col md:flex-row max-w-4xl w-full max-h-[90vh]"
         onClick={e => e.stopPropagation()}
       >
         {/* Image Section */}
-        <div onDoubleClick={handleImageDoubleClick} className="bg-gradient-to-br from-gray-900 to-black md:w-[512px] w-full h-[512px]  flex items-center justify-center relative overflow-hidden border-2 border-gray-700">
+        <div onDoubleClick={handleImageDoubleClick} className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]  flex items-center justify-center relative overflow-hidden border-2 border-gray-700">
+          {eyeOpen ?
           <img
             src={post.url_bucket}
             alt="Post Image"
             className="w-full h-full object-cover"
             draggable={false}
-          />
+          /> :
+          <div className="w-full h-full bg-gray-900 flex justify-left overflow-y-auto">
+            <span className="text-gray-500 text-xl p-4 wrap-anywhere">{post.content} </span>
+          </div>
+          }
+          
+          {disliked && dislikePop && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <HeartCrack className="w-40 h-40 text-blue-400 opacity-80 animate-ping" fill="currentColor" />
+            </div>
+          )}
           {liked && likePop && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <Heart
@@ -56,7 +108,7 @@ export const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () =
         </div>
 
         {/* Comments & Description Section */}
-        <div className="flex flex-col w-full md:max-w-md h-[512px]">
+        <div className="flex flex-col w-[512px] h-[512px]">
           <div className="p-4 text-white ">
             <div className="flex items-center space-x-3 mb-1">
               {/* User Avatar - Replace with actual user image if available */}
@@ -118,14 +170,22 @@ export const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () =
                   
 
                 ))}
-                
+                  {!loading && isLoadingMore && (
+                    <div className="flex items-center gap-2 text-gray-400 text-xs">
+                      <svg aria-hidden="true" className="w-4 h-4 animate-spin text-gray-600 fill-blue-500" viewBox="0 0 100 101" fill="none">
+                        <path d="M100 50.59c0 27.614-22.386 50-50 50s-50-22.386-50-50 22.386-50 50-50 50 22.386 50 50ZM9.08 50.59c0 22.598 18.32 40.919 40.92 40.919 22.598 0 40.919-18.321 40.919-40.919C90.919 27.992 72.598 9.672 50 9.672 27.401 9.672 9.081 27.992 9.081 50.59Z" fill="currentColor"/>
+                        <path d="M93.968 39.04c2.425-.637 3.895-3.129 3.04-5.486-1.715-4.731-4.137-9.185-7.191-13.206-3.972-5.229-8.934-9.624-14.605-12.935C69.541 4.101 63.275 1.94 56.77 1.051 51.767.368 46.698.447 41.734 1.279c-2.473.415-3.922 2.919-3.285 5.344.637 2.426 3.119 3.849 5.6 3.485 3.801-.559 7.669-.58 11.49-.057 5.324.727 10.453 2.496 15.093 5.205 4.64 2.71 8.701 6.307 11.951 10.586 2.332 3.071 4.214 6.45 5.595 10.035.902 2.34 3.361 3.803 5.787 3.165Z" fill="currentFill"/>
+                      </svg>
+                      <span>Loading more...</span>
+                    </div>
+                  )}
               </ul>
             )}
           </div>
 
           {/* Comment Input */}
           <div className="px-4 py-2 border-t border-gray-700">
-            <div className="flex gap-3 mb-3">
+            <div className="flex gap-3 mb-3 relative"> {/* made relative for popover */}
               <button
                 type="button"
                 onClick={handleToggleLike}
@@ -137,6 +197,21 @@ export const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () =
                   className={`w-6 h-6 transition-transform duration-200 ease-out ${likePop ? 'scale-125' : 'scale-100'
                     }`}
                   fill={liked ? 'currentColor' : 'none'}
+                  color="white"
+                  strokeWidth={2}
+                />
+              </button>
+              <button
+                type="button"
+                onClick={handleToggleDislike}
+                className={`p-2 rounded transition-colors ${disliked ? 'text-blue-400' : 'text-white hover:text-gray-400'}`}
+                aria-pressed={disliked}
+                aria-label="Dislike"
+              >
+                <HeartCrack
+                  className={`w-6 h-6 transition-transform duration-200 ease-out ${dislikePop ? 'scale-125' : 'scale-100'}`}
+                  fill={disliked ? 'currentColor' : 'none'}
+                  color="white"
                   strokeWidth={2}
                 />
               </button>
@@ -151,6 +226,7 @@ export const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () =
               >
                 <MessageCircle className="w-6 h-6" strokeWidth={2} />
               </button>
+              
               <button
                 type="button"
                 className={`p-2 rounded transition-colors text-white hover:text-gray-400`}
@@ -166,13 +242,47 @@ export const PostModal = ({ post, onClose }: { post: PostResponse; onClose: () =
                   )}
                   
               </button>
-              <button
-                type="button"
-                className="p-2 rounded  text-white hover:text-gray-400 transition-colors"
-                aria-label="Share"
-              >
-                <Share2 className="w-6 h-6" strokeWidth={2} />
-              </button>
+              <div ref={shareRef} className="relative"> {/* added wrapper */}
+                <button
+                  type="button"
+                  className="p-2 rounded  text-white hover:text-gray-400 transition-colors"
+                  aria-label="Share"
+                  onClick={() => setShowShareMenu(o => !o)}
+                >
+                  <Share2 className="w-6 h-6" strokeWidth={2} />
+                </button>
+                
+                {(showShareMenu || copyMsg) && (
+                  <div
+                    className="absolute left-full bottom-full ml-2 w-40 bg-gray-800 border border-gray-600 rounded shadow-lg z-20 text-xs"
+                  >
+                    <button
+                      className="w-full text-left px-3 py-2 hover:bg-gray-700"
+                      onClick={() =>
+                        handleCopy(
+                          `${window.location.origin}/post/${post.id}`,
+                          'Link'
+                        )
+                      }
+                    >
+                      Copy link
+                    </button>
+                    <button
+                      className="w-full text-left px-3 py-2 hover:bg-gray-700"
+                      onClick={() =>
+                        handleCopy(post.content || '', 'Post code')
+                      }
+                    >
+                      Copy post code
+                    </button>
+                    {copyMsg && (
+                      <div className="px-3 py-2 text-green-400 border-t border-gray-700">
+                        {copyMsg}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex items-center">
               <input

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePosts } from '../hooks/posts';
 import useInfiniteScroll from '../hooks/infinetescroll';
 import { PostModal } from './postmodal';
@@ -11,13 +11,32 @@ export const PostGallery = ({ userId }: { userId?: string }) => {
   });
 
   const [selectedPost, setSelectedPost] = useState<any>(null);
-  const emptyArray = Array(6).fill(-1);
+  const prevUrlRef = useRef<string | null>(null);
+  const emptyArray = Array(6).fill(-1); // Array of 6 elements for loading placeholders
 
   const handlePostPreview = (postIndex: number) => {
     if (posts?.posts?.[postIndex]) {
-      setSelectedPost(posts.posts[postIndex]);
+      const post = posts.posts[postIndex];
+      if (prevUrlRef.current === null) {
+        prevUrlRef.current = window.location.pathname + window.location.search + window.location.hash;
+      }
+      // push new state with post id, does not trigger react-router navigation directly
+      window.history.pushState({ modalPostId: post.id }, '', `/post/${post.id}`);
+      setSelectedPost(post);
     }
   };
+
+  useEffect(() => {
+    const onPopState = (e: PopStateEvent) => {
+      // If modal open and state has no modalPostId, close it (user went back)
+      if (selectedPost && (!e.state || !e.state.modalPostId)) {
+        setSelectedPost(null);
+        prevUrlRef.current = null;
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [selectedPost]);
 
   useEffect(() => {
     if (selectedPost) {
@@ -34,6 +53,10 @@ export const PostGallery = ({ userId }: { userId?: string }) => {
 
   const closeModal = () => {
     setSelectedPost(null);
+    if (prevUrlRef.current) {
+      window.history.replaceState({}, '', prevUrlRef.current);
+      prevUrlRef.current = null;
+    }
   };
 
   const renderContent = (postID: number) => {
@@ -110,7 +133,15 @@ export const PostGallery = ({ userId }: { userId?: string }) => {
           )}
         <div ref={sentinelRef} ></div>
       </div>
-
+      {!loading && isLoadingMore && (
+        <div className="flex items-center gap-2 text-gray-400 text-xl justify-center mt-4">
+          <svg aria-hidden="true" className="w-6 h-6 animate-spin text-gray-600 fill-blue-500" viewBox="0 0 100 101" fill="none">
+            <path d="M100 50.59c0 27.614-22.386 50-50 50s-50-22.386-50-50 22.386-50 50-50 50 22.386 50 50ZM9.08 50.59c0 22.598 18.32 40.919 40.92 40.919 22.598 0 40.919-18.321 40.919-40.919C90.919 27.992 72.598 9.672 50 9.672 27.401 9.672 9.081 27.992 9.081 50.59Z" fill="currentColor"/>
+            <path d="M93.968 39.04c2.425-.637 3.895-3.129 3.04-5.486-1.715-4.731-4.137-9.185-7.191-13.206-3.972-5.229-8.934-9.624-14.605-12.935C69.541 4.101 63.275 1.94 56.77 1.051 51.767.368 46.698.447 41.734 1.279c-2.473.415-3.922 2.919-3.285 5.344.637 2.426 3.119 3.849 5.6 3.485 3.801-.559 7.669-.58 11.49-.057 5.324.727 10.453 2.496 15.093 5.205 4.64 2.71 8.701 6.307 11.951 10.586 2.332 3.071 4.214 6.45 5.595 10.035.902 2.34 3.361 3.803 5.787 3.165Z" fill="currentFill"/>
+          </svg>
+          <span>Loading more...</span>
+        </div>
+      )}
       
     </div>
   );

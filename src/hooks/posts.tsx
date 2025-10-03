@@ -201,6 +201,7 @@ export function usePosts(options: UsePostsOptions = {}) {
     // Check if we're already at the last page
     if (posts && currentPage >= posts.maxPages) {
       console.log("No more pages available");
+      setIsLoadingMore(false);
       throw new NoMoreDataAvailableError();
     }
 

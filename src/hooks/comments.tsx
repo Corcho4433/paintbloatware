@@ -38,10 +38,11 @@ export function useComments(postId: string) {
 
   const loadMore = async () => {
     if (isLoadingMore || loading) return;
-    setIsLoadingMore(true);
+    
     if (maxPages !== null && page >= maxPages) {
       throw new NoMoreDataAvailableError("No more comments available");
     }
+    setIsLoadingMore(true);
     try {
       const nextPage = page + 1;
       const res = await fetch(serverPath + `/api/comments/${postId}?page=${nextPage}`, {

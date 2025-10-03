@@ -9,6 +9,7 @@ import Drawing from './pages/Drawing'
 import UserPage from './pages/User';
 import Upload from './pages/Upload';
 import WikiPage from './pages/wiki';
+import SinglePost from './pages/singlePost';
 
 function App() {
   const PaintQueryClient = new QueryClient();
@@ -28,6 +29,7 @@ function App() {
               <Route path='/wiki' element={<WikiPage></WikiPage>} />
               <Route path='/user/:id' element={<UserPage></UserPage>} />
               <Route path='/upload' element={<Upload></Upload>} />
+              <Route path='/post/:id' element={<SinglePost></SinglePost>} />
             </Routes>
 
           </BrowserRouter>

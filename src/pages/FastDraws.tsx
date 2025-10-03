@@ -198,11 +198,11 @@ const FastDraws = () => {
             </section>
 
             <div className="flex w-[30%] mt-3 gap-2 bg-gray-700 p-2 rounded-xl justify-center mx-auto">
-              <Button onClick={isAnimating ? undefined : handleReactionClick} className="group cursor-pointer !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-green-500 hover:!border-green-500">
+              <Button onClick={isAnimating ? undefined : handleReactionClick} className="border-gray-500 group cursor-pointer !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-green-500 hover:!border-green-500">
                 <Laugh className={`${photoIcon}  group-hover:text-green-400 group-focus:text-green-400`} />
               </Button>
 
-              <Button onClick={isAnimating ? undefined : handleReactionClick} className="group cursor-pointer  !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-red-800 hover:!border-red-800">
+              <Button onClick={isAnimating ? undefined : handleReactionClick} className="border-gray-500 group cursor-pointer  !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-red-800 hover:!border-red-800">
                 <Angry
                   className={`${photoIcon}  group-hover:text-red-500 group-focus:text-red-500`}
                 />
@@ -211,18 +211,18 @@ const FastDraws = () => {
           </div>
 
           <section className="absolute right-[0px] translate-x-3/2 translate-y-2/4 h-[200px] justify-around flex flex-col bg-gray-800 p-2 rounded-xl">
-            <Button className="cursor-pointer group focus:outline-none focus:ring-0 !bg-black !border-2  aspect-square !p-0 h-12">
+            <Button className="focus:!border-white hover:!border-white cursor-pointer group focus:outline-none focus:ring-0 !bg-black !border-2 border-gray-500 aspect-square !p-0 h-12">
               <MessageCircle
                 className={`${photoIcon}`}
               />
             </Button>
             <Button
               onClick={handleShareClick}
-              className="cursor-pointer group focus:outline-none !bg-black !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12"
+              className="cursor-pointer group focus:outline-none border-gray-500  !bg-black !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12"
             >
               <Send color={"white"} className={photoIcon} />
             </Button>
-            <Button className="cursor-pointer group focus:outline-none !bg-black  !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12">
+            <Button className="cursor-pointer border-gray-500  group focus:outline-none !bg-black  !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12">
               <EllipsisVertical
                 color={"white"}
                 className={photoIcon}
