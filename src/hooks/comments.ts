@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { PostPageResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
 import { NoMoreDataAvailableError } from "../types/errors";
+import fetchWithRefresh from "./authorization";
 
 export function useComments(postId: string) {
   const [comments, setComments] = useState<PostPageResponse | null>(null);
@@ -88,7 +89,7 @@ export function useComments(postId: string) {
 
   const addComment = async (content: string) => {
     try {
-      const res = await fetch(serverPath + `/api/comments/${postId}`, {
+      const res = await fetchWithRefresh(serverPath + `/api/comments/${postId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

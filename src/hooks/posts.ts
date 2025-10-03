@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { PostPage, CreatePostRequest, PostResponse, PostIDResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
 import { NoMoreDataAvailableError } from "../types/errors";
+import fetchWithRefresh from "./authorization";
 // NOTE: Keep exports stable (hooks only). Avoid adding conditional exports to preserve Fast Refresh compatibility.
 
 interface UsePostsOptions {
@@ -222,84 +223,6 @@ export function usePosts(options: UsePostsOptions = {}) {
     }
   }, [isLoadingMore, posts, currentPage, fetchPosts]);
 
-  // Add new post optimistically
-  const addPost = useCallback(async (postData: CreatePostRequest) => {
-    try {
-      const res = await fetch(serverPath + "/api/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(postData),
-      });
-
-      if (!res.ok) throw new Error("Failed to create post");
-      
-      const response = await res.json();
-      const newPost = response.post;
-
-      // Convert Post to PostResponse format if needed
-      // You might need to adjust this based on your actual types
-      const newPostResponse = {
-        ...newPost,
-        // Add missing PostResponse properties with default values
-        url_bucket: newPost.url_bucket || '',
-        height: newPost.height || 0,
-        width: newPost.width || 0,
-        version: newPost.version || 1,
-        // Add any other missing PostResponse properties
-      };
-
-      // Add to current posts optimistically
-      setPosts(prev => {
-        if (!prev) {
-          return {
-            posts: [newPostResponse],
-            maxPages: 1,
-            currentPage: 1,
-            totalCount: 1,
-          };
-        }
-        return {
-          ...prev,
-          posts: [newPostResponse, ...prev.posts],
-          totalCount: prev.totalCount + 1,
-        };
-      });
-
-      // Clear cache to ensure fresh data on next fetch
-      pageCache.clear();
-
-      return newPost;
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    }
-  }, [pageCache]);
-
-  // Update post in local state
-  const updatePost = useCallback((postId: string, updates: Partial<PostResponse>) => {
-    setPosts(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        posts: prev.posts.map(post => 
-          post.id === postId ? { ...post, ...updates } : post
-        )
-      };
-    });
-  }, []);
-
-  // Remove post from local state
-  const removePost = useCallback((postId: string) => {
-    setPosts(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        posts: prev.posts.filter(post => post.id !== postId)
-      };
-    });
-  }, []);
-
   // Get cached pages info
   const getCacheInfo = useCallback(() => {
     return {
@@ -330,9 +253,7 @@ export function usePosts(options: UsePostsOptions = {}) {
     // Data management
     refresh,
     loadMore,
-    addPost,
-    updatePost,
-    removePost,
+
     
     // Prefetching
     prefetch,
@@ -378,7 +299,7 @@ interface PostPacket {
 }
 
 export async function createPost(sentPacket: PostPacket, callback: any) {
-  return await fetch(serverPath + "/api/posts", {
+  return await fetchWithRefresh(serverPath + "/api/posts", {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json', 

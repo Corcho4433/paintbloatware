@@ -174,62 +174,73 @@ const Drawing = () => {
   };
 
   return (
-    <div className="bg-[#121212] text-[#eee] min-h-screen flex">
+    <div className="bg-gray-900 text-gray-100 min-h-screen flex">
       <PaintSidebar />
-      <div className="flex flex-1 gap-4">
+      <div className="flex flex-1 gap-6 p-6">
         {/* Editor Column */}
-        <div className="flex-1 p-8">
-          <span className="text-white font-bold text-3xl mb-4 block">
-            SOURCE
-          </span>
-          <textarea
-            ref={textareaRef}
-            id="source"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-            onKeyDown={handleAlternativeInputs}
-            className="w-full h-full bg-[#1e1e1e] outline-none text-white border-none p-8 font-mono resize-none"
-          />
+        <div className="flex-1 flex flex-col bg-gray-800 rounded-lg border border-gray-700">
+          <div className="mx-6 mt-6">
+            <h2 className="text-2xl font-bold text-white mb-2">Source Code</h2>
+            <p className="text-gray-400 text-sm">Write your Lua code here</p>
+          </div>
+          <div className="flex-1 bg-gray-900 m-6 rounded-lg overflow-hidden">
+            <textarea
+              ref={textareaRef}
+              id="source"
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              onKeyDown={handleAlternativeInputs}
+              className="w-full h-full bg-transparent outline-none text-gray-100 border-none p-6 font-mono text-sm resize-none placeholder-gray-500"
+              placeholder="Enter your Lua code here..."
+            />
+          </div>
         </div>
 
         {/* Preview + Snippets Column */}
-        <div className="flex flex-1 flex-col gap-4">
-          {/* Preview */}
-          <div className="w-full p-8 bg-[#1e1e1e] rounded-lg overflow-auto">
-            <span className="text-white text-3xl font-bold mb-4 block">
-              PREVIEW
-            </span>
-            <div className="w-full p-8 rounded-lg flex justify-center items-center">
+        <div className="flex flex-1 flex-col gap-6">
+          {/* Preview Section */}
+          <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Preview</h2>
+              <p className="text-gray-400 text-sm">Live preview of your animation</p>
+            </div>
+            
+            <div className="bg-gray-900 rounded-lg p-6 mb-6 flex justify-center items-center">
               <canvas
                 ref={canvasRef}
                 width={FIXED_CANVAS_SIZE}
                 height={FIXED_CANVAS_SIZE}
-                className="border border-[#333] [image-rendering:pixelated]"
+                className="border-2 border-gray-600 rounded-lg shadow-lg [image-rendering:pixelated]"
               />
             </div>
 
-            <div className="flex gap-2 items-center">
-              <button
-                onClick={handleRun}
-                className="px-2 py-1 rounded border border-gray-600 bg-gray-800 text-white hover:bg-gray-700 transition-colors cursor-pointer"
-              >
-                Run code
-              </button>
-              <button
-                onClick={handleStep}
-                className="px-2 py-1 rounded border border-gray-600 bg-gray-800 text-white hover:bg-gray-700 transition-colors cursor-pointer"
-              >
-                Step
-              </button>
-              <button
-                onClick={handlePost}
-                className="px-2 py-1 rounded border border-gray-600 bg-gray-800 text-white hover:bg-gray-700 transition-colors cursor-pointer"
-              >
-                Post
-              </button>
+            {/* Controls */}
+            <div className="flex flex-wrap gap-3 items-center justify-between">
+              <div className="flex gap-2">
+                <button
+                  onClick={handleRun}
+                  className="px-4 py-2 rounded-lg border border-green-600 bg-green-600 text-white hover:bg-green-700 transition-all duration-200 font-medium shadow-sm"
+                >
+                  Run
+                </button>
+                <button
+                  onClick={handleStep}
+                  className="px-4 py-2 rounded-lg border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm"
+                >
+                  Step
+                </button>
+                <button
+                  onClick={handlePost}
+                  className="px-4 py-2 rounded-lg border border-purple-600 bg-purple-600 text-white hover:bg-purple-700 transition-all duration-200 font-medium shadow-sm"
+                >
+                  Post
+                </button>
+              </div>
 
-              <label className="text-white ml-auto flex items-center gap-2">
-                Grid Size:
+              <div className="flex items-center gap-3 bg-gray-700 rounded-lg px-3 py-2">
+                <label className="text-gray-300 text-sm font-medium">
+                  Grid Size:
+                </label>
                 <input
                   type="number"
                   value={gridSize}
@@ -240,14 +251,18 @@ const Drawing = () => {
                       Math.min(Math.max(parseInt(e.target.value) || 0, 0), 512)
                     )
                   }
-                  className="px-2 py-1 rounded border border-gray-600 bg-gray-800 text-white hover:bg-gray-700 transition-colors cursor-text w-20"
+                  className="px-3 py-1 rounded-md border border-gray-600 bg-gray-800 text-white hover:bg-gray-700 focus:bg-gray-700 focus:border-blue-500 transition-all duration-200 w-20 text-sm"
                 />
-              </label>
+              </div>
             </div>
           </div>
 
           {/* Code Snippets */}
-          <div className="p-8 flex-1">
+          <div className="flex-1 bg-gray-800 rounded-lg border border-gray-700 p-6">
+            <div className="mb-4">
+              <h2 className="text-xl font-bold text-white mb-2">Code Snippets</h2>
+              <p className="text-gray-400 text-sm">Ready-to-use code examples</p>
+            </div>
             <CodeSnippets snippetImports={snippetImports} />
           </div>
         </div>

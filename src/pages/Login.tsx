@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Formik, Field, Form } from "formik";
 import { useState } from "react";
-import { LoginUserRequest, RegisterUserRequest, LoginUserResponse, RegisterUserResponse } from "../types/requests";
+import { LoginUserRequest, RegisterUserRequest } from "../types/requests";
 import { serverPath } from "../utils/servers";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore, User } from "../store/useAuthStore";
@@ -34,6 +34,17 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
+
+const oauthProviders = [
+  { id: "google", label: "Google" },
+  { id: "github", label: "GitHub" },
+];
+
+const handleOAuth = (providerId: string) => {
+  // Redirect to backend OAuth start endpoint
+  // Backend should handle redirect_uri internally or accept one via query param
+  window.location.href = `${serverPath}/api/auth/oauth/${providerId}/start`;
+};
 
 const RegisterForm = () => {
   const registerMutation = useMutation({
@@ -229,6 +240,24 @@ const LoginForm = () => {
           >
             {isSubmitting ? "Submitting..." : "Login"}
           </button>
+          <div className="flex items-center gap-2 pt-2">
+            <div className="h-px bg-gray-600 flex-1" />
+            <span className="text-gray-400 text-xs">OR</span>
+            <div className="h-px bg-gray-600 flex-1" />
+          </div>
+          <div className="grid gap-2">
+            {oauthProviders.map(p => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => handleOAuth(p.id)}
+                className="w-full text-sm bg-gray-700 hover:bg-gray-600 text-white rounded px-4 py-2 transition flex items-center justify-center gap-2"
+              >
+                Continue with {p.label}
+              </button>
+            ))}
+          </div>
+          {/* Optional: After OAuth redirect, frontend can fetch /api/auth/me to hydrate store */}
         </Form>
       )}
     </Formik>

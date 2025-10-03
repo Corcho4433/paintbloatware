@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { usePosts } from '../hooks/posts';
+import { usePosts  } from '../hooks/posts';
 import useInfiniteScroll from '../hooks/infinetescroll';
 import { PostModal } from './postmodal';
 
@@ -110,7 +110,7 @@ export const PostGallery = ({ userId }: { userId?: string }) => {
       {selectedPost && <PostModal post={selectedPost} onClose={closeModal} />}
 
       {/* Masonry Grid */}
-      <div className="flex flex-wrap gap-8 justify-center w-full overflow-x-hidden mt-7">
+      <div className="flex flex-wrap justify-center w-full overflow-x-hidden mx-auto mt-7">
         {!loading && !error && posts?.posts?.length ?
           posts.posts.map((_, index) => (
             <div
