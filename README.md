@@ -1,14 +1,15 @@
 # PaintBloatware Frontend
 
-Tareas para gazo:
+Tareas para beni
 
-- Hook de comentarios con paginacion e infinite scrolling
-- Hook para los likes y todo eso
+- Terminar fastdraws
+- Normalizar los iconos de like o corazones o caritas
+- Agregar la carga de imagenes de menor resolucion antes de fetchear todas las imagenes en calidad completa
 
 Tareas para corsa y malva:
 
-- Terminar diseño de la pagina de wiki y hacerla linda
-- Cuando beni implemente el hook de los usuarios, cambiar la pagina para mostrar los resultados
+- Terminar diseño de la pagina de wiki
+- Agregar informacion a la wiki
 
 
 Tareas juani:
