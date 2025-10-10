@@ -2,15 +2,14 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import Cookies from 'js-cookie';
 
-export interface User {
+export interface AuthStorageUser {
     id: string;
-    name: string;
-    email: string;
+    pfp?: string;
 }
 
 interface AuthStore {
-    user: User | null;
-    setUser: (user: User) => void;
+    user: AuthStorageUser | null;
+    setUser: (user: AuthStorageUser) => void;
     logout: () => Promise<void>;
     // Sidebar state
     isMobileSidebarOpen: boolean;
@@ -23,7 +22,7 @@ export const useAuthStore = create<AuthStore>()(
     persist(
         (set) => ({
             user: null,
-            setUser: (user: User) => set({ user }),
+            setUser: (user: AuthStorageUser) => set({ user }),
             // Sidebar state
             isMobileSidebarOpen: false,
             isDesktopSidebarCollapsed: false,

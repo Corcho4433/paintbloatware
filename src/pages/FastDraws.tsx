@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import PaintSidebar from "../components/paintsidebar";
-import { usePosts } from "../hooks/posts";
+import { usePosts, usePostById } from "../hooks/posts";
 
 const animations = {
   in: "animate-slide-in",
@@ -19,75 +19,78 @@ const animations = {
 };
 
 const FastDraws = () => {
-  const { posts, loading, error, prefetch, loadMore, hasNextPage, isLoadingMore } = usePosts();
+  const { posts, loading, error, loadMore, isLoadingMore, setPosts } = usePosts();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [currentPostIndex, setCurrentPostIndex] = useState<number | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  
-  // Effect to handle initial load and URL params
-  useEffect(() => {
-    // Only proceed if posts are loaded and not empty
-    if (!loading && posts?.posts?.length) {
-      const postId = searchParams.get('postId');
-      if (postId) {
-        const index = posts.posts.findIndex(post => post.id === postId);
-        if (index >= 0) {
-          setCurrentPostIndex(index);
-        } else {
-          // If post not found, redirect to first post
-          setCurrentPostIndex(0);
-          setSearchParams({ postId: posts.posts[0].id });
-        }
-      } else {
-        // No postId in URL, set to first post
-        setCurrentPostIndex(0);
-        setSearchParams({ postId: posts.posts[0].id });
-      }
-    }
-  }, [posts, loading, searchParams, setSearchParams]);
+  // Get postId from URL params
+  const postId = searchParams.get('postId');
+  const { post, loading: postLoading, error: postError } = usePostById(postId);
 
-  // Effect to update URL when post changes
+  // Effect to handle URL postId - prioritize fetched post from URL
   useEffect(() => {
-    console.log(error);
-    if (!loading && posts?.posts?.length && currentPostIndex !== null) {
-      const currentPost = posts.posts[currentPostIndex];
-      if (currentPost) {
-        setSearchParams({ postId: currentPost.id });
+    if (postId && post && !postLoading && !postError) {
+      // Check if this post is already in the posts array
+      const existingIndex = posts?.posts?.findIndex(p => p.id === postId);
+
+      if (existingIndex !== undefined && existingIndex >= 0) {
+        // Post exists in array, just set the index
+        setCurrentPostIndex(existingIndex);
+      } else if (posts?.posts && !posts.posts.some(p => p.id === postId)) {
+        // Post doesn't exist in array, add it to the beginning
+        setPosts(prev => ({
+          ...prev!,
+          posts: [post, ...prev!.posts],
+        }));
+        setCurrentPostIndex(0);
+
+      } else if (!posts?.posts) {
+        // No posts array yet, create one with just this post
+        setPosts({
+          posts: [post],
+          maxPages: 1,
+          currentPage: 1,
+          totalCount: 1
+        });
+        setCurrentPostIndex(0);
       }
     }
-  }, [currentPostIndex, posts, loading, setSearchParams, error]);
+  }, [postId, post, postLoading, postError]);
+
+  // Effect to handle initial load when no postId in URL
+  useEffect(() => {
+    if (!postId && !loading && posts?.posts?.length && currentPostIndex === null) {
+      // No postId in URL, set to first post from the general posts
+      setCurrentPostIndex(0);
+      setSearchParams({ postId: posts.posts[0].id });
+    }
+  }, [postId, loading, posts, currentPostIndex, setSearchParams]);
 
   const handleReactionClick = () => {
-  if (isAnimating || !posts?.posts?.length || currentPostIndex === null) return;
-  setIsAnimating(true);
+    if (isAnimating || !posts?.posts?.length || currentPostIndex === null) return;
+    setIsAnimating(true);
 
-  setTimeout(() => {
-   
-    const isLastPost = currentPostIndex === posts.posts.length - 2; // -1 es el ultimo post, -2 e es el penultimo post
-    console.log(currentPostIndex, posts.posts.length);
-    if (isLastPost) {
-      if (hasNextPage) {
-        // Prefetch next page if available
-        prefetch(currentPageIndex + 1);
-        console.log("Prefetching next page...");
+    setTimeout(() => {
+
+      const isLastPost = currentPostIndex === posts.posts.length - 2; // -1 es el ultimo post, -2 e es el penultimo post
+      if (isLastPost) {
+
+
+        if (!isLoadingMore) {
+          // Load more posts only if not already loading
+          loadMore();
+
+        }
       }
 
-      if (!isLoadingMore) {
-        // Load more posts only if not already loading
-        loadMore();
-        console.log("Loading next page...");
-      }
-    }
-
-    // Move to next post (loop around if necessary)
-    setCurrentPostIndex((prev) =>
-      prev !== null ? (prev + 1) : 0
-    );
-    setIsAnimating(false);
-  }, 500);
-};
+      // Move to next post (loop around if necessary)
+      setCurrentPostIndex((prev) =>
+        prev !== null ? (prev + 1) : 0
+      );
+      setIsAnimating(false);
+    }, 500);
+  };
   useEffect(() => {
     if (isAnimating) {
       // Remove focus from all buttons in the container
@@ -104,12 +107,33 @@ const FastDraws = () => {
   };
 
   let photoIcon =
-    "opacity-50 ease-in-out group-focus:opacity-100 group-hover:scale-116  group-focus:scale-116 group-hover:opacity-100 transition-all duration-600";
+    "ease-in-out group-hover:scale-116  group-focus:scale-116 group-hover:opacity-100 transition-all duration-600";
 
   const renderContent = () => {
+    // If we have a postId but are still loading that specific post
+    if (postId && postLoading) {
+      return (
+        <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700">
+          <div className="w-full h-full flex items-center justify-center text-white">
+            Loading post...
+          </div>
+        </div>
+      );
+    }
+
+    // If we have a postId but failed to load that specific post
+    if (postId && postError) {
+      return (
+        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
+          Failed to load post: {postError.message}
+        </div>
+      );
+    }
+
+    // Loading general posts
     if (loading) {
       return (
-        <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700">
+        <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700">
           <div className="w-full h-full flex items-center justify-center text-white">
             Loading...
           </div>
@@ -117,9 +141,10 @@ const FastDraws = () => {
       );
     }
 
+    // General error loading posts
     if (error) {
       return (
-        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
+        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
           {error instanceof Error ? error.message : "An error occurred while loading posts"}
         </div>
       );
@@ -127,7 +152,7 @@ const FastDraws = () => {
 
     if (currentPostIndex === null || !posts?.posts?.length) {
       return (
-        <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white">
+        <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white">
           Loading post...
         </div>
       );
@@ -136,7 +161,7 @@ const FastDraws = () => {
     const currentPost = posts.posts[currentPostIndex];
     if (!currentPost) {
       return (
-        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
+        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black w-[512px] h-[512px] flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
           Post not found
         </div>
       );
@@ -153,13 +178,9 @@ const FastDraws = () => {
             objectFit: 'cover',
           }}
         />
-      )
-
+      );
     }
-
-
-
-  }
+  };
 
 
 
@@ -170,37 +191,38 @@ const FastDraws = () => {
       <section className="flex-1 ml-0 min-h-screen w-full h-full bg-gray-900 flex items-center justify-center px-6 flex-col space-y-4">
         <div className="flex relative">
           <div className={`flex flex-col ${animations[isAnimating ? 'out' : 'in']}`}>
-            <section className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px] rounded-xl flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
+            <section className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
               <div className="w-full h-full">
                 {renderContent()}
               </div>
             </section>
 
             <div className="flex w-[30%] mt-3 gap-2 bg-gray-700 p-2 rounded-xl justify-center mx-auto">
-              <Button onClick={isAnimating ? undefined : handleReactionClick} className="group cursor-pointer !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-green-500 hover:!border-green-500">
-                <Laugh color={"white"} className={photoIcon} />
+              <Button onClick={isAnimating ? undefined : handleReactionClick} className="border-gray-500 group cursor-pointer !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-green-500 hover:!border-green-500">
+                <Laugh className={`${photoIcon}  group-hover:text-green-400 group-focus:text-green-400`} />
               </Button>
 
-              <Button onClick={isAnimating ? undefined : handleReactionClick} className="group cursor-pointer  !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-red-800 hover:!border-red-800">
-                <Angry color={"white"} className={photoIcon} />
+              <Button onClick={isAnimating ? undefined : handleReactionClick} className="border-gray-500 group cursor-pointer  !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-red-800 hover:!border-red-800">
+                <Angry
+                  className={`${photoIcon}  group-hover:text-red-500 group-focus:text-red-500`}
+                />
               </Button>
             </div>
           </div>
 
           <section className="absolute right-[0px] translate-x-3/2 translate-y-2/4 h-[200px] justify-around flex flex-col bg-gray-800 p-2 rounded-xl">
-            <Button className="group focus:outline-none focus:ring-0   !bg-black !border-2 focus:!border-white hover:!border-white  aspect-square !p-0 h-12">
+            <Button className="focus:!border-white hover:!border-white cursor-pointer group focus:outline-none focus:ring-0 !bg-black !border-2 border-gray-500 aspect-square !p-0 h-12">
               <MessageCircle
-                color={"white"}
-                className={photoIcon}
+                className={`${photoIcon}`}
               />
             </Button>
             <Button
               onClick={handleShareClick}
-              className="group focus:outline-none !bg-black !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12"
+              className="cursor-pointer group focus:outline-none border-gray-500  !bg-black !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12"
             >
               <Send color={"white"} className={photoIcon} />
             </Button>
-            <Button className="group focus:outline-none !bg-black  !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12">
+            <Button className="cursor-pointer border-gray-500  group focus:outline-none !bg-black  !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12">
               <EllipsisVertical
                 color={"white"}
                 className={photoIcon}

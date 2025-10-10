@@ -48,9 +48,7 @@ const CodeSnippets = ({ snippetImports }: CodeSnippetsProps) => {
         gap: "0.5rem",
       }}
     >
-      <span style={{ fontWeight: "bold", fontSize: "32px", color: "#1e3a8a" }}>
-        CODE SNIPPETS
-      </span>
+      
 
       <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
         {snippets.map((s, idx) => (

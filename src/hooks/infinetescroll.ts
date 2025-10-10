@@ -11,37 +11,38 @@ interface UseInfiniteScrollProps {
 const useInfiniteScroll = ({
   loadMore,
   isLoading,
-  rootMargin = '700px'
+  rootMargin = '200%'
 }: UseInfiniteScrollProps) => {
   const loadMoreRef = useRef(loadMore);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [noMoreData, setNoMoreData] = useState(false);
-  
-  
-  // Update ref when loadMore changes to avoid stale closures
-  useEffect(() => {
+  const callingRef = useRef(false); // prevent rapid duplicate calls
 
+  useEffect(() => {
     loadMoreRef.current = loadMore;
   }, [loadMore]);
 
-  const handleIntersect = useCallback((entries: IntersectionObserverEntry[]) => {
+  const handleIntersect = useCallback(async (entries: IntersectionObserverEntry[]) => {
     const [entry] = entries;
-    
-    
-    
-    // Only load more if sentinel is visible, we have next page, and not currently loading
-    if (entry.isIntersecting && !isLoading && !noMoreData) {
-      try {
-        loadMoreRef.current();
-      } catch (error) {
-        if (error instanceof NoMoreDataAvailableError) {
-          setNoMoreData(true);
-          loadMoreRef.current = () => {}; // Disable further loading
-          console.error("No more data available:", error);
-        } else {
-          console.error("Error loading more posts:", error);
-        }
+
+    if (!entry.isIntersecting || isLoading || noMoreData || callingRef.current) return;
+
+    callingRef.current = true;
+    try {
+      const maybePromise = loadMoreRef.current();
+      if (typeof maybePromise !== 'undefined' && maybePromise !== null && typeof (maybePromise as Promise<unknown>).then === 'function') {
+        await maybePromise;
       }
+    } catch (error) {
+      if (error instanceof NoMoreDataAvailableError) {
+        setNoMoreData(true);
+        loadMoreRef.current = () => {};
+        console.warn('No more data available');
+      } else {
+        console.error('Error loading more posts:', error);
+      }
+    } finally {
+      callingRef.current = false;
     }
   }, [isLoading, noMoreData]);
 
@@ -49,23 +50,19 @@ const useInfiniteScroll = ({
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
 
-    // Create intersection observer
     const observer = new IntersectionObserver(handleIntersect, {
-      root: null, // Use viewport as root
+      root: null,
       rootMargin,
-      threshold: 0., // Trigger when 10% of sentinel is visible
+      threshold: 0
     });
 
     observer.observe(sentinel);
-
-    // Cleanup
     return () => {
       observer.unobserve(sentinel);
       observer.disconnect();
     };
   }, [handleIntersect, rootMargin]);
 
-  // Return ref to attach to sentinel element
   return sentinelRef;
 };
 

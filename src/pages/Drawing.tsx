@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import PaintSidebar from "../components/paintsidebar";
 import { processorResponse, processorAction, Frame } from "../types/draw";
-import styles from "../styles/drawing.module.css";
 import CodeSnippets from "../components/snippets";
 
 const snippetImports = import.meta.glob("../code-snippets/*.md", {
@@ -9,8 +8,6 @@ const snippetImports = import.meta.glob("../code-snippets/*.md", {
   import: "default",
 });
 
-const GRID_SIZE = 32;
-const PIXEL_SIZE = 8;
 const INITIAL_FRAME = 1;
 const FRAME_RATE = 24;
 const MS_TIME = (1 / FRAME_RATE) * 1000;
@@ -32,6 +29,14 @@ const Drawing = () => {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [source, setSource] = useState(example_text);
   const [isRunning, setIsRunning] = useState(false);
+
+  const [gridSize, setGridSize] = useState(32);
+  const FIXED_CANVAS_SIZE = 512;
+
+  // Redibuja automáticamente cuando cambia gridSize
+  useEffect(() => {
+    drawFrame(fullFrameAnimation.current.get(currentFrame.current) as Frame);
+  }, [gridSize]);
 
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:8080/ws");
@@ -150,134 +155,114 @@ const Drawing = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const pixelSize = FIXED_CANVAS_SIZE / gridSize; // recalculamos cada vez
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    for (let y = 0; y < GRID_SIZE; y++) {
-      for (let x = 0; x < GRID_SIZE; x++) {
+    for (let y = 0; y < gridSize; y++) {
+      for (let x = 0; x < gridSize; x++) {
         const isOdd = (x + y) % 2 === 0;
-        const index = y * GRID_SIZE + x;
-        let pixel = isOdd ? [40, 40, 40, 255] : [60, 60, 60, 255]; // dark colors
+        const index = y * gridSize + x;
+        let pixel = isOdd ? [40, 40, 40, 255] : [60, 60, 60, 255];
         if (Frame) pixel = Frame.frame_data[index];
         ctx.fillStyle = `rgba(${pixel[0]}, ${pixel[1]}, ${pixel[2]}, ${
           pixel[3] / 255
         })`;
-        ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+        ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
       }
     }
   };
 
-  const darkButtonStyle = (active: boolean) => ({
-    padding: "0.25rem 0.5rem",
-    background: active ? "#444" : "#222",
-    color: "#fff",
-    border: "1px solid #555",
-    borderRadius: "4px",
-    cursor: "pointer",
-  });
-
   return (
-    <div
-      className={styles.container}
-      style={{
-        background: "#121212",
-        color: "#eee",
-        minHeight: "100vh",
-        padding: "32px", // <-- padding for all content
-      }}
-    >
+    <div className="bg-gray-900 text-gray-100 min-h-screen flex">
       <PaintSidebar />
-      <div className={styles.content} style={{ display: "flex", gap: "16px" }}>
+      <div className="flex flex-1 gap-6 p-6">
         {/* Editor Column */}
-        <div
-          className={styles.editorColumn}
-          style={{ flex: 1, padding: "32px" }}
-        >
-          <span
-            style={{
-              color: "#fff",
-              fontWeight: "bold",
-              fontSize: "32px",
-              marginBottom: "16px",
-              display: "block",
-            }}
-          >
-            SOURCE
-          </span>
-          <textarea
-            ref={textareaRef}
-            id="source"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-            onKeyDown={handleAlternativeInputs}
-            style={{
-              width: "100%",
-              height: "100%",
-              background: "#1e1e1e",
-              outline: "none",
-              color: "#fff",
-              border: "none",
-              padding: "32px",
-              fontFamily: "monospace",
-            }}
-          />
+        <div className="flex-1 flex flex-col bg-gray-800 rounded-lg border border-gray-700">
+          <div className="mx-6 mt-6">
+            <h2 className="text-2xl font-bold text-white mb-2">Source Code</h2>
+            <p className="text-gray-400 text-sm">Write your Lua code here</p>
+          </div>
+          <div className="flex-1 bg-gray-900 m-6 rounded-lg overflow-hidden">
+            <textarea
+              ref={textareaRef}
+              id="source"
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              onKeyDown={handleAlternativeInputs}
+              className="w-full h-full bg-transparent outline-none text-gray-100 border-none p-6 font-mono text-sm resize-none placeholder-gray-500"
+              placeholder="Enter your Lua code here..."
+            />
+          </div>
         </div>
 
         {/* Preview + Snippets Column */}
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-          }}
-        >
-          {/* Preview */}
-          <div
-            style={{
-              width: "100%",
-              padding: "32px",
-              background:
-                "#1e1e1e" /*REVISAR backgorung color (que sea consistente lolo) */,
-              borderRadius: "8px",
-            }}
-          >
-            <span
-              style={{
-                color: "#fff",
-                fontSize: "32px",
-                fontWeight: "bold",
-                marginBottom: "16px",
-                display: "block",
-              }}
-            >
-              PREVIEW
-            </span>
-            <canvas
-              ref={canvasRef}
-              width={GRID_SIZE * PIXEL_SIZE}
-              height={GRID_SIZE * PIXEL_SIZE}
-              style={{
-                display: "block",
-                border: "1px solid #333",
-                marginBottom: "16px",
-                width: "100%",
-              }}
-            />
-            <div style={{ display: "flex", gap: "8px" }}>
-              <button onClick={handleRun} style={darkButtonStyle(false)}>
-                Run code
-              </button>
-              <button onClick={handleStep} style={darkButtonStyle(false)}>
-                Step
-              </button>
-              <button onClick={handlePost} style={darkButtonStyle(false)}>
-                Post
-              </button>
+        <div className="flex flex-1 flex-col gap-6">
+          {/* Preview Section */}
+          <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Preview</h2>
+              <p className="text-gray-400 text-sm">Live preview of your animation</p>
+            </div>
+            
+            <div className="bg-gray-900 rounded-lg p-6 mb-6 flex justify-center items-center">
+              <canvas
+                ref={canvasRef}
+                width={FIXED_CANVAS_SIZE}
+                height={FIXED_CANVAS_SIZE}
+                className="border-2 border-gray-600 rounded-lg shadow-lg [image-rendering:pixelated]"
+              />
+            </div>
+
+            {/* Controls */}
+            <div className="flex flex-wrap gap-3 items-center justify-between">
+              <div className="flex gap-2">
+                <button
+                  onClick={handleRun}
+                  className="px-4 py-2 rounded-lg border border-green-600 bg-green-600 text-white hover:bg-green-700 transition-all duration-200 font-medium shadow-sm"
+                >
+                  Run
+                </button>
+                <button
+                  onClick={handleStep}
+                  className="px-4 py-2 rounded-lg border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm"
+                >
+                  Step
+                </button>
+                <button
+                  onClick={handlePost}
+                  className="px-4 py-2 rounded-lg border border-purple-600 bg-purple-600 text-white hover:bg-purple-700 transition-all duration-200 font-medium shadow-sm"
+                >
+                  Post
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3 bg-gray-700 rounded-lg px-3 py-2">
+                <label className="text-gray-300 text-sm font-medium">
+                  Grid Size:
+                </label>
+                <input
+                  type="number"
+                  value={gridSize}
+                  min={1}
+                  max={512}
+                  onChange={(e) =>
+                    setGridSize(
+                      Math.min(Math.max(parseInt(e.target.value) || 0, 0), 512)
+                    )
+                  }
+                  className="px-3 py-1 rounded-md border border-gray-600 bg-gray-800 text-white hover:bg-gray-700 focus:bg-gray-700 focus:border-blue-500 transition-all duration-200 w-20 text-sm"
+                />
+              </div>
             </div>
           </div>
 
           {/* Code Snippets */}
-          <div style={{ padding: "32px", flex: 1 }}>
+          <div className="flex-1 bg-gray-800 rounded-lg border border-gray-700 p-6">
+            <div className="mb-4">
+              <h2 className="text-xl font-bold text-white mb-2">Code Snippets</h2>
+              <p className="text-gray-400 text-sm">Ready-to-use code examples</p>
+            </div>
             <CodeSnippets snippetImports={snippetImports} />
           </div>
         </div>
