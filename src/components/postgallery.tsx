@@ -3,6 +3,7 @@ import { usePosts  } from '../hooks/posts';
 import useInfiniteScroll from '../hooks/infinetescroll';
 import { PostModal } from './postmodal';
 import { useAuthStore } from '../store/useAuthStore';
+import { Heart, MessageCircle } from 'lucide-react';
 
 export const PostGallery = ({ userId }: { userId?: string }) => {
   const { posts, loading, error, loadMore, isLoadingMore } = usePosts({ userId: userId });
@@ -149,17 +150,32 @@ export const PostGallery = ({ userId }: { userId?: string }) => {
       );
     } else {
       return (
-        <img
-          src={currentPost.url_bucket}
-          alt="Post Image"
-          width={300}
-          height={300}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
-        />
+        <div className="relative w-full h-full group">
+          <img
+            src={currentPost.url_bucket}
+            alt="Post Image"
+            width={300}
+            height={300}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
+          {/* Hover overlay with stats */}
+          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+            <div className="flex items-center gap-4 p-4 text-white">
+              <div className="flex items-center gap-1">
+                <Heart className="w-5 h-5" fill="currentColor" />
+                <span className="text-sm font-medium">{currentPost.rating || 0}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <MessageCircle className="w-5 h-5" />
+                <span className="text-sm font-medium">{currentPost._count?.comments || 0}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       );
     }
   };
