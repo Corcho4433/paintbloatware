@@ -16,7 +16,8 @@ export interface PostResponse {
   },
   _count: {
     comments: number,
-  }
+  },
+  rating: number;
 }
 
 // Base Comment interface

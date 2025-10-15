@@ -107,7 +107,7 @@ export const PostModal = (
   };
 
   return (
-    <div className={`fixed ${darkenScreen ? 'inset-0 !bg-black/70' : 'inset-0'} flex items-center justify-center z-50 p-0 md:p-4 bg-gray-900`} onClick={onClose}>
+    <div className={`fixed ${darkenScreen ? 'inset-0 !bg-black/70' : ''} flex items-center justify-center z-50 p-0 md:p-4 bg-gray-900`} onClick={onClose}>
       <div
         className="bg-gray-800 overflow-hidden flex flex-col md:flex-row max-w-4xl w-full max-h-[100vh] md:max-h-[90vh] relative"
         onClick={e => e.stopPropagation()}
