@@ -11,43 +11,73 @@ const snippetImports = import.meta.glob("../code-snippets/*.md", {
 const INITIAL_FRAME = 1;
 const FRAME_RATE = 24;
 const MS_TIME = (1 / FRAME_RATE) * 1000;
+const FIXED_CANVAS_SIZE = 512;
+const INITIAL_GRID_SIZE = 64;
 
-const example_text = `local max = 31
+const example_text = `local max = ${INITIAL_GRID_SIZE-1}
 for x = 0, max do
     for y = 0, max do
-      grid:set_pixel(x, y, 0, 255 - x*8, y*8)
+      grid:set_pixel(x, y, math.max(255 - (255/${INITIAL_GRID_SIZE}) * x, 0), 0, 0)
     end
 end\n`;
 
 const Drawing = () => {
+  
+  // states
+  const [ws, setWs] = useState<WebSocket | null>(null);
+  const [source, setSource] = useState(example_text);
+  const [isRunning, setIsRunning] = useState(false);  
+  const [gridSize, setGridSize] = useState(INITIAL_GRID_SIZE);
+  
+  // refs
   const fullFrameAnimation = useRef<Map<number, Frame>>(new Map());
   const currentFrame = useRef(INITIAL_FRAME);
   const animationInterval = useRef<NodeJS.Timeout | null>(null);
-
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [ws, setWs] = useState<WebSocket | null>(null);
-  const [source, setSource] = useState(example_text);
-  const [isRunning, setIsRunning] = useState(false);
-
-  const [gridSize, setGridSize] = useState(32);
-  const FIXED_CANVAS_SIZE = 512;
-
+  const sourceRef = useRef(source);
+  const dimensionRef = useRef(gridSize);
+  
   // Redibuja automáticamente cuando cambia gridSize
+  const sendUpdatedSource = () => {
+    setIsRunning(true);
+    if (ws && ws.readyState === WebSocket.OPEN)
+      ws.send(
+        JSON.stringify({
+          action: processorAction.ProcessSourceCode,
+          data: { source: sourceRef.current, dimension: dimensionRef.current },
+        })
+      );
+    else console.warn("WebSocket not connected.");
+  };
+  
+  useEffect(() => {
+    sourceRef.current = source;
+    dimensionRef.current = gridSize;
+  }, [source, gridSize]);
+  
   useEffect(() => {
     drawFrame(fullFrameAnimation.current.get(currentFrame.current) as Frame);
   }, [gridSize]);
 
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:8080/ws");
-    socket.onopen = () => console.log("Connected to server");
-    socket.onerror = (error) =>
-      console.error("WebSocket Connection Error:", error);
+    socket.onopen = () => {
+      console.log("Connected to server")
+    };
+
+    socket.onerror = (error) => { 
+      console.error("WebSocket Connection Error:", error)
+    };
+
+
     socket.onmessage = (event) => {
       const newData = JSON.parse(event.data) as processorResponse;
 
-      if (newData.action === "FrameData") saveFrame(newData.data.frame);
-      else if (newData.action === "Error")
+      if (newData.action === "FrameData") {
+        console.log(newData.data.frame);
+        saveFrame(newData.data.frame)
+      } else if (newData.action === "Error")
         console.error("Error:", newData.data.error);
       else if (newData.action === "UploadSuccess") {
         sessionStorage.setItem("post_bucket_url", newData.data.urlBucket);
@@ -63,9 +93,13 @@ const Drawing = () => {
       socket.close();
       stopAnimation();
     };
-  }, []);
+  }, []);;
 
   useEffect(() => {
+    setInterval(() => {
+      sendUpdatedSource();
+    }, 1000);
+
     if (isRunning) startAnimation();
     else stopAnimation();
     return () => stopAnimation();
@@ -121,18 +155,6 @@ const Drawing = () => {
     }
   };
 
-  const handleRun = () => {
-    setIsRunning(true);
-    if (ws && ws.readyState === WebSocket.OPEN)
-      ws.send(
-        JSON.stringify({
-          action: processorAction.ProcessSourceCode,
-          data: { source },
-        })
-      );
-    else console.warn("WebSocket not connected.");
-  };
-
   const handleStep = () => {
     setIsRunning(false);
     nextFrame();
@@ -149,25 +171,46 @@ const Drawing = () => {
     else console.warn("WebSocket not connected.");
   };
 
+  // Redibuja y limpia la animación cuando cambia gridSize
+  useEffect(() => {
+    // Clear the stored animation frames
+    fullFrameAnimation.current.clear();
+    currentFrame.current = INITIAL_FRAME;
+
+    // Redraw an empty canvas (or a default grid)
+    drawFrame(); // This will draw without a Frame, using the checkerboard pattern
+
+    // Optional: Automatically request new data from the server with the new grid size
+    // sendUpdatedSource(); 
+  }, [gridSize]);
+
   const drawFrame = (Frame?: Frame) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const pixelSize = FIXED_CANVAS_SIZE / gridSize; // recalculamos cada vez
+    const currentSize = dimensionRef.current;
+    const pixelSize = FIXED_CANVAS_SIZE / currentSize; // recalculamos cada vez
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    for (let y = 0; y < gridSize; y++) {
-      for (let x = 0; x < gridSize; x++) {
+    for (let y = 0; y < currentSize; y++) {
+      for (let x = 0; x < currentSize; x++) {
         const isOdd = (x + y) % 2 === 0;
-        const index = y * gridSize + x;
+        const index = y * currentSize + x;
         let pixel = isOdd ? [40, 40, 40, 255] : [60, 60, 60, 255];
         if (Frame) pixel = Frame.frame_data[index];
+
+        if (pixel == undefined) {
+          console.log(x, y, ' is undef', Frame?.frame_data);
+          pixel = [0, 0, 0, 255];
+        }
+        
         ctx.fillStyle = `rgba(${pixel[0]}, ${pixel[1]}, ${pixel[2]}, ${
           pixel[3] / 255
         })`;
+
         ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
       }
     }
@@ -218,7 +261,7 @@ const Drawing = () => {
             <div className="flex flex-wrap gap-3 items-center justify-between">
               <div className="flex gap-2">
                 <button
-                  onClick={handleRun}
+                  onClick={sendUpdatedSource}
                   className="px-4 py-2 rounded-lg border border-green-600 bg-green-600 text-white hover:bg-green-700 transition-all duration-200 font-medium shadow-sm"
                 >
                   Run
