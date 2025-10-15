@@ -10,7 +10,7 @@ export const PostModal = (
 ) => {
   if (!post) return null;
   const { comments, loading, error, addComment, loadMore , isLoadingMore } = useComments(post.id);
-  const { liked, disliked, toggleLike, toggleDislike } = useRatings(post.id);
+  const { liked, disliked, toggleLike, toggleDislike } = useRatings(post.id, post.ratingValue);
   const [likePop, setLikePop] = useState(false);
   const [dislikePop, setDislikePop] = useState(false);
   const [eyeOpen, setEyeOpen] = useState(true);

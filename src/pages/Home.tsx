@@ -36,13 +36,7 @@ const HomePage = () => {
         <div className="sticky top-0 z-10 !bg-gray-900 border-b border-gray-800">
           <div className="p-6">
             <div className="max-w-6xl mx-auto">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-4">
-                <h1 className="text-2xl font-bold text-white">Explore Posts</h1>
-                <div className="text-sm text-gray-400">
-                  {availableTags.length > 0 && `${availableTags.length} tags available`}
-                </div>
-              </div>
+
 
               {/* Tag Filter */}
               <div className="flex items-center gap-3">

@@ -130,6 +130,18 @@ export const updateProfileInfo = async (profileData: ProfileUpdateData): Promise
   return data.user || data;
 };
 
+
+export const deleteProfile = async (userId: string): Promise<void> => {
+  const response = await fetchWithRefresh(`${serverPath}/api/users/${userId}`, {
+    method: 'DELETE',
+    credentials: 'include'
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete profile');
+  }
+};
+
 // API function to upload profile image file
 export const uploadProfileImageFile = async (file: File): Promise<any> => {
   const formData = new FormData();
