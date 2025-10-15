@@ -5,8 +5,8 @@ import { PostModal } from './postmodal';
 import { useAuthStore } from '../store/useAuthStore';
 import { Heart, MessageCircle } from 'lucide-react';
 
-export const PostGallery = ({ userId }: { userId?: string }) => {
-  const { posts, loading, error, loadMore, isLoadingMore } = usePosts({ userId: userId });
+export const PostGallery = ({ userId, tag }: { userId?: string; tag?: string }) => {
+  const { posts, loading, error, loadMore, isLoadingMore } = usePosts({ userId: userId, tag: tag });
   const auth = useAuthStore();
   const id = auth.user?.id; // Adjust this line if your user ID is stored differently
   const sentinelRef = useInfiniteScroll({
@@ -32,6 +32,7 @@ export const PostGallery = ({ userId }: { userId?: string }) => {
       setSelectedPost(post);
     }
   };
+
 
   useEffect(() => {
     const onPopState = (e: PopStateEvent) => {

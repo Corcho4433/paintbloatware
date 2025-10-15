@@ -18,6 +18,7 @@ type UserInfo = {
   name: string;
   description: string;
   urlPfp: string;
+  oauth: boolean;
 }
 
 // Profile update types
