@@ -144,8 +144,8 @@ const SettingsPage = () => {
                 onClick={() => setActiveSection('profile')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                   activeSection === 'profile' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                    ? '!bg-blue-600 text-white' 
+                    : 'text-gray-400 hover:text-white hover:!bg-gray-700'
                 }`}
               >
                 <User className="w-4 h-4" />
@@ -155,8 +155,8 @@ const SettingsPage = () => {
                 onClick={() => setActiveSection('preferences')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                   activeSection === 'preferences' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                    ? '!bg-blue-600 text-white' 
+                    : 'text-gray-400 hover:text-white hover:!bg-gray-700'
                 }`}
               >
                 <Palette className="w-4 h-4" />
@@ -166,8 +166,8 @@ const SettingsPage = () => {
                 onClick={() => setActiveSection('account')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                   activeSection === 'account' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                    ? '!bg-blue-600 text-white' 
+                    : 'text-gray-400 hover:text-white hover:!bg-gray-700'
                 }`}
               >
                 <Shield className="w-4 h-4" />
@@ -211,7 +211,7 @@ const SettingsPage = () => {
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
                             disabled={uploadingImage}
-                            className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white text-sm rounded hover:bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 px-3 py-2 !bg-gray-600 text-white text-sm rounded hover:!bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <Upload className="w-4 h-4" />
                             Choose File
@@ -234,8 +234,8 @@ const SettingsPage = () => {
                               disabled={uploadingImage}
                               className={`px-3 py-1 text-sm rounded transition-colors ${
                                 uploadingImage
-                                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                                  ? '!bg-gray-600 text-gray-400 cursor-not-allowed'
+                                  : '!bg-blue-600 text-white hover:!bg-blue-700'
                               }`}
                             >
                               {uploadingImage ? 'Uploading...' : 'Upload File'}
@@ -243,7 +243,7 @@ const SettingsPage = () => {
                             <button
                               onClick={clearSelectedFile}
                               disabled={uploadingImage}
-                              className="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-500 transition-colors disabled:opacity-50"
+                              className="px-3 py-1 !bg-gray-600 text-white text-sm rounded hover:!bg-gray-500 transition-colors disabled:opacity-50"
                             >
                               Cancel
                             </button>
@@ -292,8 +292,9 @@ const SettingsPage = () => {
                           type="email"
                           id="email"
                           name="email"
+                          disabled={user?.oauth} // Disable if OAuth user
                           placeholder="your.email@example.com"
-                          className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className={`${user?.oauth ? 'bg-gray-900 cursor-not-allowed' : 'bg-gray-700'} w-full px-3 py-2 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         <ErrorMessage name="email" component="div" className="text-red-400 text-sm mt-1" />
                       </div>
@@ -346,8 +347,8 @@ const SettingsPage = () => {
                         disabled={isSubmitting}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                           isSubmitting
-                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                            ? '!bg-gray-600 text-gray-400 cursor-not-allowed'
+                            : '!bg-blue-600 text-white hover:!bg-blue-700'
                         }`}
                       >
                         <Save className="w-4 h-4" />
@@ -419,7 +420,7 @@ const SettingsPage = () => {
 
                 <button
                   onClick={handleSavePreferences}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 !bg-blue-600 text-white rounded-lg hover:!bg-blue-700 transition-colors"
                 >
                   <Save className="w-4 h-4" />
                   Save Preferences
@@ -497,7 +498,7 @@ const SettingsPage = () => {
 
                     <button
                       onClick={handleChangePassword}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 !bg-blue-600 text-white rounded-lg hover:!bg-blue-700 transition-colors"
                     >
                       <Save className="w-4 h-4" />
                       Change Password
@@ -509,10 +510,10 @@ const SettingsPage = () => {
                 <div className="border-t border-gray-700 pt-6">
                   <h3 className="text-lg font-medium text-red-400 mb-3">Danger Zone</h3>
                   <div className="space-y-3">
-                    <button className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    <button className="w-full px-4 py-2 !bg-red-600 text-white rounded-lg hover:!bg-red-700 transition-colors">
                       Export Account Data
                     </button>
-                    <button className="w-full px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors">
+                    <button className="w-full px-4 py-2 !bg-red-700 text-white rounded-lg hover:!bg-red-800 transition-colors">
                       Delete Account
                     </button>
                   </div>

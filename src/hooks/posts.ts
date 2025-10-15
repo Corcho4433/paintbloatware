@@ -10,6 +10,7 @@ interface UsePostsOptions {
   autoRefresh?: boolean;
   refreshInterval?: number; // in milliseconds
   userId?: string; 
+  tag?: string; // Add tag parameter
 }
 
 export function usePostById(postId: string | null) {
@@ -52,7 +53,8 @@ export function usePosts(options: UsePostsOptions = {}) {
     initialPage = 1, 
     autoRefresh = false, 
     refreshInterval = 30000, // 30 seconds default
-    userId = null
+    userId = null,
+    tag = null // Add tag parameter
   } = options;
 
   const [posts, setPosts] = useState<PostPage | null>(null);
@@ -81,10 +83,15 @@ export function usePosts(options: UsePostsOptions = {}) {
     
     abortControllerRef.current = new AbortController();
     
-    // Add userId to URL if provided
-    const url = userId 
-      ? `${serverPath}/api/posts/user/${userId}?page=${page}`
-      : `${serverPath}/api/posts?page=${page}`;
+    // Build URL based on parameters
+    let url: string;
+    if (userId) {
+      url = `${serverPath}/api/posts/user/${userId}?page=${page}`;
+    } else if (tag) {
+      url = `${serverPath}/api/posts/tag/${encodeURIComponent(tag)}?page=${page}`;
+    } else {
+      url = `${serverPath}/api/posts?page=${page}`;
+    }
     
     const res = await fetch(url, {
       method: "GET",
@@ -96,9 +103,7 @@ export function usePosts(options: UsePostsOptions = {}) {
     if (!res.ok) throw new Error(`Failed to fetch posts: ${res.statusText}`);
     const data: PostPage = await res.json();
     
-    console.log("data.maxPages", data);
     if (data.totalCount === 0){
-      console.log("h9adsfpadsf")
       throw new NoPostsMadeYet("No posts made yet")
     }
     
@@ -106,7 +111,7 @@ export function usePosts(options: UsePostsOptions = {}) {
     pageCache.set(page, data);
     
     return data;
-  }, [pageCache, userId]);
+  }, [pageCache, userId, tag]);
 
   const load = useCallback(async (page: number = currentPage, isRefresh: boolean = false) => {
     try {

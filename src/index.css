@@ -23,6 +23,15 @@
     scrollbar-width: thin;
     scrollbar-color: #444 #1f1f1f; /* thumb color, track color */
   }
+
+  /* Hide scrollbar utility class */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+  }
 }
 
 @layer utilities {
@@ -134,15 +143,3 @@ button:focus-visible {
 }
   */
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #ff00ea;
-    background-color: #7300ff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #00ffa6;
-  }
-}
