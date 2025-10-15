@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
-// Props for the component
 interface CodeSnippetsProps {
   snippetImports: Record<string, () => Promise<string>>;
 }
@@ -15,65 +14,86 @@ const CodeSnippets = ({ snippetImports }: CodeSnippetsProps) => {
   useEffect(() => {
     const loadSnippets = async () => {
       const keys = Object.keys(snippetImports);
-      const loaded: { name: string; content: string }[] = [];
-
+      const loaded = [];
       for (const key of keys) {
         const module = await snippetImports[key]();
         const name = key.split("/").pop()?.replace(".md", "") || "Snippet";
         loaded.push({ name, content: module as string });
       }
-
       setSnippets(loaded);
     };
-
     loadSnippets();
   }, [snippetImports]);
 
-  const buttonStyle = (active: boolean) => ({
-    padding: "0.25rem 0.5rem",
-    background: active ? "#3b82f6" : "#60a5fa",
-    color: "#fff",
-    border: "1px solid #2563eb",
-    borderRadius: "4px",
-    cursor: "pointer",
-  });
+  const extractCode = (markdown: string) => {
+    const match = markdown.match(/```lua\s*([\s\S]*?)```/i);
+    return match ? match[1].trim() : markdown.trim();
+  };
+
+  const copyToClipboard = async (text: string) => {
+    const codeOnly = extractCode(text);
+    await navigator.clipboard.writeText(codeOnly);
+  };
 
   return (
     <div
       style={{
-        flex: 1,
-        overflowY: "auto",
-        display: "flex",
-        flexDirection: "column",
-        gap: "0.5rem",
+        background: "#1F2937",
+        color: "#E0E7FF",
+        padding: "1rem",
+        borderRadius: "8px",
       }}
     >
-      
-
-      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
-        {snippets.map((s, idx) => (
+      {/* Buttons */}
+      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
+        {snippets.map((s, i) => (
           <button
-            key={idx}
-            onClick={() => setActiveSnippet(idx)}
-            style={buttonStyle(idx === activeSnippet)}
+            key={i}
+            onClick={() => setActiveSnippet(i)}
+            style={{
+              background: i === activeSnippet ? "#3B82F6" : "#2563EB",
+              color: "#fff",
+              border: "1px solid #1E40AF",
+              borderRadius: "6px",
+              cursor: "pointer",
+              padding: "0.4rem 0.8rem",
+            }}
           >
             {s.name}
           </button>
         ))}
       </div>
 
+      {/* Snippet display */}
       {snippets[activeSnippet] && (
-        <div
-          style={{
-            background: "#bfdbfe",
-            padding: "0.5rem",
-            borderRadius: "4px",
-            flex: 1,
-            overflowY: "auto",
-            color: "#1e3a8a",
-          }}
-        >
-          <ReactMarkdown>{snippets[activeSnippet].content}</ReactMarkdown>
+        <div style={{ position: "relative" }}>
+          <button
+            onClick={() => copyToClipboard(snippets[activeSnippet].content)}
+            style={{
+              position: "absolute",
+              top: "8px",
+              right: "8px",
+              background: "#374151",
+              color: "#E0E7FF",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              padding: "0.3rem 0.6rem",
+              fontSize: "0.8rem",
+            }}
+          >
+            Copy
+          </button>
+          <div
+            style={{
+              background: "#273349",
+              padding: "1rem",
+              borderRadius: "6px",
+              overflowX: "auto",
+            }}
+          >
+            <ReactMarkdown>{snippets[activeSnippet].content}</ReactMarkdown>
+          </div>
         </div>
       )}
     </div>
