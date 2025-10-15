@@ -132,7 +132,7 @@ export const updateProfileInfo = async (profileData: ProfileUpdateData): Promise
 
 
 export const deleteProfile = async (userId: string): Promise<void> => {
-  const response = await fetchWithRefresh(`${serverPath}/api/users/${userId}`, {
+  const response = await fetchWithRefresh(`${serverPath}/api/users/delete/${userId}`, {
     method: 'DELETE',
     credentials: 'include'
   });
