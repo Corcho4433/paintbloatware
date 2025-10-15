@@ -1,5 +1,6 @@
 import { PostResponse } from "../types/requests";
 import { useComments } from "../hooks/comments";
+import { useRatings } from "../hooks/ratings";
 import { Link } from "react-router-dom";
 import { Heart, MessageCircle, Share2, Eye, EyeOff, HeartCrack, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
@@ -9,8 +10,7 @@ export const PostModal = (
 ) => {
   if (!post) return null;
   const { comments, loading, error, addComment, loadMore , isLoadingMore } = useComments(post.id);
-  const [liked, setLiked] = useState(false); // added
-  const [disliked, setDisliked] = useState(false); // added
+  const { liked, disliked, toggleLike, toggleDislike } = useRatings(post.id);
   const [likePop, setLikePop] = useState(false);
   const [dislikePop, setDislikePop] = useState(false);
   const [eyeOpen, setEyeOpen] = useState(true);
@@ -46,27 +46,36 @@ export const PostModal = (
     setDislikePop(true);
     setTimeout(() => setDislikePop(false), 300);
   };
-  const handleToggleDislike = ( ) => {
-    setDisliked(d => !d);
-    if (liked && !disliked) {
-      setLiked(false);
-    }
+  const handleToggleDislike = async () => {
     triggerDislikePop();
-  };
-
-  const handleToggleLike = () => {
-    setLiked(l => !l);
-    if (disliked && !liked) {
-      setDisliked(false);
+    
+    try {
+      await toggleDislike();
+    } catch (error) {
+      console.error("Failed to toggle dislike:", error);
     }
-    triggerLikePop();
   };
 
-  const handleImageDoubleClick = () => {
-    // Force like on double click
-    setLiked(true);
-    setDisliked(false); 
+  const handleToggleLike = async () => {
     triggerLikePop();
+    
+    try {
+      await toggleLike();
+    } catch (error) {
+      console.error("Failed to toggle like:", error);
+    }
+  };
+
+  const handleImageDoubleClick = async () => {
+    try {
+      // Force like on double click
+      if (!liked) {
+        await toggleLike();
+      }
+      triggerLikePop();
+    } catch (error) {
+      console.error("Failed to like on double click:", error);
+    }
   };
   const sentinelRef = useInfiniteScroll({
     loadMore,
@@ -255,7 +264,9 @@ export const PostModal = (
               <button
                 type="button"
                 onClick={handleToggleLike}
-                className={`p-2 rounded transition-colors ${liked ? 'text-red-500' : 'text-white hover:text-gray-400'}`}
+                className={`p-2 rounded transition-colors ${
+                  liked ? 'text-red-500' : 'text-white hover:text-gray-400'
+                }`}
                 aria-pressed={liked}
                 aria-label="Like"
               >
@@ -270,7 +281,9 @@ export const PostModal = (
               <button
                 type="button"
                 onClick={handleToggleDislike}
-                className={`p-2 rounded transition-colors ${disliked ? 'text-blue-400' : 'text-white hover:text-gray-400'}`}
+                className={`p-2 rounded transition-colors ${
+                  disliked ? 'text-blue-400' : 'text-white hover:text-gray-400'
+                }`}
                 aria-pressed={disliked}
                 aria-label="Dislike"
               >

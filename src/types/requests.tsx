@@ -8,6 +8,7 @@ export interface PostResponse {
   description: string,
   created_at: string,
   edited: boolean,
+  rating?: number, // Sum of all ratings for this post
   TagsForPost: { tag: { name: string } }[],
   user: {
     name: string,
@@ -16,8 +17,8 @@ export interface PostResponse {
   },
   _count: {
     comments: number,
-  },
-  rating: number;
+    ratings?: number, // Count of total ratings
+  }
 }
 
 // Base Comment interface
