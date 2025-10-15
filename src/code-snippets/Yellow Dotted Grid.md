@@ -4,9 +4,8 @@ Draws yellow dots evenly spaced on a dark background.
 
 Snippet:
 
-local max = 31
-
 ```lua
+local max = 31
 for x = 0, max do
     for y = 0, max do
         if (x % 4 == 0 and y % 4 == 0) then
