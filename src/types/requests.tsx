@@ -17,8 +17,8 @@ export interface PostResponse {
   },
   _count: {
     comments: number,
-    ratings?: number, // Count of total ratings
-  }
+  },
+	ratingValue: number // 1 | -1 | 0 for like/dislike by current user
 }
 
 // Base Comment interface

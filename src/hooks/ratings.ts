@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { serverPath } from "../utils/servers";
 import fetchWithRefresh from "./authorization";
 import { useAuthStore } from "../store/useAuthStore";
@@ -10,7 +10,7 @@ interface RatingState {
   error: string | null;
 }
 
-export function useRatings(postId: string) {
+export function useRatings(postId: string, initialRatingValue?: number) {
   const user = useAuthStore((state) => state.user);
   const [ratingState, setRatingState] = useState<RatingState>({
     liked: false,
@@ -18,6 +18,24 @@ export function useRatings(postId: string) {
     loading: false,
     error: null,
   });
+
+  // Initialize state based on the post's ratingValue
+  useEffect(() => {
+    if (initialRatingValue !== undefined) {
+      setRatingState(prev => ({
+        ...prev,
+        liked: initialRatingValue === 1,
+        disliked: initialRatingValue === -1,
+      }));
+    } else {
+      // If no initial rating value, reset to default state
+      setRatingState(prev => ({
+        ...prev,
+        liked: false,
+        disliked: false,
+      }));
+    }
+  }, [initialRatingValue]);
 
   const createRating = useCallback(async (value: 1 | -1 | 0) => {
     if (!user) {

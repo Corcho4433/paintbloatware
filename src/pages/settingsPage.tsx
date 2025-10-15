@@ -21,26 +21,25 @@ const profileValidationSchema = Yup.object({
 
 const SettingsPage = () => {
   const auth = useAuthStore();
-  const authUser = auth.user; 
-  const {user, loading} = useUserInfo(authUser?.id)
-  
+  const authUser = auth.user;
+  const { user, loading } = useUserInfo(authUser?.id)
+
   // Profile picture state (file upload only)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // App preferences state
   const [sidebarCollapsed, setSidebarCollapsed] = useState(auth.isDesktopSidebarCollapsed);
   const [notifications, setNotifications] = useState(true);
   const [privateProfile, setPrivateProfile] = useState(false);
-  
+
   // Account settings state
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPasswords, setShowPasswords] = useState(false);
-  
+
   const [activeSection, setActiveSection] = useState('profile');
 
   useEffect(() => {
@@ -50,49 +49,40 @@ const SettingsPage = () => {
     }
   }, [user, loading]);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setSelectedFile(file);
       // Create a preview URL for the selected file
       const preview = URL.createObjectURL(file);
       setPreviewUrl(preview);
-    }
-  };
 
-  const handleFileUpload = async () => {
-    if (!selectedFile) return;
+      // Automatically upload the file
+      setUploadingImage(true);
+      try {
+        // Use the new upload function
+        const updatedUser = await uploadProfileImageFile(file);
 
-    setUploadingImage(true);
-    try {
-      // Use the new upload function
-      const updatedUser = await uploadProfileImageFile(selectedFile);
-      
-      // Update the preview with the uploaded image URL
-      setPreviewUrl(updatedUser.urlPfp);
-      setSelectedFile(null);
-      
-      // Clear file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        // Update the preview with the uploaded image URL
+        setPreviewUrl(updatedUser.urlPfp);
+
+        // Clear file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+
+        alert('Profile image uploaded successfully!');
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        alert('Failed to upload image');
+        // Reset to original profile picture on error
+        setPreviewUrl(user?.urlPfp || '');
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      } finally {
+        setUploadingImage(false);
       }
-      
-      alert('Profile image uploaded successfully!');
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Failed to upload image');
-    } finally {
-      setUploadingImage(false);
     }
-  };
-
-  const clearSelectedFile = () => {
-    setSelectedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-    // Reset to original profile picture
-    setPreviewUrl(user?.urlPfp || '');
   };
 
   const handleSavePreferences = () => {
@@ -142,33 +132,30 @@ const SettingsPage = () => {
             <div className="flex gap-2">
               <button
                 onClick={() => setActiveSection('profile')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  activeSection === 'profile' 
-                    ? '!bg-blue-600 text-white' 
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeSection === 'profile'
+                    ? '!bg-blue-600 text-white'
                     : 'text-gray-400 hover:text-white hover:!bg-gray-700'
-                }`}
+                  }`}
               >
                 <User className="w-4 h-4" />
                 Profile
               </button>
               <button
                 onClick={() => setActiveSection('preferences')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  activeSection === 'preferences' 
-                    ? '!bg-blue-600 text-white' 
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeSection === 'preferences'
+                    ? '!bg-blue-600 text-white'
                     : 'text-gray-400 hover:text-white hover:!bg-gray-700'
-                }`}
+                  }`}
               >
                 <Palette className="w-4 h-4" />
                 Preferences
               </button>
               <button
                 onClick={() => setActiveSection('account')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  activeSection === 'account' 
-                    ? '!bg-blue-600 text-white' 
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeSection === 'account'
+                    ? '!bg-blue-600 text-white'
                     : 'text-gray-400 hover:text-white hover:!bg-gray-700'
-                }`}
+                  }`}
               >
                 <Shield className="w-4 h-4" />
                 Account
@@ -183,7 +170,7 @@ const SettingsPage = () => {
                 <User className="w-5 h-5" />
                 Profile Information
               </h2>
-              
+
               <div className="space-y-6">
                 {/* Profile Picture - File Upload Only */}
                 <div>
@@ -205,6 +192,7 @@ const SettingsPage = () => {
                           accept="image/*"
                           onChange={handleFileSelect}
                           className="hidden"
+                          disabled={uploadingImage}
                         />
                         <div className="flex items-center gap-2">
                           <button
@@ -214,41 +202,17 @@ const SettingsPage = () => {
                             className="flex items-center gap-2 px-3 py-2 !bg-gray-600 text-white text-sm rounded hover:!bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <Upload className="w-4 h-4" />
-                            Choose File
+                            {uploadingImage ? 'Uploading...' : 'Choose File'}
                           </button>
-                          {selectedFile && (
-                            <span className="text-sm text-gray-300">
-                              {selectedFile.name}
+                          {uploadingImage && (
+                            <span className="text-sm text-blue-400">
+                              Uploading image...
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-gray-400 mt-1">Upload an image file (JPG, PNG, GIF)</p>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex gap-2">
-                        {selectedFile && (
-                          <>
-                            <button
-                              onClick={handleFileUpload}
-                              disabled={uploadingImage}
-                              className={`px-3 py-1 text-sm rounded transition-colors ${
-                                uploadingImage
-                                  ? '!bg-gray-600 text-gray-400 cursor-not-allowed'
-                                  : '!bg-blue-600 text-white hover:!bg-blue-700'
-                              }`}
-                            >
-                              {uploadingImage ? 'Uploading...' : 'Upload File'}
-                            </button>
-                            <button
-                              onClick={clearSelectedFile}
-                              disabled={uploadingImage}
-                              className="px-3 py-1 !bg-gray-600 text-white text-sm rounded hover:!bg-gray-500 transition-colors disabled:opacity-50"
-                            >
-                              Cancel
-                            </button>
-                          </>
-                        )}
+                        <p className="text-xs text-gray-400 mt-1">
+                          Upload an image file (JPG, PNG, GIF) - uploads automatically when selected
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -292,9 +256,9 @@ const SettingsPage = () => {
                           type="email"
                           id="email"
                           name="email"
-                          disabled={user?.oauth} // Disable if OAuth user
+                          disabled={user?.oauth === true} // Disable if OAuth user
                           placeholder="your.email@example.com"
-                          className={`${user?.oauth ? 'bg-gray-900 cursor-not-allowed' : 'bg-gray-700'} w-full px-3 py-2 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                          className={`${user?.oauth === true ? 'bg-gray-900 cursor-not-allowed' : 'bg-gray-700'} w-full px-3 py-2 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         <ErrorMessage name="email" component="div" className="text-red-400 text-sm mt-1" />
                       </div>
@@ -332,11 +296,10 @@ const SettingsPage = () => {
 
                       {/* Status Messages */}
                       {status && (
-                        <div className={`p-3 rounded ${
-                          status.type === 'success' 
-                            ? 'bg-green-600 text-white' 
+                        <div className={`p-3 rounded ${status.type === 'success'
+                            ? 'bg-green-600 text-white'
                             : 'bg-red-600 text-white'
-                        }`}>
+                          }`}>
                           {status.message}
                         </div>
                       )}
@@ -345,11 +308,10 @@ const SettingsPage = () => {
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                          isSubmitting
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isSubmitting
                             ? '!bg-gray-600 text-gray-400 cursor-not-allowed'
                             : '!bg-blue-600 text-white hover:!bg-blue-700'
-                        }`}
+                          }`}
                       >
                         <Save className="w-4 h-4" />
                         {isSubmitting ? 'Saving...' : 'Save Profile Changes'}
@@ -368,7 +330,7 @@ const SettingsPage = () => {
                 <Palette className="w-5 h-5" />
                 App Preferences
               </h2>
-              
+
               <div className="space-y-6">
                 {/* Sidebar Settings */}
                 <div>
@@ -385,8 +347,8 @@ const SettingsPage = () => {
                     <span className="text-gray-300">Collapse sidebar by default</span>
                   </div>
                 </div>
-
-                {/* Notifications */}
+                {/*
+                {/* Notifications 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Notifications
@@ -401,8 +363,9 @@ const SettingsPage = () => {
                     <span className="text-gray-300">Enable notifications</span>
                   </div>
                 </div>
+                */}
 
-                {/* Privacy */}
+                {/* Privacy 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Privacy
@@ -417,7 +380,7 @@ const SettingsPage = () => {
                     <span className="text-gray-300">Make profile private</span>
                   </div>
                 </div>
-
+                  */}
                 <button
                   onClick={handleSavePreferences}
                   className="flex items-center gap-2 px-4 py-2 !bg-blue-600 text-white rounded-lg hover:!bg-blue-700 transition-colors"
@@ -436,10 +399,11 @@ const SettingsPage = () => {
                 <Shield className="w-5 h-5" />
                 Account Security
               </h2>
-              
+
               <div className="space-y-6">
                 {/* Change Password */}
-                <div>
+                {user?.oauth === true ? (<div> <p className="text-gray-400">No puedes cambiar la contraseña</p></div>
+                ) : (<div>
                   <h3 className="text-lg font-medium text-white mb-3">Change Password</h3>
                   <div className="space-y-4">
                     <div>
@@ -456,7 +420,7 @@ const SettingsPage = () => {
                         />
                       </div>
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
                         New Password
@@ -469,7 +433,7 @@ const SettingsPage = () => {
                         className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
                         Confirm New Password
@@ -504,7 +468,7 @@ const SettingsPage = () => {
                       Change Password
                     </button>
                   </div>
-                </div>
+                </div>)}
 
                 {/* Danger Zone */}
                 <div className="border-t border-gray-700 pt-6">
