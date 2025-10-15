@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import PaintSidebar from '../components/paintsidebar';
 import { useAuthStore } from '../store/useAuthStore';
+import { deleteProfile } from '../hooks/user';
 import { User, Settings, Shield, Palette, Save, Eye, EyeOff, Upload } from 'lucide-react';
 import { useUserInfo, updateProfileInfo, uploadProfileImageFile } from '../hooks/user';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
@@ -477,7 +478,7 @@ const SettingsPage = () => {
                     <button className="w-full px-4 py-2 !bg-red-600 text-white rounded-lg hover:!bg-red-700 transition-colors">
                       Export Account Data
                     </button>
-                    <button className="w-full px-4 py-2 !bg-red-700 text-white rounded-lg hover:!bg-red-800 transition-colors">
+                    <button onClick={() =>deleteProfile(user!.id)} className="w-full px-4 py-2 !bg-red-700 text-white rounded-lg hover:!bg-red-800 transition-colors">
                       Delete Account
                     </button>
                   </div>
