@@ -3,7 +3,6 @@ import { Sidebar, SidebarItem, SidebarItemGroup } from "flowbite-react";
 import { BookOpen } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-// Ahora acepta archivos .md
 const articleImports = import.meta.glob("../wiki-articles/*.md", {
   query: "?raw",
   import: "default",
@@ -100,7 +99,30 @@ const Wiki = () => {
               <h1 className="text-2xl font-bold text-white">{selected}</h1>
             </header>
             <article className="prose prose-invert max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  p: ({ children }) => (
+                    <p className="whitespace-pre-wrap mb-4">{children}</p>
+                  ),
+                  ul: ({ children }) => (
+                    <ul className="list-disc list-inside mb-4 ml-4">
+                      {children}
+                    </ul>
+                  ),
+                  ol: ({ children }) => (
+                    <ol className="list-decimal list-inside mb-4 ml-4">
+                      {children}
+                    </ol>
+                  ),
+                  li: ({ children }) => <li className="mb-1">{children}</li>,
+                  blockquote: ({ children }) => (
+                    <blockquote className="border-l-4 border-gray-500 pl-4 italic mb-4">
+                      {children}
+                    </blockquote>
+                  ),
+                }}
+              >
                 {articles[selected]}
               </ReactMarkdown>
             </article>
