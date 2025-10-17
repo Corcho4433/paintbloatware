@@ -2,8 +2,6 @@
 
 Creates alternating green stripes across the image.
 
-Snippet:
-
 ```lua
 local size = 64
 local max = size - 1

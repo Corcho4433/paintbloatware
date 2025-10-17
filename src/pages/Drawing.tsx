@@ -97,6 +97,18 @@ const Drawing = () => {
     sourceRef.current = newSource;
   }, []);
 
+  // Sync scroll between textarea and syntax highlighter
+  const handleScroll = useCallback(() => {
+    if (textareaRef.current && syntaxHighlighterRef.current) {
+      requestAnimationFrame(() => {
+        if (textareaRef.current && syntaxHighlighterRef.current) {
+          syntaxHighlighterRef.current.scrollTop = textareaRef.current.scrollTop;
+          syntaxHighlighterRef.current.scrollLeft = textareaRef.current.scrollLeft;
+        }
+      });
+    }
+  }, []);
+
   useEffect(() => {
     dimensionRef.current = gridSize;
   }, [gridSize]);
@@ -294,129 +306,145 @@ const Drawing = () => {
       <PaintSidebar />
       <div className="flex flex-1 gap-6 p-6">
         {/* Editor Column */}
-        <div className="flex-1 flex flex-col bg-gray-800 rounded-lg border border-gray-700">
-          <div className="mx-6 mt-6">
-            <h2 className="text-2xl font-bold text-white mb-2">Source Code</h2>
-            <p className="text-gray-400 text-sm">Write your Lua code here</p>
-          </div>
-          <div className="flex-1 bg-gray-900 m-6 rounded-lg overflow-hidden relative">
-            {/* Theme selector */}
-            <div className="absolute top-2 right-2 z-10">
-              <select
-                value={editorTheme}
-                onChange={(e) => setEditorTheme(e.target.value)}
-                className="bg-gray-700 text-white text-xs px-2 py-1 rounded border border-gray-600 hover:bg-gray-600 focus:outline-none focus:border-blue-500"
-              >
-                {Object.keys(themes).map((themeName) => (
-                  <option key={themeName} value={themeName}>
-                    {themeName}
-                  </option>
-                ))}
-              </select>
+        <div className="flex flex-col w-full">
+        <div className="flex-row flex gap-3 mb-3 w-full">
+          <div className="flex-1 flex flex-col bg-gray-800 rounded-lg border border-gray-700">
+            <div className="mx-6 mt-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Source Code</h2>
+              <p className="text-gray-400 text-sm">Write your Lua code here</p>
             </div>
-            {/* Syntax highlighted background */}
-            <div className="absolute inset-0 pointer-events-none overflow-auto">
-              <SyntaxHighlighter
-                language="lua"
-                style={themes[editorTheme as keyof typeof themes] || themes.dracula}
-                customStyle={{
-                  margin: 0,
-                  padding: '1.5rem',
-                  background: 'transparent',
-                  fontSize: '0.875rem',
-                  lineHeight: '1.5',
-                }}
-                codeTagProps={{
-                  style: {
-                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                  }
-                }}
-              >
-                {source || ' '}
-              </SyntaxHighlighter>
-            </div>
-            {/* Transparent textarea overlay */}
-            <textarea
-              ref={textareaRef}
-              id="source"
-              value={source}
-              onChange={handleSourceChange}
-              onKeyDown={handleAlternativeInputs}
-              className="absolute inset-0 w-full h-full bg-transparent outline-none text-transparent caret-white border-none p-6 font-mono text-sm resize-none placeholder-gray-500 whitespace-pre"
-              placeholder="Enter your Lua code here..."
-              spellCheck={false}
-              style={{
-                caretColor: 'white',
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Preview + Snippets Column */}
-        <div className="flex flex-1 flex-col gap-6">
-          {/* Preview Section */}
-          <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2">Preview</h2>
-              <p className="text-gray-400 text-sm">
-                Live preview of your animation
-              </p>
-            </div>
-
-            <div className="bg-gray-900 rounded-lg p-6 mb-6 flex justify-center items-center">
-              <canvas
-                ref={canvasRef}
-                width={FIXED_CANVAS_SIZE}
-                height={FIXED_CANVAS_SIZE}
-                className="border-2 border-gray-600 rounded-lg shadow-lg [image-rendering:pixelated]"
-              />
-            </div>
-
-            {/* Controls */}
-            <div className="flex flex-wrap gap-3 items-center justify-between">
-              <div className="flex gap-2">
-                <button
-                  onClick={sendUpdatedSource}
-                  className="px-4 py-2 rounded-lg border border-green-600 bg-green-600 text-white hover:bg-green-700 transition-all duration-200 font-medium shadow-sm"
+            <div className="flex-1 bg-gray-900 m-6 rounded-lg relative overflow-hidden">
+              {/* Theme selector */}
+              <div className="absolute top-2 right-2 z-10">
+                <select
+                  value={editorTheme}
+                  onChange={(e) => setEditorTheme(e.target.value)}
+                  className="bg-gray-700 text-white text-xs px-2 py-1 rounded border border-gray-600 hover:bg-gray-600 focus:outline-none focus:border-blue-500"
                 >
-                  Run
-                </button>
-                <button
-                  onClick={handleStep}
-                  className="px-4 py-2 rounded-lg border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm"
-                >
-                  Step
-                </button>
-                <button
-                  onClick={handlePost}
-                  className="px-4 py-2 rounded-lg border border-purple-600 bg-purple-600 text-white hover:bg-purple-700 transition-all duration-200 font-medium shadow-sm"
-                >
-                  Post
-                </button>
+                  {Object.keys(themes).map((themeName) => (
+                    <option key={themeName} value={themeName}>
+                      {themeName}
+                    </option>
+                  ))}
+                </select>
               </div>
-
-              <div className="flex items-center gap-3 bg-gray-700 rounded-lg px-3 py-2">
-                <label className="text-gray-300 text-sm font-medium">
-                  Grid Size:
-                </label>
-                <input
-                  type="number"
-                  value={gridSize}
-                  min={1}
-                  max={512}
-                  onChange={(e) =>
-                    setGridSize(
-                      Math.min(Math.max(parseInt(e.target.value) || 0, 0), 512)
-                    )
-                  }
-                  className="px-3 py-1 rounded-md border border-gray-600 bg-gray-800 text-white hover:bg-gray-700 focus:bg-gray-700 focus:border-blue-500 transition-all duration-200 w-20 text-sm"
+              
+              {/* Shared scrollable container */}
+              <div className="absolute inset-0 overflow-auto">
+                {/* Syntax highlighted background */}
+                <div className="absolute top-0 left-0 w-full pointer-events-none">
+                  <SyntaxHighlighter
+                    language="lua"
+                    style={themes[editorTheme as keyof typeof themes] || themes.dracula}
+                    customStyle={{
+                      margin: 0,
+                      padding: '1.5rem',
+                      background: 'transparent',
+                      fontSize: '0.875rem',
+                      lineHeight: '1.5',
+                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                    }}
+                    codeTagProps={{
+                      style: {
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                        fontSize: '0.875rem',
+                        lineHeight: '1.5',
+                      }
+                    }}
+                  >
+                    {source || ' '}
+                  </SyntaxHighlighter>
+                </div>
+                
+                {/* Transparent textarea overlay */}
+                <textarea
+                  ref={textareaRef}
+                  id="source"
+                  value={source}
+                  onChange={handleSourceChange}
+                  onKeyDown={handleAlternativeInputs}
+                  className="relative w-full bg-transparent outline-none text-transparent caret-white border-none resize-none placeholder-gray-500 whitespace-pre"
+                  placeholder="Enter your Lua code here..."
+                  spellCheck={false}
+                  style={{
+                    caretColor: 'white',
+                    padding: '1.5rem',
+                    fontSize: '0.875rem',
+                    lineHeight: '1.5',
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                    minHeight: '100%',
+                  }}
                 />
               </div>
             </div>
           </div>
+          {/* Preview + Snippets Column */}
+          <div className="flex flex-1 flex-col gap-6">
+            {/* Preview Section */}
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-white mb-2">Preview</h2>
+                <p className="text-gray-400 text-sm">
+                  Live preview of your animation
+                </p>
+              </div>
 
-          {/* Code Snippets */}
-          <div className="flex-1 bg-gray-800 rounded-lg border border-gray-700 p-6">
+              <div className="bg-gray-900 rounded-lg p-6 mb-6 flex justify-center items-center">
+                <canvas
+                  ref={canvasRef}
+                  width={FIXED_CANVAS_SIZE}
+                  height={FIXED_CANVAS_SIZE}
+                  className="border-2 border-gray-600 rounded-lg shadow-lg [image-rendering:pixelated]"
+                />
+              </div>
+
+              {/* Controls */}
+              <div className="flex flex-wrap gap-3 items-center justify-between">
+                <div className="flex gap-2">
+                  <button
+                    onClick={sendUpdatedSource}
+                    className="px-4 py-2 rounded-lg border border-green-600 bg-green-600 text-white hover:bg-green-700 transition-all duration-200 font-medium shadow-sm"
+                  >
+                    Run
+                  </button>
+                  <button
+                    onClick={handleStep}
+                    className="px-4 py-2 rounded-lg border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm"
+                  >
+                    Step
+                  </button>
+                  <button
+                    onClick={handlePost}
+                    className="px-4 py-2 rounded-lg border border-purple-600 bg-purple-600 text-white hover:bg-purple-700 transition-all duration-200 font-medium shadow-sm"
+                  >
+                    Post
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-3 bg-gray-700 rounded-lg px-3 py-2">
+                  <label className="text-gray-300 text-sm font-medium">
+                    Grid Size:
+                  </label>
+                  <input
+                    type="number"
+                    value={gridSize}
+                    min={1}
+                    max={512}
+                    onChange={(e) =>
+                      setGridSize(
+                        Math.min(Math.max(parseInt(e.target.value) || 0, 0), 512)
+                      )
+                    }
+                    className="px-3 py-1 rounded-md border border-gray-600 bg-gray-800 text-white hover:bg-gray-700 focus:bg-gray-700 focus:border-blue-500 transition-all duration-200 w-20 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
+
+          </div>
+         </div>
+         <div className="flex-1 bg-gray-800 rounded-lg border border-gray-700 p-6">
             <div className="mb-4">
               <h2 className="text-xl font-bold text-white mb-2">
                 Code Snippets

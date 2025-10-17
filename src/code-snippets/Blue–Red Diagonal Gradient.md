@@ -2,8 +2,6 @@
 
 Creates a diagonal gradient shifting from red to blue.
 
-Snippet:
-
 ```lua
 local size = 64
 local max = size - 1

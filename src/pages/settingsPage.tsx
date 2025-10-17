@@ -6,7 +6,36 @@ import { User, Settings, Shield, Palette, Save, Eye, EyeOff, Upload } from 'luci
 import { useUserInfo, updateProfileInfo, uploadProfileImageFile } from '../hooks/user';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-
+import {
+  dracula,
+  vscDarkPlus,
+  oneDark,
+  atomDark,
+  tomorrow,
+  okaidia,
+  darcula,
+  materialDark,
+  nord,
+  nightOwl,
+  coldarkDark,
+  duotoneDark,
+  solarizedDarkAtom
+} from 'react-syntax-highlighter/dist/esm/styles/prism';
+const themes = {
+  dracula,
+  vscDarkPlus,
+  oneDark,
+  atomDark,
+  tomorrow,
+  okaidia,
+  darcula,
+  materialDark,
+  nord,
+  nightOwl,
+  coldarkDark,
+  duotoneDark,
+  solarizedDarkAtom
+};
 // Validation schema for profile form
 const profileValidationSchema = Yup.object({
   name: Yup.string()
@@ -36,12 +65,15 @@ const callDeleteProfile = (userId: string) => {
         alert('Failed to delete profile. Please try again later.');
       });
 
-}};
+  }
+};
 
 const SettingsPage = () => {
   const auth = useAuthStore();
   const authUser = auth.user;
-  const { user, loading } = useUserInfo(authUser?.id)
+  const { user, loading } = useUserInfo(authUser?.id);
+  const editorTheme = useAuthStore((state) => state.editorTheme);
+  const setEditorTheme = useAuthStore((state) => state.setEditorTheme);
 
   // Profile picture state (file upload only)
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -104,12 +136,6 @@ const SettingsPage = () => {
     }
   };
 
-  const handleSavePreferences = () => {
-    // Update sidebar preference
-    auth.setDesktopSidebarCollapsed(sidebarCollapsed);
-    // TODO: Save other preferences to backend
-    console.log('Saving preferences:', { sidebarCollapsed, notifications, privateProfile });
-  };
 
   const handleChangePassword = () => {
     if (newPassword !== confirmPassword) {
@@ -152,8 +178,8 @@ const SettingsPage = () => {
               <button
                 onClick={() => setActiveSection('profile')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeSection === 'profile'
-                    ? '!bg-blue-600 text-white'
-                    : 'text-gray-400 hover:text-white hover:!bg-gray-700'
+                  ? '!bg-blue-600 text-white'
+                  : 'text-gray-400 hover:text-white hover:!bg-gray-700'
                   }`}
               >
                 <User className="w-4 h-4" />
@@ -162,8 +188,8 @@ const SettingsPage = () => {
               <button
                 onClick={() => setActiveSection('preferences')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeSection === 'preferences'
-                    ? '!bg-blue-600 text-white'
-                    : 'text-gray-400 hover:text-white hover:!bg-gray-700'
+                  ? '!bg-blue-600 text-white'
+                  : 'text-gray-400 hover:text-white hover:!bg-gray-700'
                   }`}
               >
                 <Palette className="w-4 h-4" />
@@ -172,8 +198,8 @@ const SettingsPage = () => {
               <button
                 onClick={() => setActiveSection('account')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeSection === 'account'
-                    ? '!bg-blue-600 text-white'
-                    : 'text-gray-400 hover:text-white hover:!bg-gray-700'
+                  ? '!bg-blue-600 text-white'
+                  : 'text-gray-400 hover:text-white hover:!bg-gray-700'
                   }`}
               >
                 <Shield className="w-4 h-4" />
@@ -316,8 +342,8 @@ const SettingsPage = () => {
                       {/* Status Messages */}
                       {status && (
                         <div className={`p-3 rounded ${status.type === 'success'
-                            ? 'bg-green-600 text-white'
-                            : 'bg-red-600 text-white'
+                          ? 'bg-green-600 text-white'
+                          : 'bg-red-600 text-white'
                           }`}>
                           {status.message}
                         </div>
@@ -328,8 +354,8 @@ const SettingsPage = () => {
                         type="submit"
                         disabled={isSubmitting}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isSubmitting
-                            ? '!bg-gray-600 text-gray-400 cursor-not-allowed'
-                            : '!bg-blue-600 text-white hover:!bg-blue-700'
+                          ? '!bg-gray-600 text-gray-400 cursor-not-allowed'
+                          : '!bg-blue-600 text-white hover:!bg-blue-700'
                           }`}
                       >
                         <Save className="w-4 h-4" />
@@ -366,47 +392,22 @@ const SettingsPage = () => {
                     <span className="text-gray-300">Collapse sidebar by default</span>
                   </div>
                 </div>
-                {/*
-                {/* Notifications 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Notifications
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={notifications}
-                      onChange={(e) => setNotifications(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
-                    />
-                    <span className="text-gray-300">Enable notifications</span>
-                  </div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Prefered Editor Theme
+                </label>
+                <div className="flex items-center gap-4">
+                  <select
+                    value={editorTheme}
+                    onChange={(e) => setEditorTheme(e.target.value)}
+                    className="bg-gray-700 text-white text-xs px-2 py-1 rounded border border-gray-600 hover:bg-gray-600 focus:outline-none focus:border-blue-500"
+                  >
+                    {Object.keys(themes).map((themeName) => (
+                      <option key={themeName} value={themeName}>
+                        {themeName}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                */}
-
-                {/* Privacy 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Privacy
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={privateProfile}
-                      onChange={(e) => setPrivateProfile(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
-                    />
-                    <span className="text-gray-300">Make profile private</span>
-                  </div>
-                </div>
-                  */}
-                <button
-                  onClick={handleSavePreferences}
-                  className="flex items-center gap-2 px-4 py-2 !bg-blue-600 text-white rounded-lg hover:!bg-blue-700 transition-colors"
-                >
-                  <Save className="w-4 h-4" />
-                  Save Preferences
-                </button>
               </div>
             </div>
           )}
@@ -493,7 +494,7 @@ const SettingsPage = () => {
                 <div className="border-t border-gray-700 pt-6">
                   <h3 className="text-lg font-medium text-red-400 mb-3">Danger Zone</h3>
                   <div className="space-y-3">
-                    
+
                     <button onClick={() => callDeleteProfile(user!.id)} className="w-full px-4 py-2 !bg-red-700 text-white rounded-lg hover:!bg-red-800 transition-colors">
                       Delete Account
                     </button>

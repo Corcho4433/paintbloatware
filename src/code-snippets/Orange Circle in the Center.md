@@ -2,8 +2,6 @@
 
 Draws a bright orange circle on a dark bluish background.
 
-Snippet:
-
 ```lua
 local size = 64
 local max = size - 1

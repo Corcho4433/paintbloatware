@@ -2,8 +2,6 @@
 
 Draws yellow dots evenly spaced on a dark background.
 
-Snippet:
-
 ```lua
 local size = 64
 local max = size - 1

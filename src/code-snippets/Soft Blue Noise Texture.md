@@ -2,8 +2,6 @@
 
 Generates a fog-like blue noise texture with random brightness.
 
-Snippet:
-
 ```lua
 local size = 64
 local max = size - 1
