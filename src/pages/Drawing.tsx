@@ -1,7 +1,25 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import PaintSidebar from "../components/paintsidebar";
 import { processorResponse, processorAction, Frame } from "../types/draw";
 import CodeSnippets from "../components/snippets";
+import { useAuthStore } from "../store/useAuthStore";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+// Import multiple themes
+import { 
+  dracula,
+  vscDarkPlus,
+  oneDark,
+  atomDark,
+  tomorrow,
+  okaidia,
+  darcula,
+  materialDark,
+  nord,
+  nightOwl,
+  coldarkDark,
+  duotoneDark,
+  solarizedDarkAtom
+} from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const snippetImports = import.meta.glob("../code-snippets/*.md", {
   query: "?raw",
@@ -9,19 +27,41 @@ const snippetImports = import.meta.glob("../code-snippets/*.md", {
 });
 
 const INITIAL_FRAME = 1;
-const FRAME_RATE = 24;
+const FRAME_RATE = 12; // Reduced from 24 to 12 FPS for less CPU usage
 const MS_TIME = (1 / FRAME_RATE) * 1000;
 const FIXED_CANVAS_SIZE = 512;
 const INITIAL_GRID_SIZE = 64;
 
-const example_text = `local max = ${INITIAL_GRID_SIZE - 1}
+const example_text = `local size = ${INITIAL_GRID_SIZE}
+local max = size - 1
 for x = 0, max do
     for y = 0, max do
-      grid:set_pixel(x, y, math.max(255 - (255/${INITIAL_GRID_SIZE}) * x, 0), 0, 0)
+      grid:set_pixel(x, y, math.max(255 - (255/size) * x, 0), 0, 0)
     end
 end\n`;
 
+// Available themes
+const themes = {
+  dracula,
+  vscDarkPlus,
+  oneDark,
+  atomDark,
+  tomorrow,
+  okaidia,
+  darcula,
+  materialDark,
+  nord,
+  nightOwl,
+  coldarkDark,
+  duotoneDark,
+  solarizedDarkAtom
+};
+
 const Drawing = () => {
+  // Get theme from auth store
+  const editorTheme = useAuthStore((state) => state.editorTheme);
+  const setEditorTheme = useAuthStore((state) => state.setEditorTheme);
+  
   // states
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [source, setSource] = useState(example_text);
@@ -44,19 +84,30 @@ const Drawing = () => {
       ws.send(
         JSON.stringify({
           action: processorAction.ProcessSourceCode,
-          data: { source: sourceRef.current, dimension: dimensionRef.current },
+          data: { source: sourceRef.current, dimension: gridSize },
         })
       );
     else console.warn("WebSocket not connected.");
   };
 
-  useEffect(() => {
-    sourceRef.current = source;
-    dimensionRef.current = gridSize;
-  }, [source, gridSize]);
+  // Debounced source update to prevent excessive re-renders
+  const handleSourceChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newSource = e.target.value;
+    setSource(newSource);
+    sourceRef.current = newSource;
+  }, []);
 
   useEffect(() => {
-    drawFrame(fullFrameAnimation.current.get(currentFrame.current) as Frame);
+    dimensionRef.current = gridSize;
+  }, [gridSize]);
+
+  useEffect(() => {
+    // Only redraw if we have frames, otherwise wait for new data
+    if (fullFrameAnimation.current.size > 0) {
+      drawFrame(fullFrameAnimation.current.get(currentFrame.current) as Frame, gridSize);
+    } else {
+      drawFrame(undefined, gridSize); // Draw empty checkerboard
+    }
   }, [gridSize]);
 
   useEffect(() => {
@@ -79,25 +130,21 @@ const Drawing = () => {
         console.error("Error:", newData.data.error);
       else if (newData.action === "UploadSuccess") {
         sessionStorage.setItem("post_bucket_url", newData.data.urlBucket);
-        sessionStorage.setItem("post_source_code", source);
+        sessionStorage.setItem("post_source_code", sourceRef.current);
         window.location.href = `/upload`;
       }
     };
 
-    drawFrame();
+    drawFrame(undefined, INITIAL_GRID_SIZE);
     setWs(socket);
 
     return () => {
       socket.close();
       stopAnimation();
     };
-  }, []);
+  }, []); // Empty dependency array - only run once
 
   useEffect(() => {
-    setInterval(() => {
-      sendUpdatedSource();
-    }, 1000);
-
     if (isRunning) startAnimation();
     else stopAnimation();
     return () => stopAnimation();
@@ -149,7 +196,11 @@ const Drawing = () => {
       if (currentFrame.current > fullFrameAnimation.current.size)
         currentFrame.current = INITIAL_FRAME;
       if (!fullFrameAnimation.current.has(currentFrame.current)) return;
-      drawFrame(fullFrameAnimation.current.get(currentFrame.current) as Frame);
+      
+      // Use requestAnimationFrame for smoother rendering
+      requestAnimationFrame(() => {
+        drawFrame(fullFrameAnimation.current.get(currentFrame.current) as Frame, dimensionRef.current);
+      });
     }
   };
 
@@ -163,7 +214,7 @@ const Drawing = () => {
       ws.send(
         JSON.stringify({
           action: processorAction.PostToBucket,
-          data: { source },
+          data: { source, dimension: gridSize },
         })
       );
     else console.warn("WebSocket not connected.");
@@ -176,42 +227,66 @@ const Drawing = () => {
     currentFrame.current = INITIAL_FRAME;
 
     // Redraw an empty canvas (or a default grid)
-    drawFrame(); // This will draw without a Frame, using the checkerboard pattern
+    drawFrame(undefined, gridSize); // This will draw without a Frame, using the checkerboard pattern
 
     // Optional: Automatically request new data from the server with the new grid size
     // sendUpdatedSource();
   }, [gridSize]);
 
-  const drawFrame = (Frame?: Frame) => {
+  const drawFrame = (Frame?: Frame, size: number = gridSize) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const currentSize = dimensionRef.current;
-    const pixelSize = FIXED_CANVAS_SIZE / currentSize; // recalculamos cada vez
+    const currentSize = size;
+    
+    // Detect the actual frame data size if we have frame data
+    let frameDataSize = currentSize;
+    if (Frame && Frame.frame_data) {
+      frameDataSize = Math.sqrt(Frame.frame_data.length);
+    }
+    
+    // Use the frame data size for rendering if we have frame data, otherwise use requested size
+    const renderSize = Frame ? frameDataSize : currentSize;
+    const renderPixelSize = FIXED_CANVAS_SIZE / renderSize;
+    
+    // Use ImageData for much faster rendering
+    const imageData = ctx.createImageData(FIXED_CANVAS_SIZE, FIXED_CANVAS_SIZE);
+    const data = imageData.data;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (let y = 0; y < currentSize; y++) {
-      for (let x = 0; x < currentSize; x++) {
+    for (let y = 0; y < renderSize; y++) {
+      for (let x = 0; x < renderSize; x++) {
+        const index = y * renderSize + x;
         const isOdd = (x + y) % 2 === 0;
-        const index = y * currentSize + x;
         let pixel = isOdd ? [40, 40, 40, 255] : [60, 60, 60, 255];
-        if (Frame) pixel = Frame.frame_data[index];
-
-        if (pixel == undefined) {
-          console.log(x, y, " is undef", Frame?.frame_data);
-          pixel = [0, 0, 0, 255];
+        
+        if (Frame && Frame.frame_data[index]) {
+          pixel = Frame.frame_data[index];
         }
 
-        ctx.fillStyle = `rgba(${pixel[0]}, ${pixel[1]}, ${pixel[2]}, ${
-          pixel[3] / 255
-        })`;
+        // Calculate exact pixel boundaries
+        // Use Math.round to ensure we cover all pixels without gaps
+        const startX = Math.round(x * renderPixelSize);
+        const startY = Math.round(y * renderPixelSize);
+        const endX = Math.round((x + 1) * renderPixelSize);
+        const endY = Math.round((y + 1) * renderPixelSize);
 
-        ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+        // Fill the pixel block
+        for (let canvasY = startY; canvasY < endY && canvasY < FIXED_CANVAS_SIZE; canvasY++) {
+          for (let canvasX = startX; canvasX < endX && canvasX < FIXED_CANVAS_SIZE; canvasX++) {
+            const pixelIndex = (canvasY * FIXED_CANVAS_SIZE + canvasX) * 4;
+
+            data[pixelIndex] = pixel[0];     // R
+            data[pixelIndex + 1] = pixel[1]; // G
+            data[pixelIndex + 2] = pixel[2]; // B
+            data[pixelIndex + 3] = pixel[3]; // A
+          }
+        }
       }
     }
+
+    ctx.putImageData(imageData, 0, 0);
   };
 
   return (
@@ -224,15 +299,55 @@ const Drawing = () => {
             <h2 className="text-2xl font-bold text-white mb-2">Source Code</h2>
             <p className="text-gray-400 text-sm">Write your Lua code here</p>
           </div>
-          <div className="flex-1 bg-gray-900 m-6 rounded-lg overflow-hidden">
+          <div className="flex-1 bg-gray-900 m-6 rounded-lg overflow-hidden relative">
+            {/* Theme selector */}
+            <div className="absolute top-2 right-2 z-10">
+              <select
+                value={editorTheme}
+                onChange={(e) => setEditorTheme(e.target.value)}
+                className="bg-gray-700 text-white text-xs px-2 py-1 rounded border border-gray-600 hover:bg-gray-600 focus:outline-none focus:border-blue-500"
+              >
+                {Object.keys(themes).map((themeName) => (
+                  <option key={themeName} value={themeName}>
+                    {themeName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Syntax highlighted background */}
+            <div className="absolute inset-0 pointer-events-none overflow-auto">
+              <SyntaxHighlighter
+                language="lua"
+                style={themes[editorTheme as keyof typeof themes] || themes.dracula}
+                customStyle={{
+                  margin: 0,
+                  padding: '1.5rem',
+                  background: 'transparent',
+                  fontSize: '0.875rem',
+                  lineHeight: '1.5',
+                }}
+                codeTagProps={{
+                  style: {
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                  }
+                }}
+              >
+                {source || ' '}
+              </SyntaxHighlighter>
+            </div>
+            {/* Transparent textarea overlay */}
             <textarea
               ref={textareaRef}
               id="source"
               value={source}
-              onChange={(e) => setSource(e.target.value)}
+              onChange={handleSourceChange}
               onKeyDown={handleAlternativeInputs}
-              className="w-full h-full bg-transparent outline-none text-gray-100 border-none p-6 font-mono text-sm resize-none placeholder-gray-500"
+              className="absolute inset-0 w-full h-full bg-transparent outline-none text-transparent caret-white border-none p-6 font-mono text-sm resize-none placeholder-gray-500 whitespace-pre"
               placeholder="Enter your Lua code here..."
+              spellCheck={false}
+              style={{
+                caretColor: 'white',
+              }}
             />
           </div>
         </div>

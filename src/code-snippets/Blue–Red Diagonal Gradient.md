@@ -5,10 +5,11 @@ Creates a diagonal gradient shifting from red to blue.
 Snippet:
 
 ```lua
-local max = 31
+local size = 64
+local max = size - 1
 for x = 0, max do
     for y = 0, max do
-        grid:set_pixel(x, y, x * 8, 0, y * 8)
+        grid:set_pixel(x, y, x * 4, 0, y * 4)
     end
 end
 ```

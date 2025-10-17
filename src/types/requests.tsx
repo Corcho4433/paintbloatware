@@ -24,15 +24,39 @@ export interface PostResponse {
 // Base Comment interface
 export interface Comment {
   id: string;
-
+  created_at: string;
   content: string;
   user: {
     name: string,
     id: number,
     urlPfp?: string,
   },
+  _count?: {
+    CommentThread: number;
+  },
   // Add other comment fields based on your database schema
 }
+
+// Comment Thread (Reply) interface
+export interface CommentThread {
+  id: string;
+  content: string;
+  created_at: string;
+  user: {
+    name: string;
+    id?: number;
+    urlPfp?: string;
+  };
+}
+
+// Response for comment threads pagination
+export interface CommentThreadsResponse {
+  threads: CommentThread[];
+  maxPages: number;
+  currentPage: number;
+  totalCount: number;
+}
+
 export interface Post {
   id: string;
   id_user: string;

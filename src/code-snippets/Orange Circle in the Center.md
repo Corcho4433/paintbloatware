@@ -5,7 +5,8 @@ Draws a bright orange circle on a dark bluish background.
 Snippet:
 
 ```lua
-local max = 63
+local size = 64
+local max = size - 1
 local cx, cy = max / 2, max / 2
 local radius = 20
 

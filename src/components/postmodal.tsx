@@ -5,10 +5,48 @@ import { Link } from "react-router-dom";
 import { Heart, MessageCircle, Share2, Eye, EyeOff, HeartCrack, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import useInfiniteScroll from "../hooks/infinetescroll";
+import { CommentWithThreads } from "./CommentWithThreads";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { useAuthStore } from "../store/useAuthStore";
+// Import all themes
+import { 
+  dracula,
+  vscDarkPlus,
+  oneDark,
+  atomDark,
+  tomorrow,
+  okaidia,
+  darcula,
+  materialDark,
+  nord,
+  nightOwl,
+  coldarkDark,
+  duotoneDark,
+  solarizedDarkAtom
+} from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+// Available themes
+const themes = {
+  dracula,
+  vscDarkPlus,
+  oneDark,
+  atomDark,
+  tomorrow,
+  okaidia,
+  darcula,
+  materialDark,
+  nord,
+  nightOwl,
+  coldarkDark,
+  duotoneDark,
+  solarizedDarkAtom
+};
+
 export const PostModal = (
   { post, onClose, darkenScreen = true }: { post: PostResponse; onClose: () => void; darkenScreen?: boolean }
 ) => {
   if (!post) return null;
+  const editorTheme = useAuthStore((state) => state.editorTheme);
   const { comments, loading, error, addComment, loadMore , isLoadingMore } = useComments(post.id);
   const { liked, disliked, toggleLike, toggleDislike } = useRatings(post.id, post.ratingValue);
   const [likePop, setLikePop] = useState(false);
@@ -17,7 +55,6 @@ export const PostModal = (
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copyMsg, setCopyMsg] = useState<string>('');
   const shareRef = useRef<HTMLDivElement | null>(null); // added
-  const [commentLikes, setCommentLikes] = useState<Record<string, { liked: boolean, count: number }>>({});
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
   useEffect(() => { // added
@@ -95,24 +132,9 @@ export const PostModal = (
       ))}
     </div>
   );
-  const handleCommentLike = (commentId: string) => {
-    setCommentLikes(prev => ({
-      ...prev,
-      [commentId]: {
-        liked: !prev[commentId]?.liked,
-        count: prev[commentId]?.liked 
-          ? (prev[commentId]?.count || 0) - 1 
-          : (prev[commentId]?.count || 0) + 1
-      }
-    }));
-  };
 
   const handleReply = (commentId: string) => {
     setReplyingTo(replyingTo === commentId ? null : commentId);
-    const input = document.getElementById('comment-input') as HTMLInputElement;
-    if (input) {
-      input.focus();
-    }
   };
 
   return (
@@ -134,12 +156,25 @@ export const PostModal = (
           {eyeOpen ?
           <img
             src={post.url_bucket}
+            className="[image-rendering:pixelated] w-full h-full object-cover"
             alt="Post Image"
-            className="w-full h-full object-cover"
-            draggable={false}
+            draggable={false} 
           /> :
           <div className="w-full h-full bg-gray-900 flex justify-left overflow-y-auto">
-            <span className="text-gray-500 text-xl p-4 wrap-anywhere">{post.content} </span>
+            <SyntaxHighlighter 
+              language="lua" 
+              style={themes[editorTheme as keyof typeof themes] || themes.dracula}
+              customStyle={{
+                margin: 0,
+                padding: '1rem',
+                background: '!transparent',
+                fontSize: '0.875rem',
+                width: '100%',
+              }}
+              className="*:!bg-transparent text-xl wrap-anywhere"
+            >
+              {post.content || ''}
+            </SyntaxHighlighter>
           </div>
           }
           
@@ -195,56 +230,14 @@ export const PostModal = (
             {!loading && comments && comments.comments.length > 0 && (
               <ul className="space-y-3">
                 {comments.comments.map(c => (
-                  <div className="space-y-1 overflow-hidden" key={c.id}>
-                    <div className="flex items-start space-x-3 mb-2">
-                      {c.user?.urlPfp ? (
-                        <img
-                          src={`${c.user.urlPfp}`}
-                          alt="User"
-                          className="w-8 h-8 rounded-full border-1 border-white flex-shrink-0"
-                        />) : (
-                        <img
-                          src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${c.user?.name || 'User'}`}
-                          alt="User"
-                          className="w-8 h-8 rounded-full border-1 border-white flex-shrink-0"
-                        />
-                      )}
-                      <div className='flex-1 min-w-0'>
-                        <div className="flex items-start gap-1">
-                          <h3 className="text-sm font-medium"> <Link to={"/user/" + c.user?.id}>{c.user?.name || 'Unknown User'}</Link></h3>
-                          <div className="text-sm ml-1 wrap-anywhere">{c.content}</div>
-                        </div>
-                        <div className="flex items-center gap-3 mt-1">
-                          <button
-                            onClick={() => handleCommentLike(c.id)}
-                            className={`flex items-center gap-1 text-xs transition-colors ${
-                              commentLikes[c.id]?.liked 
-                                ? 'text-red-500' 
-                                : 'text-gray-400 hover:text-red-400'
-                            }`}
-                          >
-                            <Heart 
-                              className="w-3 h-3" 
-                              fill={commentLikes[c.id]?.liked ? 'currentColor' : 'none'}
-                            />
-                            {commentLikes[c.id]?.count || 0}
-                          </button>
-                          <button
-                            onClick={() => handleReply(c.id)}
-                            className={`text-xs transition-colors ${
-                              replyingTo === c.id 
-                                ? 'text-blue-400' 
-                                : 'text-gray-400 hover:text-blue-400'
-                            }`}
-                          >
-                            Reply
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <div ref={sentinelRef}></div>
-                  </div>
+                  <CommentWithThreads 
+                    key={c.id}
+                    comment={c}
+                    onReply={handleReply}
+                    replyingTo={replyingTo}
+                  />
                 ))}
+                <div ref={sentinelRef}></div>
                 {!loading && isLoadingMore && (
                   <div className="flex items-center gap-2 text-gray-400 text-xs">
                     <svg aria-hidden="true" className="w-4 h-4 animate-spin text-gray-600 fill-blue-500" viewBox="0 0 100 101" fill="none">
@@ -366,7 +359,7 @@ export const PostModal = (
             <div className="flex items-center">
               <input
                 type="text"
-                placeholder={replyingTo ? `Replying to comment...` : "Add a comment..."}
+                placeholder="Add a comment..."
                 className="flex-1 bg-gray-700 text-white p-2 focus:outline-none"
                 id="comment-input"
                 autoComplete="off"
@@ -377,7 +370,6 @@ export const PostModal = (
                   if (input && input.value.trim()) {
                     await addComment(input.value.trim());
                     input.value = '';
-                    setReplyingTo(null);
                   }
                 }}
                 className="bg-blue-500 text-white px-4 py-2 ml-2 hover:bg-blue-600 transition-colors text-sm font-medium"
@@ -385,17 +377,6 @@ export const PostModal = (
                 Post
               </button>
             </div>
-            {replyingTo && (
-              <div className="mt-2 text-xs text-gray-400">
-                Replying to comment 
-                <button 
-                  onClick={() => setReplyingTo(null)}
-                  className="ml-1 text-blue-400 hover:text-blue-300"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>

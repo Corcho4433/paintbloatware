@@ -13,6 +13,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.8",
     "@tanstack/react-query": "^5.76.0",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "axios": "^1.8.4",
     "cors": "^2.8.5",
     "flowbite": "^3.1.2",
@@ -24,6 +25,7 @@
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.6.2",
+    "react-syntax-highlighter": "^15.6.6",
     "remark-gfm": "^4.0.1",
     "yup": "^1.7.1",
     "zustand": "^5.0.6"

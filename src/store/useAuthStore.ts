@@ -16,6 +16,9 @@ interface AuthStore {
     isDesktopSidebarCollapsed: boolean;
     setMobileSidebarOpen: (isOpen: boolean) => void;
     setDesktopSidebarCollapsed: (isCollapsed: boolean) => void;
+    // Editor theme
+    editorTheme: string;
+    setEditorTheme: (theme: string) => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -28,6 +31,9 @@ export const useAuthStore = create<AuthStore>()(
             isDesktopSidebarCollapsed: false,
             setMobileSidebarOpen: (isOpen: boolean) => set({ isMobileSidebarOpen: isOpen }),
             setDesktopSidebarCollapsed: (isCollapsed: boolean) => set({ isDesktopSidebarCollapsed: isCollapsed }),
+            // Editor theme
+            editorTheme: 'dracula',
+            setEditorTheme: (theme: string) => set({ editorTheme: theme }),
             logout: async () => {
                 try {
                     console.log("Logging out user:", useAuthStore.getState().user);

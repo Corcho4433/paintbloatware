@@ -157,6 +157,7 @@ export const PostGallery = ({ userId, tag }: { userId?: string; tag?: string }) 
             alt="Post Image"
             width={300}
             height={300}
+            className="[image-rendering:pixelated]"
             style={{
               width: '100%',
               height: '100%',
