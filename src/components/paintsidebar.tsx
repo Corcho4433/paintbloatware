@@ -48,16 +48,8 @@ const PaintSidebar = () => {
         `}
       >
         {/* Logo → Clickable to go Home */}
-        <div className="flex justify-center p-4">
-          <Link to="/home">
-            <img
-              src="/logo2.png"
-              alt="logo-sidebar"
-              className={`cursor-pointer transition-all duration-300 ${
-                isDesktopSidebarCollapsed ? "h-8 w-8" : "h-16 w-16"
-              }`}
-            />
-          </Link>
+        <div className="space-y-3">
+
         </div>
 
         {/* Navigation */}

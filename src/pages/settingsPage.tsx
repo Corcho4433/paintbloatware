@@ -20,6 +20,24 @@ const profileValidationSchema = Yup.object({
     .max(500, 'Description must be less than 500 characters')
 });
 
+const callDeleteProfile = (userId: string) => {
+  if (!userId) {
+    alert('User ID is missing. Cannot delete profile.');
+  }
+  if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+    deleteProfile(userId!)
+      .then(() => {
+        alert('Profile deleted successfully.');
+        // Optionally, redirect to homepage or login page
+        window.location.href = '/';
+      })
+      .catch((error) => {
+        console.error('Error deleting profile:', error);
+        alert('Failed to delete profile. Please try again later.');
+      });
+
+}};
+
 const SettingsPage = () => {
   const auth = useAuthStore();
   const authUser = auth.user;
@@ -403,7 +421,7 @@ const SettingsPage = () => {
 
               <div className="space-y-6">
                 {/* Change Password */}
-                {user?.oauth === true ? (<div> <p className="text-gray-400">No puedes cambiar la contraseña</p></div>
+                {user?.oauth === true ? (<div> <p className="text-gray-400">No puedes cambiar la contraseña al ser una cuenta oauth</p></div>
                 ) : (<div>
                   <h3 className="text-lg font-medium text-white mb-3">Change Password</h3>
                   <div className="space-y-4">
@@ -475,10 +493,8 @@ const SettingsPage = () => {
                 <div className="border-t border-gray-700 pt-6">
                   <h3 className="text-lg font-medium text-red-400 mb-3">Danger Zone</h3>
                   <div className="space-y-3">
-                    <button className="w-full px-4 py-2 !bg-red-600 text-white rounded-lg hover:!bg-red-700 transition-colors">
-                      Export Account Data
-                    </button>
-                    <button onClick={() =>deleteProfile(user!.id)} className="w-full px-4 py-2 !bg-red-700 text-white rounded-lg hover:!bg-red-800 transition-colors">
+                    
+                    <button onClick={() => callDeleteProfile(user!.id)} className="w-full px-4 py-2 !bg-red-700 text-white rounded-lg hover:!bg-red-800 transition-colors">
                       Delete Account
                     </button>
                   </div>

@@ -33,61 +33,51 @@ const HomePage = () => {
       <PaintSidebar />
       <main className="flex-1 ml-0 min-h-screen !bg-gray-900">
         {/* Tag Selector - Redesigned */}
-        <div className="sticky top-0 z-10 !bg-gray-900 border-b border-gray-800">
-          <div className="p-6">
-            <div className="max-w-6xl mx-auto">
+        <div className="top-0 z-10 !bg-gray-900 border-b border-gray-800">
+            {/* Tag Filter - Scrollable and Left Aligned */}
+            <div className="py-6 px-6 overflow-x-auto flex gap-2 flex-nowrap pb-2 min-w-max">
+              {/* Recent/All Posts Chip */}
+              <button
+                onClick={() => setSelectedTag("")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${selectedTag === ""
+                    ? "!bg-blue-600 text-white shadow-lg shadow-blue-600/25"
+                    : "!bg-gray-800 text-gray-300 hover:!bg-gray-700 hover:text-white border border-gray-700"
+                  }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Recent
+              </button>
 
-
-              {/* Tag Filter */}
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-gray-400 whitespace-nowrap">Filter by:</span>
-
-                <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-                  {/* Recent/All Posts Chip */}
+              {/* Tag Chips */}
+              {loading ? (
+                // Loading skeleton
+                <>
+                  {[...Array(6)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="h-9 w-16 !bg-gray-800 rounded-full animate-pulse border border-gray-700"
+                    />
+                  ))}
+                </>
+              ) : (
+                availableTags.map((tag) => (
                   <button
-                    onClick={() => setSelectedTag("")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${selectedTag === ""
+                    key={tag.name}
+                    id={tag.name}
+                    onClick={() => setSelectedTag(tag.name)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${selectedTag === tag.name
                         ? "!bg-blue-600 text-white shadow-lg shadow-blue-600/25"
-                        : "!bg-gray-800 text-gray-300 hover:!bg-gray-700 hover:text-white border border-gray-700"
+                        : "!bg-gray-800 text-gray-300 hover:!bg-gray-700 hover:text-white border border-gray-700 hover:border-gray-600"
                       }`}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Recent
+                    <span className="w-2 h-2 rounded-full bg-current opacity-60"></span>
+                    {tag.name}
                   </button>
-
-                  {/* Tag Chips */}
-                  {loading ? (
-                    // Loading skeleton
-                    <div className="flex gap-2">
-                      {[...Array(6)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="h-9 w-16 !bg-gray-800 rounded-full animate-pulse border border-gray-700"
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    availableTags.map((tag) => (
-                      <button
-                        key={tag.name}
-                        id={tag.name}
-                        onClick={() => setSelectedTag(tag.name)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${selectedTag === tag.name
-                            ? "!bg-blue-600 text-white shadow-lg shadow-blue-600/25"
-                            : "!bg-gray-800 text-gray-300 hover:!bg-gray-700 hover:text-white border border-gray-700 hover:border-gray-600"
-                          }`}
-                      >
-                        <span className="w-2 h-2 rounded-full bg-current opacity-60"></span>
-                        {tag.name}
-                      </button>
-                    ))
-                  )}
-                </div>
-              </div>
+                ))
+              )}
             </div>
-          </div>
         </div>
 
         {/* Post Gallery */}

@@ -1,16 +1,23 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import PaintSidebar from '../components/paintsidebar';
 import styles from "../styles/upload.module.css"
 import { createPost } from '../hooks/posts';
 import { fetchAllTags } from '../hooks/trending';
 
+interface Tag {
+    name: string;
+}
+
 export default function Upload() {
+    const navigate = useNavigate();
     const [savedUrl, setSavedUrl] = useState('');
     const [sourceCode, setSourceCode] = useState('');
     const [searchParams] = useSearchParams();
-    const [availableTags, setAvailableTags] = useState<string[]>([]);
+    const [availableTags, setAvailableTags] = useState<Tag[]>([]);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [description, setDescription] = useState('');
+    const [serverResponse, setServerResponse] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     // Effect 1: Only for session storage data
     useEffect(() => {
@@ -41,20 +48,43 @@ export default function Upload() {
 
     const handlePost = async () => {
         if (savedUrl) {
+            setServerResponse(null); // Limpiar mensajes anteriores
+            
             const sentPacket = {
                 image: savedUrl,
-                description: "",
+                description: description,
                 source: sourceCode,
                 tags: selectedTags,
             }
 
-            await createPost(sentPacket, () => {
-                sessionStorage.removeItem("post_bucket_url");
-                sessionStorage.removeItem("post_source_code");
-                
-                setSavedUrl('');        
-                setSourceCode('');
-                setSelectedTags([]);
+            await createPost(sentPacket, (data: any) => {
+                if (data.error) {
+                    setServerResponse({ 
+                        message: data.error || 'Error al crear el post', 
+                        type: 'error' 
+                    });
+                } else {
+                    setServerResponse({ 
+                        message: data.message || 'Post creado exitosamente!', 
+                        type: 'success' 
+                    });
+                    
+                    // Limpiar formulario después del éxito
+                    
+                    
+                    
+                    
+                    // Redirigir a home después de 1.5 segundos
+                    setTimeout(() => {
+                    sessionStorage.removeItem("post_bucket_url");
+                    sessionStorage.removeItem("post_source_code");
+                    setSavedUrl('');        
+                    setSourceCode('');
+                    setSelectedTags([]);
+                    setDescription('');
+                    navigate('/home');
+                    }, 1500);
+                }
             });
         }
     };
@@ -104,7 +134,18 @@ export default function Upload() {
             <div className={styles.columncontainer}>
                 <div className={styles.container}>
                     <p className={styles.edit_post_text_label}>Description</p>
-                    <textarea className={styles.post_description_area} />
+                    <textarea 
+                        className={styles.post_description_area}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Describe tu dibujo..."
+                    />
+
+                    {serverResponse && (
+                        <div className={`${styles.server_response} ${serverResponse.type === 'success' ? styles.success : styles.error}`}>
+                            {serverResponse.message}
+                        </div>
+                    )}
 
                     <p className={styles.edit_post_text_label}>Tags</p>
                     <div className={styles.tags_container}>

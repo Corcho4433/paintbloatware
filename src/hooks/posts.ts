@@ -136,6 +136,16 @@ export function usePosts(options: UsePostsOptions = {}) {
     load(initialPage);
   }, [initialPage]); // Only depend on initialPage, not load
 
+  // Reset and reload when userId or tag changes
+  useEffect(() => {
+    setLoading(true);
+    setPosts(null);
+    setError(null);
+    setCurrentPage(initialPage);
+    pageCache.clear();
+    load(initialPage);
+  }, [userId, tag]); // When these change, reload everything
+
   // Auto refresh setup
   useEffect(() => {
     if (autoRefresh) {
