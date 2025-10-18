@@ -11,10 +11,8 @@ const snippetImports = import.meta.glob("../code-snippets/*.md", {
   import: "default",
 });
 
-
-const ADDRESS = "localhost:8000";
-const WS_ROUTE = "/processor";
-const WS_URL = `ws://${ADDRESS}${WS_ROUTE}`;
+const ROUTE = "/render";
+const ADDRESS = `ws://localhost:8080${ROUTE}`;
 const INITIAL_FRAME = 1;
 const FRAME_RATE = 12; // Reduced from 24 to 12 FPS for less CPU usage
 const MS_TIME = (1 / FRAME_RATE) * 1000;
@@ -157,7 +155,7 @@ const Drawing = () => {
   }, [gridSize]);
 
   useEffect(() => {
-    const socket = new WebSocket(WS_URL);
+    const socket = new WebSocket(ADDRESS);
     socket.onopen = () => {
       console.log("Connected to server");
     };
