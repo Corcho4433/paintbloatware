@@ -78,6 +78,7 @@ const CodeSnippets = ({ snippetImports }: CodeSnippetsProps) => {
                       PreTag="div"
                       className="!bg-gray-800 text-indigo-100 text-base break-all whitespace-pre-wrap w-full max-w-full overflow-x-hidden rounded"
                       customStyle={{ margin: 0 }}
+                      codeTagProps={{ }}
                       {...props}
                     >
                       {String(children).replace(/\n$/, "")}

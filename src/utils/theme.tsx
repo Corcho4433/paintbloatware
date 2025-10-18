@@ -32,7 +32,7 @@ const themes = {
 };
 
 export const getThemeFromString = (theme: string) : { [key: string]: React.CSSProperties } => {
-    return themes[theme as keyof typeof themes] || dracula;
+    return themes[theme as keyof typeof themes] || undefined;
 };
 
 export const getAvailableThemes = () : string[] => {

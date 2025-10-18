@@ -139,7 +139,7 @@ const SettingsPage = () => {
       <main className="flex-1 ml-0 min-h-screen bg-gray-900 p-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="bg-gray-800 p-6 rounded-xl mb-6">
+          <div className="bg-gray-800 border-gray-700 p-6 rounded-xl mb-6">
             <h1 className="text-3xl font-bold text-white flex items-center gap-3">
               <Settings className="w-8 h-8" />
               Settings

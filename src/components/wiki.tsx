@@ -3,6 +3,10 @@ import { Sidebar, SidebarItem, SidebarItemGroup } from "flowbite-react";
 import { BookOpen } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import dracula from "react-syntax-highlighter/dist/esm/styles/prism/dracula";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { useAuthStore } from "../store/useAuthStore";
+import { getThemeFromString } from "../utils/theme";
 const articleImports = import.meta.glob("../wiki-articles/*.md", {
   query: "?raw",
   import: "default",
@@ -12,30 +16,28 @@ type WikiSidebarProps = {
   selected: string | null;
   setSelected: (title: string) => void;
   articles: Record<string, string>;
-  animateSidebar: boolean;
 };
 
-const WikiSidebar = ({ selected, setSelected, articles, animateSidebar }: WikiSidebarProps) => (
+const WikiSidebar = ({ selected, setSelected, articles }: WikiSidebarProps) => (
   <div
     className={`
       transition-transform duration-600 ease-in-out
-      ${animateSidebar ? "translate-x-0" : "-translate-x-full"}
+      
     `}
   >
-    <Sidebar className="[&>div]:!bg-gray-800 w-64 h-screen rounded-r-2xl z-40 shadow-xl !bg-gray-800">
+    <Sidebar className=" flex-1 rounded-2xl border border-gray-700 p-6  w-64 h-screen rounded-r-2xl z-40 shadow-xl !bg-gray-800">
       <div className="flex flex-col items-center p-4">
         <BookOpen className="w-10 h-10 text-white mb-2" />
         <h2 className="text-lg font-semibold text-white mb-4 text-center">
-          Paintbloat official wiki
+          Paintbloatware official wiki
         </h2>
       </div>
       <SidebarItemGroup className="space-y-2 bg-gray-800">
         {Object.keys(articles).map((title) => (
           <SidebarItem
             key={title}
-            className={`!hover:bg-gray-600 rounded-lg transition-colors ${
-              selected === title ? "!bg-gray-600 text-white" : ""
-            }`}
+            className={`!hover:bg-gray-600 rounded-lg transition-colors ${selected === title ? "!bg-gray-600 text-white" : ""
+              }`}
             onClick={() => setSelected(title)}
           >
             <span className="flex items-center w-full p-2 cursor-pointer">
@@ -57,14 +59,9 @@ const WikiSidebar = ({ selected, setSelected, articles, animateSidebar }: WikiSi
 const Wiki = () => {
   const [articles, setArticles] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
-  const [animateSidebar, setAnimateSidebar] = useState(false);
-  const [animateContent, setAnimateContent] = useState(false);
+  const useAuthTheme = useAuthStore((state) => state.editorTheme);
+  const theme = getThemeFromString(useAuthTheme) || dracula;
 
-  useEffect(() => {
-    setAnimateSidebar(true);
-    const timeout = setTimeout(() => setAnimateContent(true), 300);
-    return () => clearTimeout(timeout);
-  }, []);
 
   useEffect(() => {
     const loadArticles = async () => {
@@ -83,21 +80,18 @@ const Wiki = () => {
   }, []);
 
   return (
-    <section className="flex gap-6 min-h-screen w-full p-6 !bg-gray-800 rounded-lg shadow-md">
+    <section className="flex gap-6 min-h-screen w-full p-6 !bg-gray-900 rounded-lg shadow-md">
+      <div className="bg-gray-900 rounded-2xl border border-gray-700 shadow-lg w-64 h-screen z-40">
       <WikiSidebar
         selected={selected}
         setSelected={setSelected}
         articles={articles}
-        animateSidebar={animateSidebar}
       />
+    </div>
       <div
         className={`
-          flex-1 text-gray-200 transition-transform duration-500 z-10
-          ${
-            animateContent
-              ? "translate-x-0 opacity-100"
-              : "translate-x-full opacity-0"
-          }
+          flex-1 w-full bg-gray-800 rounded-2xl border border-gray-700 p-6 shadow-lg transition-transform duration-500 z-10
+          
         `}
       >
         {selected ? (
@@ -109,6 +103,15 @@ const Wiki = () => {
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
+                  h1: ({ children }) => (
+                    <h1 className="text-4xl font-bold mb-6 mt-8">{children}</h1>
+                  ),
+                  h2: ({ children }) => (
+                    <h2 className="text-3xl font-semibold mb-5 mt-7">{children}</h2>
+                  ),
+                  h3: ({ children }) => (
+                    <h3 className="text-2xl font-semibold mb-4 mt-6">{children}</h3>
+                  ),
                   p: ({ children }) => (
                     <p className="whitespace-pre-wrap mb-4">{children}</p>
                   ),
@@ -128,6 +131,29 @@ const Wiki = () => {
                       {children}
                     </blockquote>
                   ),
+                  code({ node, inline, className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || "");
+                    return !inline && match ? (
+                      <SyntaxHighlighter
+                        style={theme}
+                        language={match[1]}
+                        PreTag="div"
+                        className="!bg-gray-900 text-indigo-100 text-base break-all whitespace-pre-wrap w-full max-w-full overflow-x-hidden rounded"
+                        customStyle={{ margin: 0 }}
+                        codeTagProps={{}}
+                        {...props}
+                      >
+                        {String(children).replace(/\n$/, "")}
+                      </SyntaxHighlighter>
+                    ) : (
+                      <code
+                        className="bg-gray-900 rounded-xl px-1 py-0.5 text-base break-all whitespace-pre-wrap w-full max-w-full overflow-x-hidden"
+                        {...props}
+                      >
+                        {children}
+                      </code>
+                    );
+                  },
                 }}
               >
                 {articles[selected]}
