@@ -151,8 +151,9 @@ export default function Upload() {
                         </div>
                         {/* Right column: Description & Tags */}
                         <div className="flex-1 flex flex-col bg-gray-800 rounded-lg border border-gray-700 p-6">
-                            <div className=" mb-4">
-                                <h2 className="text-lg font-bold text-white mb-2">Source Code</h2>
+                            <h2 className="text-lg font-bold text-white mb-2">Source Code</h2>
+                            <div className=" mb-4 h-[60vh] w-[50vw] overflow-auto">
+                                
                                 <SyntaxHighlighter language="lua" className="!bg-gray-900 rounded-xl" style={ getThemeFromString(editorTheme)} customStyle={{
                                     margin: 0,
                                     padding: '1.5rem',

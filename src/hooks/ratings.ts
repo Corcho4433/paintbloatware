@@ -10,7 +10,16 @@ interface RatingState {
   error: string | null;
 }
 
-export function useRatings(postId: string, initialRatingValue?: number) {
+export function useRatings(postId: string | undefined, initialRatingValue?: number) {
+  if (!postId) {
+    return {
+      liked: false,
+      disliked: false,
+      toggleDislike: async () => {},
+      toggleLike: async () => {},
+      createRating: async (value: 1 | -1 | 0) => {},
+    }
+  }
   const user = useAuthStore((state) => state.user);
   const [ratingState, setRatingState] = useState<RatingState>({
     liked: false,

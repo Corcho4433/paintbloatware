@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import Cookies from 'js-cookie';
+import { LogoutUser } from "../hooks/user";
 
 export interface AuthStorageUser {
     id: string;
@@ -49,15 +50,7 @@ export const useAuthStore = create<AuthStore>()(
             logout: async () => {
                 try {
                     console.log("Logging out user:", useAuthStore.getState().user);
-                    // Call the logout endpoint to clear server-side cookies
-                   // const response = await fetch("http://localhost:3000/api/auth/logout", {
-                    //    method: "POST",
-                    //    credentials: "include",
-                    //});
-                        // AGREGAR ESTO CUANDO SE AGREGUE EL LOGOUT !
-                   // if (!response.ok) {
-                    //    throw new Error("Logout failed");
-                    //}
+                    await LogoutUser();
 
                     // Clear all client-side cookies
                     Object.keys(Cookies.get()).forEach(cookieName => {

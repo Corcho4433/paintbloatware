@@ -165,3 +165,16 @@ export const uploadProfileImageFile = async (file: File): Promise<any> => {
   // Your backend returns { message: "Foto de perfil actualizada exitosamente", pfp: updatedPfp }
   return data.pfp || data;
 };
+
+export const LogoutUser = async (): Promise<boolean> => {
+  const response = await fetchWithRefresh(`${serverPath}/api/auth/logout`, {
+    method: 'POST',
+    credentials: 'include'
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to logout');
+  }
+
+  return true;
+};

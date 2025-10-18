@@ -20,8 +20,7 @@ export interface processorResponse {
     action : string,
     data : {
         frame : Frame,
-        error: string,
-        errorCode: number,
+        message: string,
         previewReady: boolean,
         urlBucket: string,
     }
