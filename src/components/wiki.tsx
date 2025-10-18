@@ -8,7 +8,14 @@ const articleImports = import.meta.glob("../wiki-articles/*.md", {
   import: "default",
 });
 
-const WikiSidebar = ({ selected, setSelected, articles, animateSidebar }) => (
+type WikiSidebarProps = {
+  selected: string | null;
+  setSelected: (title: string) => void;
+  articles: Record<string, string>;
+  animateSidebar: boolean;
+};
+
+const WikiSidebar = ({ selected, setSelected, articles, animateSidebar }: WikiSidebarProps) => (
   <div
     className={`
       transition-transform duration-600 ease-in-out
@@ -66,7 +73,7 @@ const Wiki = () => {
         const content = await articleImports[path]();
         const filename = path.substring(path.lastIndexOf("/") + 1);
         const title = filename.replace(/\.md$/i, "");
-        loadedArticles[title] = content;
+        loadedArticles[title] = content as string;
       }
       setArticles(loadedArticles);
       if (!selected) setSelected(Object.keys(loadedArticles)[0]);
