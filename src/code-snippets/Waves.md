@@ -1,6 +1,8 @@
 # Sine Waves
 
-``` lua 
+Generates colorful sine wave patterns across the grid.
+
+```lua
 local size = 64
 local max = size - 1
 local cx, cy = max / 2, max / 2

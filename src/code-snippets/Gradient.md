@@ -1,6 +1,8 @@
 # Color Gradient
 
-``` lua
+Creates a smooth color gradient from corner to corner.
+
+```lua
 local size = 64
 local max = size - 1
 for x = 0, max do

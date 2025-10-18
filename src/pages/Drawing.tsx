@@ -4,22 +4,7 @@ import { processorResponse, processorAction, Frame } from "../types/draw";
 import CodeSnippets from "../components/snippets";
 import { useAuthStore } from "../store/useAuthStore";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-// Import multiple themes
-import { 
-  dracula,
-  vscDarkPlus,
-  oneDark,
-  atomDark,
-  tomorrow,
-  okaidia,
-  darcula,
-  materialDark,
-  nord,
-  nightOwl,
-  coldarkDark,
-  duotoneDark,
-  solarizedDarkAtom
-} from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { getAvailableThemes, getThemeFromString } from "../utils/theme";
 
 const snippetImports = import.meta.glob("../code-snippets/*.md", {
   query: "?raw",
@@ -32,44 +17,30 @@ const INITIAL_FRAME = 1;
 const FRAME_RATE = 12; // Reduced from 24 to 12 FPS for less CPU usage
 const MS_TIME = (1 / FRAME_RATE) * 1000;
 const FIXED_CANVAS_SIZE = 512;
-const INITIAL_GRID_SIZE = 64;
 
-const example_text = `local size = ${INITIAL_GRID_SIZE}
-local max = size - 1
-for x = 0, max do
-    for y = 0, max do
-      grid:set_pixel(x, y, math.max(255 - (255/size) * x, 0), 0, 0)
-    end
-end\n`;
-
-// Available themes
-const themes = {
-  dracula,
-  vscDarkPlus,
-  oneDark,
-  atomDark,
-  tomorrow,
-  okaidia,
-  darcula,
-  materialDark,
-  nord,
-  nightOwl,
-  coldarkDark,
-  duotoneDark,
-  solarizedDarkAtom
-};
+const themes = getAvailableThemes();
 
 
 const Drawing = () => {
   // Get theme from auth store
   const editorTheme = useAuthStore((state) => state.editorTheme);
-  const setEditorTheme = useAuthStore((state) => state.setEditorTheme);
-  
+  const setEditorTheme = useAuthStore((state) => state.setEditorTheme );
+
+  // Get grid size from auth store
+  const gridSize = useAuthStore((state) => state.gridSize);
+  const setGridSize = useAuthStore((state) => state.setGridSize);
+
+
+  // Source code from auth store
+  const rawSourceCode = useAuthStore((state) => state.sourceCode);
+  const setSourceCode = useAuthStore((state) => state.setSourceCode);
+  const example_text = `local size = ${gridSize}\n...`;
+
+  const sourceCode = rawSourceCode || example_text;
   // states
   const [ws, setWs] = useState<WebSocket | null>(null);
-  const [source, setSource] = useState(example_text);
   const [isRunning, setIsRunning] = useState(false);
-  const [gridSize, setGridSize] = useState(INITIAL_GRID_SIZE);
+  
 
   // refs
   const fullFrameAnimation = useRef<Map<number, Frame>>(new Map());
@@ -77,7 +48,7 @@ const Drawing = () => {
   const animationInterval = useRef<NodeJS.Timeout | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const sourceRef = useRef(source);
+  const sourceRef = useRef(sourceCode);
   const dimensionRef = useRef(gridSize);
 
   // Redibuja automáticamente cuando cambia gridSize
@@ -93,24 +64,82 @@ const Drawing = () => {
     else console.warn("WebSocket not connected.");
   };
 
+  const firstDivRef = useRef<HTMLPreElement | null>(null);
+  const secondDivRef = useRef<HTMLTextAreaElement | null>(null);
+  const syntaxRef = useRef<HTMLDivElement | null>(null);
+
+  const handleScroll = (
+    scrollingRef: React.RefObject<HTMLElement | null>,
+    targetRef: React.RefObject<HTMLElement | null>
+  ) => {
+    if (scrollingRef.current && targetRef.current) {
+
+      targetRef.current.scrollTop = scrollingRef.current.scrollTop;
+      targetRef.current.scrollLeft = scrollingRef.current.scrollLeft;
+    }
+  };
+
+  const handlePreScroll = () => {
+    console.debug('[ScrollSync] handlePreScroll triggered');
+    handleScroll(firstDivRef, secondDivRef);
+  };
+  const handleTextAreaScroll = () => {
+    console.debug('[ScrollSync] handleTextAreaScroll triggered');
+    handleScroll(secondDivRef, firstDivRef);
+  };
+
+  useEffect(() => {
+    // Use MutationObserver to detect when <pre> is rendered
+    let observer: MutationObserver | null = null;
+    let cleanupPre: HTMLPreElement | null = null;
+    if (syntaxRef.current) {
+      const tryAttach = () => {
+        const pre = syntaxRef.current!.querySelector("pre");
+        if (pre) {
+          console.debug('[ScrollSync] <pre> found and event listener attached:', pre);
+          firstDivRef.current = pre;
+          pre.addEventListener("scroll", handlePreScroll);
+          cleanupPre = pre;
+          return true;
+        }
+        return false;
+      };
+      if (!tryAttach()) {
+        observer = new MutationObserver(() => {
+          if (tryAttach() && observer) {
+            observer.disconnect();
+            observer = null;
+          }
+        });
+        observer.observe(syntaxRef.current, { childList: true, subtree: true });
+        console.debug('[ScrollSync] MutationObserver set up to watch for <pre>');
+      }
+    } else {
+      console.debug('[ScrollSync] syntaxRef.current is null');
+    }
+
+    return () => {
+      if (observer) {
+        observer.disconnect();
+        observer = null;
+        console.debug('[ScrollSync] MutationObserver disconnected');
+      }
+      if (cleanupPre) {
+        console.debug('[ScrollSync] Cleaning up scroll event listener from <pre>');
+        cleanupPre.removeEventListener("scroll", handlePreScroll);
+      }
+    };
+  }, []);
+
   // Debounced source update to prevent excessive re-renders
   const handleSourceChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newSource = e.target.value;
-    setSource(newSource);
+    setSourceCode(newSource);
     sourceRef.current = newSource;
   }, []);
 
   // Sync scroll between textarea and syntax highlighter
-  const handleScroll = useCallback(() => {
-    if (textareaRef.current && syntaxHighlighterRef.current) {
-      requestAnimationFrame(() => {
-        if (textareaRef.current && syntaxHighlighterRef.current) {
-          syntaxHighlighterRef.current.scrollTop = textareaRef.current.scrollTop;
-          syntaxHighlighterRef.current.scrollLeft = textareaRef.current.scrollLeft;
-        }
-      });
-    }
-  }, []);
+
 
   useEffect(() => {
     dimensionRef.current = gridSize;
@@ -150,7 +179,7 @@ const Drawing = () => {
       }
     };
 
-    drawFrame(undefined, INITIAL_GRID_SIZE);
+    drawFrame(undefined, gridSize);
     setWs(socket);
 
     return () => {
@@ -189,7 +218,7 @@ const Drawing = () => {
       const currentValue = textarea.value;
       const editedSource =
         currentValue.substring(0, start) + "    " + currentValue.substring(end);
-      setSource(editedSource);
+      setSourceCode(editedSource);
       setTimeout(() => {
         if (textareaRef.current) {
           const newPos = start + 4;
@@ -211,7 +240,7 @@ const Drawing = () => {
       if (currentFrame.current > fullFrameAnimation.current.size)
         currentFrame.current = INITIAL_FRAME;
       if (!fullFrameAnimation.current.has(currentFrame.current)) return;
-      
+
       // Use requestAnimationFrame for smoother rendering
       requestAnimationFrame(() => {
         drawFrame(fullFrameAnimation.current.get(currentFrame.current) as Frame, dimensionRef.current);
@@ -229,7 +258,7 @@ const Drawing = () => {
       ws.send(
         JSON.stringify({
           action: processorAction.PostToBucket,
-          data: { source, dimension: gridSize },
+          data: { source: sourceRef.current, dimension: gridSize },
         })
       );
     else console.warn("WebSocket not connected.");
@@ -255,17 +284,17 @@ const Drawing = () => {
     if (!ctx) return;
 
     const currentSize = size;
-    
+
     // Detect the actual frame data size if we have frame data
     let frameDataSize = currentSize;
     if (Frame && Frame.frame_data) {
       frameDataSize = Math.sqrt(Frame.frame_data.length);
     }
-    
+
     // Use the frame data size for rendering if we have frame data, otherwise use requested size
     const renderSize = Frame ? frameDataSize : currentSize;
     const renderPixelSize = FIXED_CANVAS_SIZE / renderSize;
-    
+
     // Use ImageData for much faster rendering
     const imageData = ctx.createImageData(FIXED_CANVAS_SIZE, FIXED_CANVAS_SIZE);
     const data = imageData.data;
@@ -275,7 +304,7 @@ const Drawing = () => {
         const index = y * renderSize + x;
         const isOdd = (x + y) % 2 === 0;
         let pixel = isOdd ? [40, 40, 40, 255] : [60, 60, 60, 255];
-        
+
         if (Frame && Frame.frame_data[index]) {
           pixel = Frame.frame_data[index];
         }
@@ -310,144 +339,149 @@ const Drawing = () => {
       <div className="flex flex-1 gap-6 p-6">
         {/* Editor Column */}
         <div className="flex flex-col w-full">
-        <div className="flex-row flex gap-3 mb-3 w-full">
-          <div className="flex-1 flex flex-col bg-gray-800 rounded-lg border border-gray-700">
-            <div className="mx-6 mt-6">
-              <h2 className="text-2xl font-bold text-white mb-2">Source Code</h2>
-              <p className="text-gray-400 text-sm">Write your Lua code here</p>
-            </div>
-            <div className="flex-1 bg-gray-900 m-6 rounded-lg relative overflow-hidden">
-              {/* Theme selector */}
-              <div className="absolute top-2 right-2 z-10">
-                <select
-                  value={editorTheme}
-                  onChange={(e) => setEditorTheme(e.target.value)}
-                  className="bg-gray-700 text-white text-xs px-2 py-1 rounded border border-gray-600 hover:bg-gray-600 focus:outline-none focus:border-blue-500"
-                >
-                  {Object.keys(themes).map((themeName) => (
-                    <option key={themeName} value={themeName}>
-                      {themeName}
-                    </option>
-                  ))}
-                </select>
+          <div className="flex-row flex gap-3 mb-3 w-full">
+            <div className="flex-1 flex flex-col bg-gray-800 rounded-lg border border-gray-700">
+              <div className="mx-6 mt-6">
+                <h2 className="text-2xl font-bold text-white mb-2">Source Code</h2>
+                <p className="text-gray-400 text-sm">Write your Lua code here</p>
               </div>
-              
-              {/* Shared scrollable container */}
-              <div className="absolute inset-0 overflow-auto">
-                {/* Syntax highlighted background */}
-                <div className="absolute top-0 left-0 w-full pointer-events-none">
-                  <SyntaxHighlighter
-                    language="lua"
-                    style={themes[editorTheme as keyof typeof themes] || themes.dracula}
-                    customStyle={{
-                      margin: 0,
+              <div className="flex-1 bg-gray-900 m-6 rounded-lg relative overflow-hidden">
+                {/* Theme selector */}
+                <div className="absolute top-2 right-2 z-10">
+                  <select
+                    value={editorTheme}
+                    onChange={(e) => setEditorTheme(e.target.value)}
+                    className="bg-gray-700 text-white text-xs px-2 py-1 rounded border border-gray-600 hover:bg-gray-600 focus:outline-none focus:border-blue-500"
+                  >
+                    {themes.map((themeName) => (
+                      <option key={themeName} value={themeName}>
+                        {themeName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Shared scrollable container */}
+                <div className="absolute inset-0 overflow-hidden w-full h-full">
+                  {/* Syntax highlighted background */}
+                  <div ref={syntaxRef} className="*:h-full h-full absolute top-0 left-0 w-full pointer-events-none">
+                    <SyntaxHighlighter
+                      language="lua"
+                      style={ getThemeFromString(editorTheme) }
+                      customStyle={{
+                        margin: 0,
+                        padding: '1.5rem',
+                        background: 'transparent',
+                        fontSize: '0.875rem',
+                        lineHeight: '1.5',
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                      }}
+                      codeTagProps={{
+                        style: {
+                          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                          fontSize: '0.875rem',
+                          lineHeight: '1.5',
+                        }
+                      }}
+
+                    >
+                      {sourceRef.current || ' '}
+                    </SyntaxHighlighter>
+                  </div>
+
+                  {/* Transparent textarea overlay */}
+                  <textarea
+                    ref={el => {
+                      textareaRef.current = el;
+                      secondDivRef.current = el;
+                    }}
+                    onScroll={handleTextAreaScroll}
+                    id="source"
+                    value={sourceRef.current}
+                    onChange={handleSourceChange}
+                    onKeyDown={handleAlternativeInputs}
+                    className=" relative w-full bg-transparent outline-none text-transparent  caret-white border-none resize-none placeholder-gray-500 whitespace-pre"
+                    placeholder="Enter your Lua code here..."
+                    spellCheck={false}
+                    style={{
+                      caretColor: 'white',
                       padding: '1.5rem',
-                      background: 'transparent',
                       fontSize: '0.875rem',
                       lineHeight: '1.5',
                       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                      minHeight: '100%',
                     }}
-                    codeTagProps={{
-                      style: {
-                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                        fontSize: '0.875rem',
-                        lineHeight: '1.5',
-                      }
-                    }}
-                  >
-                    {source || ' '}
-                  </SyntaxHighlighter>
-                </div>
-                
-                {/* Transparent textarea overlay */}
-                <textarea
-                  ref={textareaRef}
-                  id="source"
-                  value={source}
-                  onChange={handleSourceChange}
-                  onKeyDown={handleAlternativeInputs}
-                  className="relative w-full bg-transparent outline-none text-transparent caret-white border-none resize-none placeholder-gray-500 whitespace-pre"
-                  placeholder="Enter your Lua code here..."
-                  spellCheck={false}
-                  style={{
-                    caretColor: 'white',
-                    padding: '1.5rem',
-                    fontSize: '0.875rem',
-                    lineHeight: '1.5',
-                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                    minHeight: '100%',
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-          {/* Preview + Snippets Column */}
-          <div className="flex flex-1 flex-col gap-6">
-            {/* Preview Section */}
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">Preview</h2>
-                <p className="text-gray-400 text-sm">
-                  Live preview of your animation
-                </p>
-              </div>
-
-              <div className="bg-gray-900 rounded-lg p-6 mb-6 flex justify-center items-center">
-                <canvas
-                  ref={canvasRef}
-                  width={FIXED_CANVAS_SIZE}
-                  height={FIXED_CANVAS_SIZE}
-                  className="border-2 border-gray-600 rounded-lg shadow-lg [image-rendering:pixelated]"
-                />
-              </div>
-
-              {/* Controls */}
-              <div className="flex flex-wrap gap-3 items-center justify-between">
-                <div className="flex gap-2">
-                  <button
-                    onClick={sendUpdatedSource}
-                    className="px-4 py-2 rounded-lg border border-green-600 bg-green-600 text-white hover:bg-green-700 transition-all duration-200 font-medium shadow-sm"
-                  >
-                    Run
-                  </button>
-                  <button
-                    onClick={handleStep}
-                    className="px-4 py-2 rounded-lg border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm"
-                  >
-                    Step
-                  </button>
-                  <button
-                    onClick={handlePost}
-                    className="px-4 py-2 rounded-lg border border-purple-600 bg-purple-600 text-white hover:bg-purple-700 transition-all duration-200 font-medium shadow-sm"
-                  >
-                    Post
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-3 bg-gray-700 rounded-lg px-3 py-2">
-                  <label className="text-gray-300 text-sm font-medium">
-                    Grid Size:
-                  </label>
-                  <input
-                    type="number"
-                    value={gridSize}
-                    min={1}
-                    max={512}
-                    onChange={(e) =>
-                      setGridSize(
-                        Math.min(Math.max(parseInt(e.target.value) || 0, 0), 512)
-                      )
-                    }
-                    className="px-3 py-1 rounded-md border border-gray-600 bg-gray-800 text-white hover:bg-gray-700 focus:bg-gray-700 focus:border-blue-500 transition-all duration-200 w-20 text-sm"
                   />
                 </div>
               </div>
             </div>
+            {/* Preview + Snippets Column */}
+            <div className="flex flex-1 flex-col gap-6">
+              {/* Preview Section */}
+              <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-2">Preview</h2>
+                  <p className="text-gray-400 text-sm">
+                    Live preview of your animation
+                  </p>
+                </div>
+
+                <div className="bg-gray-900 rounded-lg p-6 mb-6 flex justify-center items-center">
+                  <canvas
+                    ref={canvasRef}
+                    width={FIXED_CANVAS_SIZE}
+                    height={FIXED_CANVAS_SIZE}
+                    className="border-2 border-gray-600 rounded-lg shadow-lg [image-rendering:pixelated]"
+                  />
+                </div>
+
+                {/* Controls */}
+                <div className="flex flex-wrap gap-3 items-center justify-between">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={sendUpdatedSource}
+                      className="px-4 py-2 rounded-lg border border-green-600 bg-green-600 text-white hover:bg-green-700 transition-all duration-200 font-medium shadow-sm"
+                    >
+                      Run
+                    </button>
+                    <button
+                      onClick={handleStep}
+                      className="px-4 py-2 rounded-lg border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm"
+                    >
+                      Step
+                    </button>
+                    <button
+                      onClick={handlePost}
+                      className="px-4 py-2 rounded-lg border border-purple-600 bg-purple-600 text-white hover:bg-purple-700 transition-all duration-200 font-medium shadow-sm"
+                    >
+                      Post
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-3 bg-gray-700 rounded-lg px-3 py-2">
+                    <label className="text-gray-300 text-sm font-medium">
+                      Grid Size:
+                    </label>
+                    <input
+                      type="number"
+                      value={gridSize}
+                      min={1}
+                      max={512}
+                      onChange={(e) =>
+                        setGridSize(
+                          Math.min(Math.max(parseInt(e.target.value) || 0, 0), 512)
+                        )
+                      }
+                      className="px-3 py-1 rounded-md border border-gray-600 bg-gray-800 text-white hover:bg-gray-700 focus:bg-gray-700 focus:border-blue-500 transition-all duration-200 w-20 text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
 
 
+            </div>
           </div>
-         </div>
-         <div className="flex-1 bg-gray-800 rounded-lg border border-gray-700 p-6">
+          <div className="flex-1 bg-gray-800 rounded-lg border border-gray-700 p-6">
             <div className="mb-4">
               <h2 className="text-xl font-bold text-white mb-2">
                 Code Snippets

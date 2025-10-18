@@ -1,6 +1,8 @@
 # Checkerboard Pattern
 
-``` lua
+Draws a classic checkerboard pattern using alternating blocks.
+
+```lua
 local size = 64
 local max = size - 1
 local size_block = 8
