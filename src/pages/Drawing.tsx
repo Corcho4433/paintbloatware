@@ -11,12 +11,17 @@ const snippetImports = import.meta.glob("../code-snippets/*.md", {
   import: "default",
 });
 
+
+const ADDRESS = "localhost:8000";
+const WS_ROUTE = "/processor";
+const WS_URL = `ws://${ADDRESS}${WS_ROUTE}`;
 const INITIAL_FRAME = 1;
 const FRAME_RATE = 12; // Reduced from 24 to 12 FPS for less CPU usage
 const MS_TIME = (1 / FRAME_RATE) * 1000;
 const FIXED_CANVAS_SIZE = 512;
 
 const themes = getAvailableThemes();
+
 
 const Drawing = () => {
   // Get theme from auth store
@@ -152,7 +157,7 @@ const Drawing = () => {
   }, [gridSize]);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8080/ws");
+    const socket = new WebSocket(WS_URL);
     socket.onopen = () => {
       console.log("Connected to server");
     };
