@@ -1,7 +1,9 @@
+
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import {getThemeFromString} from "../utils/theme";
+import { useAuthStore } from "../store/useAuthStore";
 
 interface CodeSnippetsProps {
   snippetImports: Record<string, () => Promise<string>>;
@@ -11,8 +13,10 @@ const CodeSnippets = ({ snippetImports }: CodeSnippetsProps) => {
   const [snippets, setSnippets] = useState<{ name: string; content: string }[]>(
     []
   );
-  const [activeSnippet, setActiveSnippet] = useState(0);
-
+  const editorTheme = useAuthStore(state => state.editorTheme);
+  const theme = getThemeFromString(editorTheme);
+  const activeSnippet = useAuthStore(state => state.snippet);
+  const setActiveSnippet = useAuthStore(state => state.setSnippet);
   useEffect(() => {
     const loadSnippets = async () => {
       const keys = Object.keys(snippetImports);
@@ -38,47 +42,15 @@ const CodeSnippets = ({ snippetImports }: CodeSnippetsProps) => {
   };
 
   return (
-    <div
-      style={{
-        background: "#1F2937",
-        color: "#E0E7FF",
-        padding: "1rem",
-        borderRadius: "8px",
-        width: '100%',
-        boxSizing: 'border-box',
-        maxWidth: '100%',
-      }}
-    >
+    <div className="bg-gray-800 text-indigo-100 p-4 rounded-lg w-full max-w-full">
       {/* Buttons */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "0.5rem",
-          marginBottom: "1rem",
-          maxWidth: "100%",
-          paddingBottom: "0.25rem",
-          scrollbarWidth: "thin",
-        }}
-      >
+      <div className="flex flex-wrap gap-2 mb-4 max-w-full pb-1 overflow-x-auto scrollbar-thin">
         {snippets.map((s, i) => (
           <button
             key={i}
             onClick={() => setActiveSnippet(i)}
-            style={{
-              background: i === activeSnippet ? "#3B82F6" : "#2563EB",
-              color: "#fff",
-              border: "1px solid #1E40AF",
-              borderRadius: "6px",
-              cursor: "pointer",
-              padding: "0.4rem 0.8rem",
-              whiteSpace: "normal",
-              flex: "1 1 auto",
-              fontSize: "0.95em",
-              minWidth: "120px",
-              maxWidth: "100%",
-              overflow: "visible",
-            }}
+            className={`border border-blue-900 rounded-md cursor-pointer px-3 py-2 min-w-[120px] max-w-full text-base font-medium transition-colors duration-150 ${i === activeSnippet ? 'bg-blue-500' : 'bg-blue-700'} text-white`}
+            style={{ whiteSpace: 'normal', overflow: 'visible' }}
           >
             {s.name}
           </button>
@@ -87,81 +59,40 @@ const CodeSnippets = ({ snippetImports }: CodeSnippetsProps) => {
 
       {/* Snippet display */}
       {snippets[activeSnippet] && (
-        <div style={{ position: "relative" }}>
+        <div className="relative">
           <button
             onClick={() => copyToClipboard(snippets[activeSnippet].content)}
-            style={{
-              position: "absolute",
-              top: "8px",
-              right: "8px",
-              background: "#374151",
-              color: "#E0E7FF",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              padding: "0.3rem 0.6rem",
-              fontSize: "0.8rem",
-            }}
+            className="absolute top-2 right-2 bg-gray-700 text-indigo-100 border-none rounded px-2 py-1 text-xs cursor-pointer"
           >
             Copy
           </button>
-          <div
-            style={{
-              background: "#273349",
-              padding: "1rem",
-              borderRadius: "6px",
-              width: "100%",
-              maxWidth: "100%",
-              wordBreak: "break-all",
-              whiteSpace: "pre-wrap",
-            }}
-          >
+          <div className="bg-gray-900 p-4 w-full max-w-full break-all whitespace-pre-wrap">
             <ReactMarkdown
               components={{
                 code({node, inline, className, children, ...props}) {
                   const match = /language-(\w+)/.exec(className || "");
                   return !inline && match ? (
                     <SyntaxHighlighter
-                      style={vscDarkPlus}
+                      style={theme}
                       language={match[1]}
                       PreTag="div"
-                      customStyle={{
-                        margin: 0,
-                        background: 'transparent',
-                        fontSize: '1em',
-                        wordBreak: 'break-all',
-                        whiteSpace: 'pre-wrap',
-                        width: '100%',
-                        maxWidth: '100%',
-                        overflowX: 'hidden',
-                      }}
+                      className="!bg-gray-800 text-indigo-100 text-base break-all whitespace-pre-wrap w-full max-w-full overflow-x-hidden rounded"
+                      customStyle={{ margin: 0 }}
                       {...props}
                     >
                       {String(children).replace(/\n$/, "")}
                     </SyntaxHighlighter>
                   ) : (
                     <code
-                      style={{
-                        background: '#222',
-                        borderRadius: '4px',
-                        padding: '0.2em 0.4em',
-                        fontSize: '0.95em',
-                        wordBreak: 'break-all',
-                        whiteSpace: 'pre-wrap',
-                        width: '100%',
-                        maxWidth: '100%',
-                        overflowX: 'hidden',
-                      }}
+                      className="bg-gray-900 rounded-xl px-1 py-0.5 text-base break-all whitespace-pre-wrap w-full max-w-full overflow-x-hidden"
                       {...props}
                     >
                       {children}
                     </code>
                   );
                 },
-                h1: ({children}) => <h1 style={{fontSize: '1.5em', fontWeight: 700, margin: '0.5em 0'}}>{children}</h1>,
-                h2: ({children}) => <h2 style={{fontSize: '1.2em', fontWeight: 600, margin: '0.5em 0'}}>{children}</h2>,
-                h3: ({children}) => <h3 style={{fontSize: '1em', fontWeight: 600, margin: '0.5em 0'}}>{children}</h3>,
-                p: ({children}) => <p style={{margin: '0.5em 0'}}>{children}</p>,
+                h1: ({children}) => <h1 className="!text-lg font-bold my-2">{children}</h1>,
+                p: ({children}) => <p className="!text-sm my-2">{children}</p>,
               }}
             >
               {snippets[activeSnippet].content}

@@ -6,36 +6,11 @@ import { User, Settings, Shield, Palette, Save, Eye, EyeOff, Upload } from 'luci
 import { useUserInfo, updateProfileInfo, uploadProfileImageFile } from '../hooks/user';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import {
-  dracula,
-  vscDarkPlus,
-  oneDark,
-  atomDark,
-  tomorrow,
-  okaidia,
-  darcula,
-  materialDark,
-  nord,
-  nightOwl,
-  coldarkDark,
-  duotoneDark,
-  solarizedDarkAtom
-} from 'react-syntax-highlighter/dist/esm/styles/prism';
-const themes = {
-  dracula,
-  vscDarkPlus,
-  oneDark,
-  atomDark,
-  tomorrow,
-  okaidia,
-  darcula,
-  materialDark,
-  nord,
-  nightOwl,
-  coldarkDark,
-  duotoneDark,
-  solarizedDarkAtom
-};
+import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/prism';
+import { getAvailableThemes, getThemeFromString } from '../utils/theme';
+import { get } from 'flowbite-react/helpers/get';
+
+const themes = getAvailableThemes();
 // Validation schema for profile form
 const profileValidationSchema = Yup.object({
   name: Yup.string()
@@ -74,7 +49,7 @@ const SettingsPage = () => {
   const { user, loading } = useUserInfo(authUser?.id);
   const editorTheme = useAuthStore((state) => state.editorTheme);
   const setEditorTheme = useAuthStore((state) => state.setEditorTheme);
-
+  
   // Profile picture state (file upload only)
   const [uploadingImage, setUploadingImage] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
@@ -401,13 +376,40 @@ const SettingsPage = () => {
                     onChange={(e) => setEditorTheme(e.target.value)}
                     className="bg-gray-700 text-white text-xs px-2 py-1 rounded border border-gray-600 hover:bg-gray-600 focus:outline-none focus:border-blue-500"
                   >
-                    {Object.keys(themes).map((themeName) => (
+                    {themes.map((themeName) => (
                       <option key={themeName} value={themeName}>
                         {themeName}
                       </option>
                     ))}
                   </select>
                 </div>
+                <SyntaxHighlighter
+                  language="lua"
+                  style={getThemeFromString(editorTheme)}
+                  className="*:!p-0"
+                  customStyle={{
+                    margin: 0,
+                    padding: '1.5rem',
+                    background: 'transparent',
+                    fontSize: '0.875rem',
+                    lineHeight: '1.5',
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                  }}
+                  codeTagProps={{
+                    style: {
+                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                      fontSize: '0.875rem',
+                      lineHeight: '1.5',
+                    }
+                  }}
+
+                >{`local max = 20
+for x = 0, max do
+  for y = 0, max do
+      grid:set_pixel(x, y, math.max(255 - (255/size) * x, 0), 0, 0)
+  end
+end`}
+                </SyntaxHighlighter>
               </div>
             </div>
           )}

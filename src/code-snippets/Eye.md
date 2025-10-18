@@ -1,5 +1,7 @@
 # Eye
 
+Draws a stylized eye using a pixel sprite and a color palette.
+
 ```lua
 local SIZE = 512
 local PIX = 32

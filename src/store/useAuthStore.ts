@@ -19,6 +19,12 @@ interface AuthStore {
     // Editor theme
     editorTheme: string;
     setEditorTheme: (theme: string) => void;
+    sourceCode: string;
+    setSourceCode: (code: string) => void;
+    gridSize: number;
+    setGridSize: (size: number) => void;
+    snippet: number;
+    setSnippet: (snippet: number) => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -28,7 +34,13 @@ export const useAuthStore = create<AuthStore>()(
             setUser: (user: AuthStorageUser) => set({ user }),
             // Sidebar state
             isMobileSidebarOpen: false,
+            gridSize: 64,
+            setGridSize: (size: number) => set({ gridSize: size }),
+            snippet: 0,
+            setSnippet: (snippet: number) => set({ snippet }),
             isDesktopSidebarCollapsed: false,
+            sourceCode: '', // Add default value for code
+            setSourceCode: (code: string) => set({ sourceCode: code }),
             setMobileSidebarOpen: (isOpen: boolean) => set({ isMobileSidebarOpen: isOpen }),
             setDesktopSidebarCollapsed: (isCollapsed: boolean) => set({ isDesktopSidebarCollapsed: isCollapsed }),
             // Editor theme
