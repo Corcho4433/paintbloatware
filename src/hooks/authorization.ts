@@ -5,6 +5,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { LoginUserRequest, LoginUserResponse, RegisterUserRequest, RegisterUserResponse } from "../types/requests";
 
 const fetchWithRefresh = async (input: RequestInfo | URL, init?: RequestInit) => {
+  
   let res = await fetch(input, init);
 
   if (res.status === 401) {
@@ -20,11 +21,15 @@ const fetchWithRefresh = async (input: RequestInfo | URL, init?: RequestInit) =>
       
       // If still 401 after refresh, don't retry again to avoid infinite loop
       if (res.status === 401) {
-        throw new Error("Session expired, please log in again n");
+        // Clear auth state and redirect to login
+        useAuthStore.getState().logout();
+        window.location.href = "/login";
+        throw new Error("Session expired, please log in again");
       }
     } else {
-      // Refresh failed, session is truly expired
-      throw new Error("Session expired, please log in again a");
+      useAuthStore.getState().logout();
+      window.location.href = "/login";
+      throw new Error("Session expired, please log in again");
     }
   }
 

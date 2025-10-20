@@ -48,13 +48,9 @@ const PaintSidebar = () => {
           [&>div]:!bg-gray-800
         `}
       >
-        {/* Logo → Clickable to go Home */}
-        <div className="space-y-3">
-
-        </div>
 
         {/* Navigation */}
-        <SidebarItemGroup className="space-y-2 flex-1">
+        <SidebarItemGroup className="space-y-2 flex-1 !mt-3">
           {/* Home */}
           <SidebarItem href="/home" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } hover:!bg-gray-700 rounded-lg transition-colors`}>
             <div className="flex items-center">
@@ -147,25 +143,7 @@ const PaintSidebar = () => {
         </SidebarItemGroup>
 
         {/* Collapse button (desktop only) */}
-        <div className="p-2 hidden md:block">
-          <button
-            onClick={() => setDesktopSidebarCollapsed(!isDesktopSidebarCollapsed)}
-            className={`
-              flex items-center justify-center p-2 rounded-lg hover:!bg-gray-600 transition
-              ${
-                isDesktopSidebarCollapsed
-                  ? "w-10 h-10 mx-auto !bg-gray-700"
-                  : "w-full !bg-gray-700"
-              }
-            `}
-          >
-            {isDesktopSidebarCollapsed ? (
-              <ChevronRight className="text-white" />
-            ) : (
-              <ChevronLeft className="text-white" />
-            )}
-          </button>
-        </div>
+        
       </Sidebar>
     </>
   );

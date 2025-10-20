@@ -16,7 +16,7 @@ const UserPage = () => {
   }, [user]);
 
   const renderSkeleton = () => (
-    <div className="p-4">
+    <div>
       <div className="flex items-center space-x-6 border border-gray-700 bg-gray-800 p-6 rounded-xl mb-8">
         <div className="w-32 h-32 rounded-full border border-white bg-gray-600 animate-pulse" />
         <div>
@@ -34,8 +34,8 @@ const UserPage = () => {
   const userName = user?.name || "Unknown User";
 
   return (
-    <div className="p-4">
-      <div className="flex items-center space-x-6 border border-gray-700 bg-gray-800 p-6 rounded-xl mb-8">
+    <div >
+      <div className="flex items-center space-x-6 border m-3 border-gray-700 bg-gray-800 p-6 rounded-xl">
         {(user && user.urlPfp && !loading) ? (
           <img
             src={`${user.urlPfp}`}

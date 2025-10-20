@@ -80,7 +80,7 @@ const Wiki = () => {
   }, []);
 
   return (
-    <section className="flex gap-6 min-h-screen w-full p-6 !bg-gray-900 rounded-lg shadow-md">
+    <section className="flex gap-3 min-h-screen w-full p-3 !bg-gray-900 rounded-lg shadow-md">
       <div className="bg-gray-900 rounded-2xl border border-gray-700 shadow-lg w-64 h-screen z-40">
       <WikiSidebar
         selected={selected}

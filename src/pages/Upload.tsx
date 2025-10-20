@@ -121,7 +121,7 @@ export default function Upload() {
                                 <p className="text-gray-400 text-sm">Preview your image and source code before posting</p>
                             </div>
                             <div className="flex-1 aspect-square bg-gray-900 mx-6 mt-6 rounded-lg relative overflow-hidden flex items-center justify-center">
-                                <div className="flex justify-center items-center w-full h-full">
+                                <div className="flex justify-center items-center w-full h-full m-3">
                                     <div className="relative w-[512px] h-[512px] flex items-center justify-center">
                                         <img
                                             width={512}
@@ -131,8 +131,8 @@ export default function Upload() {
                                             className="border-2 [image-rendering:pixelated] border-gray-600 bg-black rounded-lg shadow-lg w-full h-full object-cover"
                                         />
                                         {serverResponse && serverResponse.type === 'success' && (
-                                            <div className="absolute inset-0 rounded-lg flex items-center justify-center pointer-events-none" style={{background: 'linear-gradient(135deg, rgba(34,197,94,0.92) 0%, rgba(34,197,94,0.85) 100%)'}}>
-                                                <span className="text-white text-3xl font-extrabold drop-shadow-lg tracking-wide text-center select-none">
+                                            <div className="absolute inset-0 rounded-lg flex items-center justify-center pointer-events-none" style={{background: 'linear-gradient(135deg, rgba(34,197,94,0.50) 0%, rgba(34,197,94,0.50) 100%)'}}>
+                                                <span className="text-white text-3xl font-bold drop-shadow-lg tracking-wide text-center select-none">
                                                     ¡Post Exitoso!
                                                 </span>
                                             </div>
@@ -141,10 +141,10 @@ export default function Upload() {
                                 </div>
                             </div>
                             <div className="flex gap-3 p-4 align-center justify-center">
-                                    <button className="px-4 py-2 border border-gray-700 rounded-lg transition-all cursor-pointer max-w-full text-base duration-150 bg-gray-700 text-green-400 hover:border-green-400 font-normal shadow-lg hover:bg-gray-800" onClick={handlePost} disabled={!savedUrl}>
+                                    <button className="px-4 py-2 border border-gray-700 rounded-lg transition-all cursor-pointer max-w-full text-base duration-150 bg-gray-700 text-green-400 hover:shadow-green-400/25 hover:border-green-400 font-normal shadow-lg hover:bg-gray-800" onClick={handlePost} disabled={!savedUrl}>
                                         Post Now
                                     </button>
-                                    <button className="px-4 py-2 border border-gray-700 rounded-lg transition-all cursor-pointer max-w-full text-base duration-150 bg-gray-700 text-red-400 hover:border-red-400 font-normal shadow-lg hover:bg-gray-800" onClick={handleHideSource} disabled={!savedUrl}>
+                                    <button className="px-4 py-2 border border-gray-700 rounded-lg transition-all cursor-pointer max-w-full text-base duration-150 bg-gray-700 text-red-400 hover:shadow-red-400/25 hover:border-red-400 font-normal shadow-lg hover:bg-gray-800" onClick={handleHideSource} disabled={!savedUrl}>
                                         Hide Source
                                     </button>
                                 </div>
@@ -152,7 +152,7 @@ export default function Upload() {
                         {/* Right column: Description & Tags */}
                         <div className="flex-1 flex flex-col bg-gray-800 rounded-lg border border-gray-700 p-6">
                             <h2 className="text-lg font-bold text-white mb-2">Source Code</h2>
-                            <div className=" mb-4 h-[60vh] w-[50vw] overflow-auto">
+                            <div className=" mb-4 max-h-[55vh] w-[50vw] overflow-auto">
                                 
                                 <SyntaxHighlighter language="lua" className="!bg-gray-900 rounded-xl" style={ getThemeFromString(editorTheme)} customStyle={{
                                     margin: 0,
@@ -182,31 +182,32 @@ export default function Upload() {
                                     onChange={(e) => setDescription(e.target.value)}
                                     placeholder="Describe tu dibujo..."
                                 />
-                                {serverResponse && (
-                                    <div className={`mt-2 p-2 rounded text-sm ${serverResponse.type === 'success' ? 'bg-green-700 text-green-100' : 'bg-red-700 text-red-100'}`}>
-                                        {serverResponse.message}
-                                    </div>
-                                )}
                             </div>
                             <div className="mb-4">
                                 <h2 className="text-xl font-bold text-white mb-2">Tags</h2>
                                 <div className="flex flex-wrap gap-2 mb-2">
-                                    {availableTags.map(tag => (
-                                        <button
-                                            key={tag.name}
-                                            className={`px-3 py-1 rounded border border-blue-900 text-sm font-medium transition-colors duration-150 ${selectedTags.includes(tag.name) ? 'bg-blue-500 text-white' : 'bg-blue-700 text-white'}`}
-                                            onClick={() => toggleTag(tag.name)}
-                                            type="button"
-                                        >
-                                            {tag.name}
-                                        </button>
-                                    ))}
+                                    {availableTags.length === 0
+                                        ? [...Array(6)].map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className="h-8 w-20 bg-gray-700 rounded-lg animate-pulse border border-gray-700"
+                                            />
+                                        ))
+                                        : availableTags.map(tag => (
+                                            <button
+                                                key={tag.name}
+                                                className={`px-4 py-2 rounded-lg border border-gray-700 text-sm font-medium transition-all duration-150 shadow-lg max-w-full
+                                                    ${selectedTags.includes(tag.name)
+                                                        ? 'bg-gray-900 text-blue-400 !border-blue-400 shadow-blue-600/25'
+                                                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white hover:border-gray-600'}
+                                                `}
+                                                onClick={() => toggleTag(tag.name)}
+                                                type="button"
+                                            >
+                                                {tag.name}
+                                            </button>
+                                        ))}
                                 </div>
-                                {selectedTags.length > 0 && (
-                                    <div className="mt-2 text-gray-300">
-                                        <p>Selected tags: {selectedTags.join(', ')}</p>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { usePosts  } from '../hooks/posts';
+import { usePosts } from '../hooks/posts';
 import useInfiniteScroll from '../hooks/infinetescroll';
 import { PostModal } from './postmodal';
 import { useAuthStore } from '../store/useAuthStore';
@@ -16,10 +16,9 @@ export const PostGallery = ({ userId, tag }: { userId?: string; tag?: string }) 
 
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const prevUrlRef = useRef<string | null>(null);
-  
+
   // Check if error is "NoPostsMadeYet" to determine array size
   const isNoPostsError = error && (error.name === "NoPostsMadeYet" || error.message.includes("No posts found"));
-  let emptyArray = Array(isNoPostsError ? 1 : 6).fill(-1); // 1 element for no posts, 6 for loading
 
   const handlePostPreview = (postIndex: number) => {
     if (posts?.posts?.[postIndex]) {
@@ -75,7 +74,7 @@ export const PostGallery = ({ userId, tag }: { userId?: string; tag?: string }) 
         // Check if we're viewing a user profile and if it's the current user's profile
         const isViewingProfile = !!userId;
         const isOwnProfile = isViewingProfile && userId === id;
-        
+
         if (isViewingProfile && isOwnProfile) {
           // Viewing own profile with no posts
           return (
@@ -83,7 +82,7 @@ export const PostGallery = ({ userId, tag }: { userId?: string; tag?: string }) 
               <div className="text-6xl mb-4">🎨</div>
               <h3 className="text-xl font-bold mb-2">Your gallery is empty!</h3>
               <p className="text-sm opacity-90 mb-4">You haven't shared any artwork yet. It's time to show your creativity to the world!</p>
-              <button 
+              <button
                 onClick={() => window.location.href = '/draw'}
                 className="bg-white cursor-pointer text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
               >
@@ -110,7 +109,7 @@ export const PostGallery = ({ userId, tag }: { userId?: string; tag?: string }) 
               <div className="text-6xl mb-4">🎨</div>
               <h3 className="text-xl font-bold mb-2">Ready to Create?</h3>
               <p className="text-sm opacity-90 mb-4">No posts yet! Be the first to share your amazing artwork with the community.</p>
-              <button 
+              <button
                 onClick={() => window.location.href = '/draw'}
                 className="bg-white cursor-pointer text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
               >
@@ -120,7 +119,7 @@ export const PostGallery = ({ userId, tag }: { userId?: string; tag?: string }) 
           );
         }
       }
-      
+
       // Default error display for other errors
       return (
         <div className="bg-gradient-to-br from-red-500 via-red-700 to-black w-[350px] h-[350px] flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
@@ -128,7 +127,7 @@ export const PostGallery = ({ userId, tag }: { userId?: string; tag?: string }) 
         </div>
       );
     }
-    if (loading  || !posts?.posts?.length) {
+    if (loading || !posts?.posts?.length) {
       return (
         <div className="cursor-progress w-[350px] h-[350px] flex items-center justify-center">
           <svg aria-hidden="true" className="w-12 h-12 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -140,7 +139,7 @@ export const PostGallery = ({ userId, tag }: { userId?: string; tag?: string }) 
       );
     }
 
-    
+
 
     const currentPost = posts.posts[currentPostIndex];
     if (!currentPost) {
@@ -182,46 +181,59 @@ export const PostGallery = ({ userId, tag }: { userId?: string; tag?: string }) 
     }
   };
   return (
-    <div className="py-4">
+    <div className=" mx-3  border border-gray-700 rounded-xl rounded-b-none bg-gray-800">
       {/* Post Preview Modal */}
       {selectedPost && <PostModal post={selectedPost} onClose={closeModal} />}
 
       {/* Masonry Grid */}
-      <div className="flex justify-center">
-        <div className="flex flex-wrap mt-7 w-[90%] justify-center">
-          {!loading && !error && posts?.posts?.length ?
-            posts.posts.map((_, index) => (
-              <div
-                onClick={() => handlePostPreview(index)}
-                key={index}
-                className="bg-gray-800 overflow-hidden hover:shadow-xl duration-300 w-[350px] cursor-pointer"
-              >
-                <div className="bg-gradient-to-br from-gray-900 to-black w-[350px] h-[350px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
-                  {renderContent(index)}
-                </div>
-              </div>
-            )) : (
-              emptyArray.map((_, index) => (
-                <div key={index} className="bg-gray-800 hover:shadow-xl duration-300">
-                  <div className="bg-gradient-to-br from-gray-900 to-black w-[350px] h-[350px] flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
+      <div className="flex justify-center pt-3 min-h-screen">
+        <div className="w-full max-w-none">
+          <div
+            className="grid gap-0 justify-center"
+            style={{
+              gridTemplateColumns: "repeat(auto-fit, 350px)",
+            }}
+          >
+            {!loading && !error && posts?.posts?.length
+              ? posts.posts.map((_, index) => (
+                <div
+                  key={index}
+                  onClick={() => handlePostPreview(index)}
+                  className="bg-gray-800 overflow-hidden hover:shadow-xl h-[350px] w-[350px] cursor-pointer rounded-lg"
+                >
+                  <div className="bg-gradient-to-br from-gray-900 to-black w-full h-full flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300 rounded-lg">
                     {renderContent(index)}
                   </div>
                 </div>
               ))
+              : Array(isNoPostsError ? 1 : 12).fill(null).map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-800 overflow-hidden hover:shadow-xl h-[350px] w-[350px] duration-300 rounded-lg"
+                >
+                  <div className="bg-gradient-to-br from-gray-900 to-black w-full h-full flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300 rounded-lg">
+                    {renderContent(index)}
+                  </div>
+                </div>
+              ))}
+
+            {/* Loading more indicator */}
+            {!loading && isLoadingMore && (
+              <div className="col-span-full flex items-center justify-center gap-3 py-8">
+                <svg aria-hidden="true" className="w-8 h-8 animate-spin text-gray-600 fill-blue-500" viewBox="0 0 100 101" fill="none">
+                  <path d="M100 50.59c0 27.614-22.386 50-50 50s-50-22.386-50-50 22.386-50 50-50 50 22.386 50 50ZM9.08 50.59c0 22.598 18.32 40.919 40.92 40.919 22.598 0 40.919-18.321 40.919-40.919C90.919 27.992 72.598 9.672 50 9.672 27.401 9.672 9.081 27.992 9.081 50.59Z" fill="currentColor" />
+                  <path d="M93.968 39.04c2.425-.637 3.895-3.129 3.04-5.486-1.715-4.731-4.137-9.185-7.191-13.206-3.972-5.229-8.934-9.624-14.605-12.935C69.541 4.101 63.275 1.94 56.77 1.051 51.767.368 46.698.447 41.734 1.279c-2.473.415-3.922 2.919-3.285 5.344.637 2.426 3.119 3.849 5.6 3.485 3.801-.559 7.669-.58 11.49-.057 5.324.727 10.453 2.496 15.093 5.205 4.64 2.71 8.701 6.307 11.951 10.586 2.332 3.071 4.214 6.45 5.595 10.035.902 2.34 3.361 3.803 5.787 3.165Z" fill="currentFill" />
+                </svg>
+                <span className="text-gray-400 text-lg">Loading more posts...</span>
+              </div>
             )}
-          <div ref={sentinelRef} ></div>
+
+            {/* Sentinel for infinite scroll */}
+            <div ref={sentinelRef} className="col-span-full h-10"></div>
+          </div>
         </div>
       </div>
-      {!loading && isLoadingMore && (
-        <div className="flex items-center gap-2 text-gray-400 text-xl justify-center mt-4">
-          <svg aria-hidden="true" className="w-6 h-6 animate-spin text-gray-600 fill-blue-500" viewBox="0 0 100 101" fill="none">
-            <path d="M100 50.59c0 27.614-22.386 50-50 50s-50-22.386-50-50 22.386-50 50-50 50 22.386 50 50ZM9.08 50.59c0 22.598 18.32 40.919 40.92 40.919 22.598 0 40.919-18.321 40.919-40.919C90.919 27.992 72.598 9.672 50 9.672 27.401 9.672 9.081 27.992 9.081 50.59Z" fill="currentColor"/>
-            <path d="M93.968 39.04c2.425-.637 3.895-3.129 3.04-5.486-1.715-4.731-4.137-9.185-7.191-13.206-3.972-5.229-8.934-9.624-14.605-12.935C69.541 4.101 63.275 1.94 56.77 1.051 51.767.368 46.698.447 41.734 1.279c-2.473.415-3.922 2.919-3.285 5.344.637 2.426 3.119 3.849 5.6 3.485 3.801-.559 7.669-.58 11.49-.057 5.324.727 10.453 2.496 15.093 5.205 4.64 2.71 8.701 6.307 11.951 10.586 2.332 3.071 4.214 6.45 5.595 10.035.902 2.34 3.361 3.803 5.787 3.165Z" fill="currentFill"/>
-          </svg>
-          <span>Loading more...</span>
-        </div>
-      )}
-      
+
     </div>
   );
 

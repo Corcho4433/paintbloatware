@@ -88,7 +88,7 @@ const GeminiInput = ({ setSourceCode }: GeminiInputProps) => {
                     className={`aspect-square ${geminiLoading ? '' : 'cursor-pointer'} p-2 rounded bg-gray-700 text-white shadow-lg hover:bg-gray-900 disabled:text-gray-400 disabled:bg-gray-700 flex items-center justify-center transition-all duration-200`}
                 >
                     {geminiLoading ? (
-                        <Square className="w-3 h-3 animate-pulse" />
+                        <Square className="w-5 h-5 animate-pulse" />
                     ) : (
                         // ✈️ Paper plane (send) icon
                         <ArrowRight className="w-5 h-5" />
@@ -161,7 +161,7 @@ const GeminiInput = ({ setSourceCode }: GeminiInputProps) => {
                             setActionStatus("copied");
                             setTimeout(() => setActionStatus(null), 2000);
                         }}
-                        className={`border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 min-w-[120px] max-w-full text-base duration-150 bg-gray-700 text-gray-300 font-normal shadow-lg hover:bg-gray-800 `}
+                        className={`border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 min-w-[70px] max-w-full text-base duration-150 bg-gray-700 text-gray-300 font-normal shadow-lg hover:bg-gray-800 `}
                         style={{ whiteSpace: 'normal', overflow: 'visible' }}
                     >
                         Copy
@@ -179,7 +179,7 @@ const GeminiInput = ({ setSourceCode }: GeminiInputProps) => {
                             setActionStatus("replaced");
                             setTimeout(() => setActionStatus(null), 2000);
                         }}
-                        className={`border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 min-w-[120px] max-w-full text-base duration-150 bg-gray-700 text-gray-300 font-normal shadow-lg hover:bg-gray-800 `}
+                        className={`border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 max-w-full text-base duration-150 bg-gray-700 text-gray-300 font-normal shadow-lg hover:bg-gray-800 `}
                         style={{ whiteSpace: 'normal', overflow: 'visible' }}
                     >
                         Replace

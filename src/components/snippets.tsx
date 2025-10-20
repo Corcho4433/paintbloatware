@@ -51,10 +51,10 @@ const CodeSnippets = ({ snippetImports, setSourceCode }: CodeSnippetsProps) => {
           <button
             key={i}
             onClick={() => setActiveSnippet(i)}
-            className={`border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 min-w-[120px] max-w-full text-base duration-150
+            className={`border border-gray-700 rounded-lg transition-all  px-3 py-2 min-w-[120px] max-w-full text-base duration-150
               ${i === activeSnippet
-                ? 'bg-gray-900 text-white border-gray-700 font-medium shadow-inner'
-                : 'bg-gray-700 text-gray-300 font-normal shadow-lg hover:bg-gray-800'}
+                ? 'bg-gray-900 text-white shadow-lg  border-gray-700 font-medium '
+                : 'bg-gray-700 text-gray-300 cursor-pointer font-normal shadow-lg hover:bg-gray-800'}
             `}
             style={{ whiteSpace: 'normal', overflow: 'visible' }}
           >
@@ -113,7 +113,7 @@ const CodeSnippets = ({ snippetImports, setSourceCode }: CodeSnippetsProps) => {
             <div className="space-x-2 mt-4">
               <button
                 onClick={() => { copyToClipboard(extractCode(snippets[activeSnippet].content)); setActionStatus("copied"); setTimeout(() => setActionStatus(null), 2000); }}
-                className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 min-w-[120px] max-w-full text-base duration-150 bg-gray-700 text-gray-300 font-normal shadow-lg hover:bg-gray-800"
+                className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2  max-w-full text-base duration-150 bg-gray-700 text-gray-300 font-normal shadow-lg hover:bg-gray-800"
               >
                 Copy
               </button>
@@ -123,7 +123,7 @@ const CodeSnippets = ({ snippetImports, setSourceCode }: CodeSnippetsProps) => {
                   setActionStatus("replaced");
                   setTimeout(() => setActionStatus(null), 2000);
                 }}
-                className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 min-w-[120px] max-w-full text-base duration-150 bg-gray-700 text-gray-300 font-normal shadow-lg hover:bg-gray-800"
+                className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2  max-w-full text-base duration-150 bg-gray-700 text-gray-300 font-normal shadow-lg hover:bg-gray-800"
               >
                 Replace
               </button>

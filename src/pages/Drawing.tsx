@@ -43,6 +43,7 @@ const Drawing = () => {
   // states
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 
   // refs
@@ -173,9 +174,12 @@ const Drawing = () => {
       if (newData.action === "FrameData") {
         console.log(newData.data.frame);
         saveFrame(newData.data.frame);
-      } else if (newData.action === "Error")
+        setErrorMessage(null); // Clear error on successful frame
+      } else if (newData.action === "Error") {
         console.error("Error:", newData.data.message);
-      else if (newData.action === "UploadSuccess") {
+        setErrorMessage(newData.data.message);
+        setIsRunning(false); // Stop animation on error
+      } else if (newData.action === "UploadSuccess") {
         sessionStorage.setItem("post_bucket_url", newData.data.urlBucket);
         sessionStorage.setItem("post_source_code", sourceRef.current);
         window.location.href = `/upload`;
@@ -434,28 +438,50 @@ const Drawing = () => {
                     ref={canvasRef}
                     width={FIXED_CANVAS_SIZE}
                     height={FIXED_CANVAS_SIZE}
-                    className="border-2 border-gray-600 bg-black rounded-lg shadow-lg [image-rendering:pixelated]"
+                    className="border-2 border-gray-600 bg-black rounded-lg hover:border-gray-500 transition-colors duration-100 shadow-lg [image-rendering:pixelated]"
                   />
                 </div>
+
+                {/* Error Display */}
+                {errorMessage && (
+                  <div className="mb-6 bg-red-900/20 border border-red-500 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="text-red-500 text-xl font-bold">⚠</div>
+                      <div className="flex-1">
+                        <h3 className="text-red-400 font-bold text-sm mb-1">Lua Runtime Error</h3>
+                        <pre className="text-red-300 text-xs font-mono whitespace-pre-wrap break-words">
+                          {errorMessage}
+                        </pre>
+                      </div>
+                      <button
+                        onClick={() => setErrorMessage(null)}
+                        className="text-red-400 hover:text-red-300 transition-colors"
+                        title="Dismiss error"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Controls */}
                 <div className="flex flex-wrap gap-3 items-center justify-between">
                   <div className="flex gap-2">
                     <button
                       onClick={sendUpdatedSource}
-                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 max-w-full text-base duration-150 bg-gray-700 text-green-400 hover:border-green-400 font-normal shadow-lg hover:bg-gray-800"
+                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 min-w-[70px] py-2 max-w-full text-base duration-150 bg-gray-700 text-green-400 hover:border-green-400 hover:shadow-green-400/25 font-normal shadow-lg hover:bg-gray-800"
                     >
                       Run
                     </button>
                     <button
                       onClick={handleStep}
-                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 max-w-full text-base duration-150 bg-gray-700 text-blue-400 hover:border-blue-400 font-normal shadow-lg hover:bg-gray-800"
+                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 min-w-[70px] py-2 max-w-full text-base duration-150 bg-gray-700 text-blue-400 hover:border-blue-400 hover:shadow-blue-400/25 font-normal shadow-lg hover:bg-gray-800"
                     >
                       Step
                     </button>
                     <button
                       onClick={handlePost}
-                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 max-w-full text-base duration-150 bg-gray-700 text-purple-400 hover:border-purple-400 font-normal shadow-lg hover:bg-gray-800"
+                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 min-w-[70px] py-2 max-w-full text-base duration-150 bg-gray-700 text-purple-400 hover:border-purple-400 hover:shadow-purple-400/25  font-normal shadow-lg hover:bg-gray-800"
                     >
                       Post
                     </button>
