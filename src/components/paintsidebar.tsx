@@ -1,8 +1,8 @@
 import { Sidebar, SidebarItem, SidebarItemGroup } from "flowbite-react";
-import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import {
   LogInIcon,
+  LogOutIcon,
   House,
   Cat,
   PencilIcon,
@@ -43,6 +43,7 @@ const PaintSidebar = () => {
           ${isDesktopSidebarCollapsed ? "w-20" : "w-64"}
           rounded-r-2xl md:rounded-2xl
           z-40 shadow-xl bg-gray-800
+          border-r border-gray-700
           flex flex-col justify-between
           [&>div]:!bg-gray-800
         `}
@@ -126,11 +127,17 @@ const PaintSidebar = () => {
           </SidebarItem>
           }
           {/* Login / Logout */}
-          <SidebarItem href={current_user ? "/login" : "/login"} className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } hover:!bg-gray-700 rounded-lg transition-colors`} onClick={current_user ? logout : undefined}>
+          <SidebarItem href={current_user ? "/logout" : "/login"} className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } hover:!bg-gray-700 rounded-lg transition-colors`} onClick={current_user ? logout : undefined}>
             <div className="flex items-center">
-              <LogInIcon
-                className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
-              />
+              {current_user ? (
+                <LogOutIcon
+                  className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
+                />
+              ) : (
+                <LogInIcon
+                  className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
+                />
+              )}
               {!isDesktopSidebarCollapsed && (
                 <span className="text-md font-semibold">{current_user ? "Logout" : "Login"}</span>
               )}

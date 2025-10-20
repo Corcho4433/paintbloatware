@@ -19,18 +19,18 @@ export const LikeButtons = ({
   photoIcon 
 }: LikeButtonsProps) => {
   // Exit early if no postId - render disabled buttons
-  if (!postId) {
+  if (!postId ) {
     return (
-      <div className="flex w-[30%] mt-3 gap-2 bg-gray-700 p-2 rounded-xl justify-center mx-auto">
+      <div className="flex w-[30%] gap-2 p-2 rounded-xl justify-center mx-auto">
         <Button 
           disabled
-          className="border-gray-500 group cursor-not-allowed !bg-black !border-2 opacity-50"
+          className="border-gray-500 group animate-pulse !bg-black !border-2 opacity-50"
         >
-          <Laugh className={photoIcon} />
+          <Laugh className={photoIcon } />
         </Button>
         <Button 
           disabled
-          className="border-gray-500 group cursor-not-allowed !bg-black !border-2 opacity-50"
+          className="border-gray-500 group animate-pulse !bg-black !border-2 opacity-50"
         >
           <Angry className={photoIcon} />
         </Button>
@@ -56,7 +56,7 @@ export const LikeButtons = ({
   };
 
   return (
-    <div className="flex w-[30%] mt-3 gap-2 bg-gray-700 p-2 rounded-xl justify-center mx-auto">
+    <div className="flex w-[30%]  gap-2 bg-gray-700 p-2 rounded-xl justify-center mx-auto">
       <Button 
         onClick={handleLike}
         className={`border-gray-500 group cursor-pointer !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-green-500 ${

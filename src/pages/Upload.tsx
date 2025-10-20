@@ -128,7 +128,7 @@ export default function Upload() {
                                             height={512}
                                             src={savedUrl}
                                             alt="Preview"
-                                            className="border-2 border-gray-600 bg-black rounded-lg shadow-lg w-full h-full object-cover"
+                                            className="border-2 [image-rendering:pixelated] border-gray-600 bg-black rounded-lg shadow-lg w-full h-full object-cover"
                                         />
                                         {serverResponse && serverResponse.type === 'success' && (
                                             <div className="absolute inset-0 rounded-lg flex items-center justify-center pointer-events-none" style={{background: 'linear-gradient(135deg, rgba(34,197,94,0.92) 0%, rgba(34,197,94,0.85) 100%)'}}>
@@ -141,10 +141,10 @@ export default function Upload() {
                                 </div>
                             </div>
                             <div className="flex gap-3 p-4 align-center justify-center">
-                                    <button className="px-4 py-2 rounded-lg border border-green-600 bg-green-600 text-white hover:bg-green-700 transition-all duration-200 font-medium shadow-sm" onClick={handlePost} disabled={!savedUrl}>
+                                    <button className="px-4 py-2 border border-gray-700 rounded-lg transition-all cursor-pointer max-w-full text-base duration-150 bg-gray-700 text-green-400 hover:border-green-400 font-normal shadow-lg hover:bg-gray-800" onClick={handlePost} disabled={!savedUrl}>
                                         Post Now
                                     </button>
-                                    <button className="px-4 py-2 rounded-lg border border-gray-600 bg-gray-700 text-white hover:bg-gray-800 transition-all duration-200 font-medium shadow-sm" onClick={handleHideSource} disabled={!savedUrl}>
+                                    <button className="px-4 py-2 border border-gray-700 rounded-lg transition-all cursor-pointer max-w-full text-base duration-150 bg-gray-700 text-red-400 hover:border-red-400 font-normal shadow-lg hover:bg-gray-800" onClick={handleHideSource} disabled={!savedUrl}>
                                         Hide Source
                                     </button>
                                 </div>

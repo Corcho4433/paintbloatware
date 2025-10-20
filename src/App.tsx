@@ -11,6 +11,7 @@ import WikiPage from './pages/wiki';
 import OAuthSuccessPopup from './pages/OAuthSuccess';
 import SinglePost from './pages/singlePost';
 import SettingsPage from './pages/settingsPage';
+import LogoutPage from './pages/Logout';
 
 function App() {
   const PaintQueryClient = new QueryClient();
@@ -33,6 +34,7 @@ function App() {
               <Route path='/post/:id' element={<SinglePost></SinglePost>} />
               <Route path='/oauth/success' element={<OAuthSuccessPopup></OAuthSuccessPopup>} />
               <Route path='/settings' element={<SettingsPage />}  />
+              <Route path='/logout' element={<LogoutPage />} />
             </Routes>
 
           </BrowserRouter>

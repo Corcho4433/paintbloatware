@@ -57,8 +57,6 @@ const SettingsPage = () => {
 
   // App preferences state
   const [sidebarCollapsed, setSidebarCollapsed] = useState(auth.isDesktopSidebarCollapsed);
-  const [notifications, setNotifications] = useState(true);
-  const [privateProfile, setPrivateProfile] = useState(false);
 
   // Account settings state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -139,7 +137,7 @@ const SettingsPage = () => {
       <main className="flex-1 ml-0 min-h-screen bg-gray-900 p-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="bg-gray-800 border-gray-700 p-6 rounded-xl mb-6">
+          <div className="bg-gray-800 border-gray-700 border p-6 rounded-xl mb-6">
             <h1 className="text-3xl font-bold text-white flex items-center gap-3">
               <Settings className="w-8 h-8" />
               Settings
@@ -148,7 +146,7 @@ const SettingsPage = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="bg-gray-800 p-2 rounded-xl mb-6">
+          <div className="bg-gray-800 border-gray-700 border p-2 rounded-xl mb-6">
             <div className="flex gap-2">
               <button
                 onClick={() => setActiveSection('profile')}
@@ -185,7 +183,7 @@ const SettingsPage = () => {
 
           {/* Profile Section */}
           {activeSection === 'profile' && (
-            <div className="bg-gray-800 p-6 rounded-xl mb-6">
+            <div className="bg-gray-800 p-6 rounded-xl border-gray-700 border mb-6">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <User className="w-5 h-5" />
                 Profile Information
@@ -345,7 +343,7 @@ const SettingsPage = () => {
 
           {/* Preferences Section */}
           {activeSection === 'preferences' && (
-            <div className="bg-gray-800 p-6 rounded-xl mb-6">
+            <div className="bg-gray-800 p-6 border-gray-700 border rounded-xl mb-6">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <Palette className="w-5 h-5" />
                 App Preferences
@@ -416,7 +414,7 @@ end`}
 
           {/* Account Section */}
           {activeSection === 'account' && (
-            <div className="bg-gray-800 p-6 rounded-xl mb-6">
+            <div className="bg-gray-800 border-gray-700 border p-6 rounded-xl mb-6">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <Shield className="w-5 h-5" />
                 Account Security

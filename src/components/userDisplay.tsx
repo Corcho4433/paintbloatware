@@ -17,8 +17,8 @@ const UserPage = () => {
 
   const renderSkeleton = () => (
     <div className="p-4">
-      <div className="flex items-center space-x-6 bg-gray-800 p-6 rounded-xl mb-8">
-        <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-600 animate-pulse" />
+      <div className="flex items-center space-x-6 border border-gray-700 bg-gray-800 p-6 rounded-xl mb-8">
+        <div className="w-32 h-32 rounded-full border border-white bg-gray-600 animate-pulse" />
         <div>
           <div className="h-8 w-48 bg-gray-600 rounded animate-pulse mb-2"></div>
           <div className="h-4 w-72 bg-gray-600 rounded animate-pulse"></div>
@@ -35,17 +35,17 @@ const UserPage = () => {
 
   return (
     <div className="p-4">
-      <div className="flex items-center space-x-6 bg-gray-800 p-6 rounded-xl mb-8">
+      <div className="flex items-center space-x-6 border border-gray-700 bg-gray-800 p-6 rounded-xl mb-8">
         {(user && user.urlPfp && !loading) ? (
           <img
             src={`${user.urlPfp}`}
             alt="User"
-            className="w-32 h-32 rounded-full border-4 border-white"
+            className="w-32 h-32 rounded-full border-2 border-white"
           />) : (
           <img
             src={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${userName}`}
             alt="User"
-            className="w-32 h-32 rounded-full border-4 border-white"
+            className="w-32 h-32 rounded-full border-2 border-white"
           />
         )}
         <div>

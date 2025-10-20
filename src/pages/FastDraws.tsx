@@ -90,6 +90,16 @@ const FastDraws = () => {
     rootMargin: '200px',
   });
 
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 0) {
+        handleReactionClick();
+      }
+    };
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    return () => window.removeEventListener('wheel', handleWheel);
+  }, [currentPostIndex, posts, isAnimating]);
+
   // Close share menu on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -112,7 +122,7 @@ const FastDraws = () => {
 
 
 
-  
+
 
   // Effect to handle URL postId - prioritize fetched post from URL
   useEffect(() => {
@@ -156,7 +166,7 @@ const FastDraws = () => {
     // Trigger animation based on value
     setIsAnimating(true);
 
-    
+
 
     setTimeout(() => {
       const isLastPost = currentPostIndex === posts.posts.length - 2;
@@ -269,7 +279,7 @@ const FastDraws = () => {
                 imageRendering: 'pixelated',
               }}
             />
-            
+
           </>
         );
       } else {
@@ -308,14 +318,14 @@ const FastDraws = () => {
               </div>
             </section>
 
-            <div className="flex w-[30%] mt-3 gap-2 bg-gray-700 p-2 rounded-xl justify-center mx-auto">
+            <div className="flex w-[30%] mt-3 gap-2 bg-gray-700  rounded-xl justify-center mx-auto">
               <LikeButtons
-  postId={currentPost?.id || ''}
-  ratingValue={currentPost?.ratingValue || 0}
-  onReactionClick={handleReactionClick}
-  isAnimating={isAnimating}
-  photoIcon={photoIcon}
-/>
+                postId={currentPost?.id || ''}
+                ratingValue={currentPost?.ratingValue || 0}
+                onReactionClick={handleReactionClick}
+                isAnimating={isAnimating}
+                photoIcon={photoIcon}
+              />
             </div>
           </div>
 
@@ -467,7 +477,7 @@ const FastDraws = () => {
                             onClick={() => setShowShareMenu(o => !o)}
                             className="p-2 rounded cursor-pointer  text-white hover:text-gray-400  transition-colors"
                           >
-                            <Send  className={photoIcon} />
+                            <Send className={photoIcon} />
                           </button>
                           {(showShareMenu || copyMsg) && currentPost && (
                             <div className="absolute left-full bottom-0 ml-2 w-40 bg-gray-800 border border-gray-600 rounded shadow-lg z-20 text-xs text-white">

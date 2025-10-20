@@ -50,6 +50,8 @@ export const useAuthStore = create<AuthStore>()(
             logout: async () => {
                 try {
                     console.log("Logging out user:", useAuthStore.getState().user);
+                    set({ user: null });
+                    set({ snippet: 0 });
                     await LogoutUser();
 
                     // Clear all client-side cookies
@@ -58,7 +60,7 @@ export const useAuthStore = create<AuthStore>()(
                     });
 
                     // Clear the local state
-                    set({ user: null });
+                    
                 } catch (error) {
                     console.error("Logout error:", error);
                     throw error;

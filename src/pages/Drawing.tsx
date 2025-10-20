@@ -5,7 +5,7 @@ import CodeSnippets from "../components/snippets";
 import { useAuthStore } from "../store/useAuthStore";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { getAvailableThemes, getThemeFromString } from "../utils/theme";
-import { serverPath } from "../utils/servers";
+import GeminiInput from "../components/GeminiInput";
 
 const snippetImports = import.meta.glob("../code-snippets/*.md", {
   query: "?raw",
@@ -25,47 +25,7 @@ const themes = getAvailableThemes();
 const Drawing = () => {
   // Get theme from auth store
   // Gemini prompt states
-  const [geminiPrompt, setGeminiPrompt] = useState("");
-  const [geminiLoading, setGeminiLoading] = useState(false);
-  const [geminiResult, setGeminiResult] = useState<string | null>(null);
-
-  // Gemini API call
-  const handleGeminiPrompt = async () => {
-    if (!geminiPrompt.trim()) return;
-    setGeminiLoading(true);
-    setGeminiResult(null);
-    try {
-      const res = await fetch(`${serverPath}/api/gemini`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: geminiPrompt, gridSize: gridSize })
-      });
-      let data;
-      try {
-        const text = await res.text();
-        if (!text) throw new Error("Empty response from server");
-        data = JSON.parse(text);
-      } catch (jsonErr) {
-        setGeminiResult("Error: Invalid or empty JSON response from server.");
-        setGeminiLoading(false);
-        return;
-      }
-      // Try to extract text from Gemini response
-      let resultText = "";
-      if (data?.result?.candidates?.[0]?.content?.parts?.[0]?.text) {
-        resultText = data.result.candidates[0].content.parts[0].text;
-      } else {
-        resultText = JSON.stringify(data.result, null, 2);
-      }
-      // Remove Markdown code fences if present
-      const codeFenceRegex = /^```(?:lua)?\s*([\s\S]*?)\s*```$/i;
-      const match = resultText.match(codeFenceRegex);
-      setGeminiResult(match ? match[1] : resultText);
-    } catch (err) {
-      setGeminiResult("Error: " + (err instanceof Error ? err.message : String(err)));
-    }
-    setGeminiLoading(false);
-  };
+  
   const editorTheme = useAuthStore((state) => state.editorTheme);
   const setEditorTheme = useAuthStore((state) => state.setEditorTheme);
 
@@ -93,6 +53,13 @@ const Drawing = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sourceRef = useRef(sourceCode);
   const dimensionRef = useRef(gridSize);
+
+
+  const updateSourceCode = (newSource: string) => {
+    setSourceCode(newSource);
+    sourceRef.current = newSource;
+    console.log("Source code updated from snippet/Gemini input to:", newSource);
+  };
 
   // Redibuja automáticamente cuando cambia gridSize
   const sendUpdatedSource = () => {
@@ -123,11 +90,9 @@ const Drawing = () => {
   };
 
   const handlePreScroll = () => {
-    console.debug('[ScrollSync] handlePreScroll triggered');
     handleScroll(firstDivRef, secondDivRef);
   };
   const handleTextAreaScroll = () => {
-    console.debug('[ScrollSync] handleTextAreaScroll triggered');
     handleScroll(secondDivRef, firstDivRef);
   };
 
@@ -155,20 +120,15 @@ const Drawing = () => {
           }
         });
         observer.observe(syntaxRef.current, { childList: true, subtree: true });
-        console.debug('[ScrollSync] MutationObserver set up to watch for <pre>');
       }
-    } else {
-      console.debug('[ScrollSync] syntaxRef.current is null');
-    }
+    } 
 
     return () => {
       if (observer) {
         observer.disconnect();
         observer = null;
-        console.debug('[ScrollSync] MutationObserver disconnected');
       }
       if (cleanupPre) {
-        console.debug('[ScrollSync] Cleaning up scroll event listener from <pre>');
         cleanupPre.removeEventListener("scroll", handlePreScroll);
       }
     };
@@ -382,7 +342,7 @@ const Drawing = () => {
       <div className="flex flex-1 gap-6 p-6">
         {/* Editor Column */}
         <div className="flex flex-col w-full">
-          <div className="flex-row flex gap-3 mb-3 w-full">
+          <div className="flex-row flex gap-3 mb-4 w-full">
             <div className="flex-1 flex flex-col bg-gray-800 rounded-lg border border-gray-700">
               <div className="mx-6 mt-6">
                 <h2 className="text-2xl font-bold text-white mb-2">Source Code</h2>
@@ -483,19 +443,19 @@ const Drawing = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={sendUpdatedSource}
-                      className="px-4 py-2 rounded-lg border border-green-600 bg-green-600 text-white hover:bg-green-700 transition-all duration-200 font-medium shadow-sm"
+                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 max-w-full text-base duration-150 bg-gray-700 text-green-400 hover:border-green-400 font-normal shadow-lg hover:bg-gray-800"
                     >
                       Run
                     </button>
                     <button
                       onClick={handleStep}
-                      className="px-4 py-2 rounded-lg border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm"
+                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 max-w-full text-base duration-150 bg-gray-700 text-blue-400 hover:border-blue-400 font-normal shadow-lg hover:bg-gray-800"
                     >
                       Step
                     </button>
                     <button
                       onClick={handlePost}
-                      className="px-4 py-2 rounded-lg border border-purple-600 bg-purple-600 text-white hover:bg-purple-700 transition-all duration-200 font-medium shadow-sm"
+                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 max-w-full text-base duration-150 bg-gray-700 text-purple-400 hover:border-purple-400 font-normal shadow-lg hover:bg-gray-800"
                     >
                       Post
                     </button>
@@ -510,12 +470,13 @@ const Drawing = () => {
                       value={gridSize}
                       min={1}
                       max={512}
+                      color="white"
                       onChange={(e) =>
                         setGridSize(
                           Math.min(Math.max(parseInt(e.target.value) || 0, 0), 512)
                         )
                       }
-                      className="px-3 py-1 rounded-md border border-gray-600 bg-gray-800 text-white hover:bg-gray-700 focus:bg-gray-700 focus:border-blue-500 transition-all duration-200 w-20 text-sm"
+                      className="focus:!outline-none px-3 py-1 rounded-md border border-gray-600 bg-gray-800 text-white hover:bg-gray-900 focus:bg-gray-700 focus:border-white transition-all duration-200 w-20 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
                 </div>
@@ -524,92 +485,14 @@ const Drawing = () => {
 
             </div>
           </div>
-          <div className="flex-1  w-[92vw] max-w-full bg-gray-800 rounded-lg border border-gray-700 p-6">
+
+          <div className="flex-1  w-full max-w-full bg-gray-800 rounded-lg mb-4 border border-gray-700 p-6">
             {/* Gemini Prompt UI */}
-            <div className="mb-6 p-4 w-full max-w-full bg-gray-900 rounded-lg border border-gray-700">
-              <div className="flex items-center gap-3 mb-2">
-                <h2 className="text-lg font-bold text-white">Gemini Lua Generator</h2>
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/8/8f/Google-gemini-icon.svg"
-                  alt="Gemini Icon"
-                  width={24}
-                  height={24}
-                  className="w-6 h-6"
-                />
-              </div>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  className="flex-1 px-2 py-1 rounded border border-gray-600 bg-gray-800 text-white"
-                  placeholder="Describe what you want to draw in Lua..."
-                  value={geminiPrompt}
-                  onChange={e => setGeminiPrompt(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && !geminiLoading && geminiPrompt.trim() && handleGeminiPrompt()}
-                  disabled={geminiLoading}
-                />
-                <button
-                  className="px-4 py-1 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
-                  onClick={handleGeminiPrompt}
-                  disabled={geminiLoading || !geminiPrompt.trim()}
-                >
-                  {geminiLoading ? (
-                    <>
-                      <svg aria-hidden="true" className="w-4 h-4 text-gray-200 animate-spin fill-white" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
-                        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
-                      </svg>
-                      Generating...
-                    </>
-                  ) : "Generate Lua"}
-                </button>
-              </div>
-              {geminiLoading && (
-                <div className="flex flex-col items-center justify-center py-8 gap-4">
-                  <svg aria-hidden="true" className="w-12 h-12 text-gray-600 animate-spin fill-blue-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
-                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
-                  </svg>
-                  <p className="text-gray-400 text-sm">Gemini is thinking... This may take a moment.</p>
-                </div>
-              )}
-              {geminiResult && !geminiLoading && (
-                <div className="w-full overflow-x-auto">
-                  <h3 className="my-4">Code Result:</h3>
-                  <SyntaxHighlighter
-                    language="lua"
-                    className="!bg-gray-800 rounded-xl"
-                    style={getThemeFromString(editorTheme)}
-                    customStyle={{
-                      margin: 0,
-                      padding: '1.5rem',
-                      fontSize: '0.875rem',
-                      lineHeight: '1.5',
-                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                      maxWidth: '100%',
-                      whiteSpace: 'pre',
-                      overflow: 'visible',
-                    }}
-                    codeTagProps={{
-                      style: {
-                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                        fontSize: '0.875rem',
-                        lineHeight: '1.5',
-                        whiteSpace: 'pre',
-                        display: 'inline-block',
-                        minWidth: '100%',
-                      }
-                    }}
-                  >
-                    {geminiResult
-                      .replace(/```lua\n?/g, '')
-                      .replace(/```\n?/g, '')
-                      .replace(/\\n/g, '\n')
-                      .replace(/^"|"$/g, '')
-                      .trim()}
-                  </SyntaxHighlighter>
-                </div>
-              )}
-            </div>
+            <GeminiInput setSourceCode={updateSourceCode} />
+          </div>
+
+          <div className="flex-1  w-full max-w-full bg-gray-800 rounded-lg border border-gray-700 p-6">
+            {/* Gemini Prompt UI */}
             <div className="mb-4">
               <h2 className="text-xl font-bold text-white mb-2">
                 Code Snippets
@@ -618,7 +501,7 @@ const Drawing = () => {
                 Ready-to-use code examples
               </p>
             </div>
-            <CodeSnippets snippetImports={snippetImports as Record<string, () => Promise<string>>} />
+            <CodeSnippets setSourceCode={updateSourceCode} snippetImports={snippetImports as Record<string, () => Promise<string>>} />
           </div>
         </div>
       </div>
