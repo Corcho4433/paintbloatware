@@ -162,21 +162,27 @@ export const PostModal = (
             alt="Post Image"
             draggable={false} 
           /> :
-          <div className="w-full h-full bg-gray-900 flex justify-left overflow-y-auto">
-            <SyntaxHighlighter 
-              language="lua" 
-              style={themes[editorTheme as keyof typeof themes] || themes.dracula}
-              customStyle={{
-                margin: 0,
-                padding: '1rem',
-                background: '!transparent',
-                fontSize: '0.875rem',
-                width: '100%',
-              }}
-              className="*:!bg-transparent text-xl wrap-anywhere"
-            >
-              {post.content || ''}
-            </SyntaxHighlighter>
+          <div className="w-full h-full bg-gray-900 flex justify-left items-center overflow-y-auto">
+            {post.content ? (
+              <SyntaxHighlighter 
+                language="lua" 
+                style={themes[editorTheme as keyof typeof themes] || themes.dracula}
+                customStyle={{
+                  margin: 0,
+                  padding: '1rem',
+                  background: '!transparent',
+                  fontSize: '0.875rem',
+                  width: '100%',
+                }}
+                className="*:!bg-transparent text-xl wrap-anywhere"
+              >
+                {post.content}
+              </SyntaxHighlighter>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <span className="text-violet-400 text-lg font-semibold text-center">El contenido de este post ha sido ocultado.</span>
+              </div>
+            )}
           </div>
           }
           
