@@ -56,7 +56,8 @@ const SettingsPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // App preferences state
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(auth.isDesktopSidebarCollapsed);
+  const sidebarCollapsed = useAuthStore((state) => state.isDesktopSidebarCollapsed);
+  const setSidebarCollapsed = useAuthStore((state) => state.setDesktopSidebarCollapsed);
 
   // Account settings state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -122,7 +123,7 @@ const SettingsPage = () => {
   if (!authUser) {
     return (
       <div className="flex">
-        <PaintSidebar />
+        <PaintSidebar selectedPage="settings" />
         <main className="flex-1 ml-0 min-h-screen bg-gray-900 flex items-center justify-center">
           <div className="text-white text-xl">Please log in to access settings</div>
         </main>
@@ -133,7 +134,7 @@ const SettingsPage = () => {
 
   return (
     <div className="flex">
-      <PaintSidebar />
+      <PaintSidebar selectedPage="settings" />
       <main className="flex-1 ml-0 min-h-screen bg-gray-900 p-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -196,11 +197,19 @@ const SettingsPage = () => {
                     Profile Picture
                   </label>
                   <div className="flex items-start gap-4">
-                    <img
-                      src={previewUrl || `https://api.dicebear.com/8.x/pixel-art/svg?seed=${user?.name || 'user'}`}
-                      alt="Profile"
-                      className="w-16 h-16 rounded-full border-2 border-gray-600 object-cover"
-                    />
+                    <div className="relative w-16 h-16">
+                      {(uploadingImage || loading) ? (
+                        <div className="absolute animate-pulse inset-0 flex items-center justify-center bg-gray-900 rounded-full z-10">
+  
+                        </div>
+                      ): <img
+                        src={previewUrl}
+                        alt="Profile"
+                        className="w-16 h-16 rounded-full border-2 border-gray-600 object-cover"
+                        style={{ opacity: uploadingImage || loading ? 0.5 : 1 }}
+                      />}
+                      
+                    </div>
                     <div className="flex-1 space-y-3">
                       {/* File Upload */}
                       <div>

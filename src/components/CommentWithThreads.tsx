@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Comment } from "../types/requests";
 import { useCommentThreads } from "../hooks/commentThreads";
 import { Link } from "react-router-dom";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronUp, Square } from "lucide-react";
 import useInfiniteScroll from "../hooks/infinetescroll";
 
 // Helper function to format relative time
@@ -11,7 +11,7 @@ const getRelativeTime = (dateString: string) => {
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-  if (diffInSeconds < 60) return 'just now';
+  if (diffInSeconds < 60 || isNaN(diffInSeconds)) return 'just now';
   if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
   if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
@@ -151,28 +151,42 @@ export const CommentWithThreads = ({ comment, onReply, replyingTo }: CommentWith
 
           {/* Reply Input (shown when replying to this comment) */}
           {replyingTo === comment.id && (
-            <div className="mt-2 flex items-start gap-2">
+            <div className="mt-2 flex items-center">
               <input
                 type="text"
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
-                onKeyDown={(e) => {
+                onKeyDown={async (e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    handleSubmitReply();
+                    if (replyText.trim()) {
+                      setIsSubmitting(true);
+                      await handleSubmitReply();
+                      setIsSubmitting(false);
+                    }
                   }
                 }}
                 placeholder="Write a reply..."
-                className="flex-1 bg-gray-700 text-white text-sm px-3 py-1.5 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className={`flex-1 bg-gray-900 border ${isSubmitting ? 'border-gray-700 !text-gray-400' : 'border-gray-600'} rounded-md text-white p-2 focus:outline-none`}
                 autoFocus
                 disabled={isSubmitting}
               />
               <button
-                onClick={handleSubmitReply}
+                onClick={async () => {
+                  if (replyText.trim()) {
+                    setIsSubmitting(true);
+                    await handleSubmitReply();
+                    setIsSubmitting(false);
+                  }
+                }}
                 disabled={!replyText.trim() || isSubmitting}
-                className="bg-blue-500 text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-gray-900 cursor-pointer rounded-md border border-gray-700 aspect-square text-white p-2.5 hover:bg-gray-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Posting...' : 'Post'}
+                {isSubmitting ? (
+                  <Square className="w-5 h-5 animate-pulse"></Square>
+                ) : (
+                  <ArrowRight className="w-5 h-5"></ArrowRight>
+                )}
               </button>
             </div>
           )}

@@ -23,7 +23,7 @@ function App() {
         <QueryClientProvider client={PaintQueryClient}>
           <BrowserRouter>
             <Routes>
-              <Route path='/' element={<Navigate to="/fastdraws" replace />} />
+              <Route path='/' element={<Navigate to="/home" replace />} />
               <Route path='/login' element={<RegisterPage></RegisterPage>} />
               <Route path='/home' element={<HomePage></HomePage>} />
               <Route path='/fastdraws' element={<FastDraws></FastDraws>} />

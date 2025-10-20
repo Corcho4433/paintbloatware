@@ -307,7 +307,7 @@ const FastDraws = () => {
 
   return (
     <div className="flex overflow-y-hidden">
-      <PaintSidebar />
+      <PaintSidebar selectedPage="fastdraws" />
 
       <section className="flex-1 ml-0 min-h-screen w-full h-full bg-gray-900 flex items-center justify-center px-6 flex-col space-y-4">
         <div className="flex relative gap-4">

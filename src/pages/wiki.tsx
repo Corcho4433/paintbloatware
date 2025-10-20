@@ -4,7 +4,7 @@ const WikiPage = () => {
 
     return (
     <div className="flex">
-        <PaintSidebar />
+        <PaintSidebar selectedPage="wiki" />
         <main className="flex-1 ml-0 min-h-screen bg-gray-900">
             <Wiki/>
         </main>

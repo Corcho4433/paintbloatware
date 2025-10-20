@@ -2,7 +2,7 @@ import { PostResponse } from "../types/requests";
 import { useComments } from "../hooks/comments";
 import { useRatings } from "../hooks/ratings";
 import { Link } from "react-router-dom";
-import { Heart, MessageCircle, Share2, Eye, EyeOff, HeartCrack, X } from "lucide-react";
+import { Heart, MessageCircle, Share2, Eye, EyeOff, HeartCrack, X, ArrowRight, Square } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import useInfiniteScroll from "../hooks/infinetescroll";
 import { CommentWithThreads } from "./CommentWithThreads";
@@ -48,6 +48,8 @@ export const PostModal = (
   if (!post) return null;
   const editorTheme = useAuthStore((state) => state.editorTheme);
   const { comments, loading, error, addComment, loadMore , isLoadingMore } = useComments(post.id);
+  const [loadingComment, setLoadingComment] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const { liked, disliked, toggleLike, toggleDislike } = useRatings(post.id, post.ratingValue);
   const [likePop, setLikePop] = useState(false);
   const [dislikePop, setDislikePop] = useState(false);
@@ -360,21 +362,44 @@ export const PostModal = (
               <input
                 type="text"
                 placeholder="Add a comment..."
-                className="flex-1 bg-gray-700 text-white p-2 focus:outline-none"
+                className={`flex-1 bg-gray-900 border ${loadingComment ? 'border-gray-700 !text-gray-400' : 'border-gray-600'} rounded-md text-white p-2 focus:outline-none`}
                 id="comment-input"
                 autoComplete="off"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                disabled={loadingComment }
+                onKeyDown={async (e) => {
+                  if (e.key === 'Enter') {
+                    const input = e.currentTarget as HTMLInputElement;
+                    if (input && input.value.trim()) {
+                      setLoadingComment(true);
+                      await addComment(input.value.trim());
+                      setLoadingComment(false);
+                      input.value = '';
+                    }
+                  }
+                }}
               />
+
               <button
                 onClick={async () => {
                   const input = document.getElementById('comment-input') as HTMLInputElement;
                   if (input && input.value.trim()) {
+                    setLoadingComment(true);
                     await addComment(input.value.trim());
+                    setLoadingComment(false);
                     input.value = '';
                   }
                 }}
-                className="bg-blue-500 text-white px-4 py-2 ml-2 hover:bg-blue-600 transition-colors text-sm font-medium"
-              >
-                Post
+                disabled={loadingComment || !inputValue.trim()}
+                className="bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer rounded-md border border-gray-700 aspect-square text-white p-2.5  hover:bg-gray-700 transition-colors text-sm font-medium"
+              > {
+                loadingComment ? (
+                  <Square className="w-5 h-5 animate-pulse" />
+                ) : (
+                  <ArrowRight className="w-5 h-5" />
+                )
+              }
               </button>
             </div>
           </div>

@@ -73,7 +73,6 @@ export const useUserInfo = (userId: string | undefined) => {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const navigate = useNavigate()
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -84,9 +83,6 @@ export const useUserInfo = (userId: string | undefined) => {
           },
           credentials: 'include'
         });
-        if (response.status === 401) {
-          navigate("/")
-        }
         if (!response.ok) {
           throw new Error('Failed to fetch user data');
         }

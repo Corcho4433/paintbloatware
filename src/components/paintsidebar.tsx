@@ -14,7 +14,11 @@ import {
   Settings,
 } from "lucide-react";
 
-const PaintSidebar = () => {
+
+interface PaintSidebarProps {
+  selectedPage?: string;
+}
+const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
   const current_user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   
@@ -52,7 +56,7 @@ const PaintSidebar = () => {
         {/* Navigation */}
         <SidebarItemGroup className="space-y-2 flex-1 !mt-3">
           {/* Home */}
-          <SidebarItem href="/home" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } hover:!bg-gray-700 rounded-lg transition-colors`}>
+          <SidebarItem href="/home" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" }  !text-gray-300 hover:!bg-gray-700 rounded-lg transition-colors ${selectedPage === "home" ? " cursor-default !text-white" : ""}`}>
             <div className="flex items-center">
               <House
                 className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
@@ -64,7 +68,7 @@ const PaintSidebar = () => {
           </SidebarItem>
 
           {/* Fast Draws */}
-          <SidebarItem href="/fastdraws" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } hover:!bg-gray-700 rounded-lg transition-colors `}>
+          <SidebarItem href="/fastdraws" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" }rounded-lg  !text-gray-300 hover:!text-white transition-colors  ${selectedPage === "fastdraws" ? "  cursor-default !text-white" : ""} `}>
             <div className="flex items-center">
               <Cat className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`} />
               {!isDesktopSidebarCollapsed && (
@@ -74,7 +78,7 @@ const PaintSidebar = () => {
           </SidebarItem>
 
           {/* Draw */}
-          <SidebarItem href="/draw" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 "  : "" } hover:!bg-gray-700 rounded-lg transition-colors`}>
+          <SidebarItem href="/draw" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 "  : "" } rounded-lg  !text-gray-300 hover:!text-white transition-colors  ${selectedPage === "draw" ? " cursor-default !text-white" : ""}`}>
             <div className="flex items-center">
               <PencilIcon
                 className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
@@ -86,7 +90,7 @@ const PaintSidebar = () => {
           </SidebarItem>
 
           {/* Wiki */}
-          <SidebarItem href="/wiki" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } hover:!bg-gray-700 rounded-lg transition-colors`}>
+          <SidebarItem href="/wiki" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" }  rounded-lg  !text-gray-300 hover:!text-white transition-colors ${selectedPage === "wiki" ? "cursor-default !text-white" : ""}`}>
             <div className="flex items-center">
               <LibraryIcon
                 className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
@@ -99,7 +103,7 @@ const PaintSidebar = () => {
 
           {/* User (if logged in) */}
           {current_user && (
-            <SidebarItem href={`/user/${current_user.id}`} className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } hover:!bg-gray-700 rounded-lg transition-colors`}>
+            <SidebarItem href={`/user/${current_user.id}`} className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } rounded-lg  !text-gray-300 hover:!text-white transition-colors ${selectedPage === "user" ? "  cursor-default !text-white" : ""}`}>
               <div className="flex items-center">
                 <CircleUser
                   className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
@@ -111,7 +115,7 @@ const PaintSidebar = () => {
             </SidebarItem>
           )}
           {current_user && 
-          <SidebarItem href="/settings" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } hover:!bg-gray-700 rounded-lg transition-colors`}>
+          <SidebarItem href="/settings" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } rounded-lg  !text-gray-300 hover:!text-white transition-colors  ${selectedPage === "settings" ? " cursor-default !text-white" : ""}`}>
             <div className="flex items-center">
               <Settings
                 className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
@@ -123,7 +127,7 @@ const PaintSidebar = () => {
           </SidebarItem>
           }
           {/* Login / Logout */}
-          <SidebarItem href={current_user ? "/logout" : "/login"} className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } hover:!bg-gray-700 rounded-lg transition-colors`} onClick={current_user ? logout : undefined}>
+          <SidebarItem href={current_user ? "/logout" : "/login"} className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } rounded-lg  !text-gray-300 hover:!text-white transition-colors ${selectedPage === "login" ? "  cursor-default !text-white" : ""} `} onClick={current_user ? logout : undefined}>
             <div className="flex items-center">
               {current_user ? (
                 <LogOutIcon

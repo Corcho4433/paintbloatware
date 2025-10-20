@@ -2,6 +2,7 @@
 import { Button } from "flowbite-react";
 import { Laugh, Angry } from "lucide-react";
 import { useRatings } from "../hooks/ratings";
+import { useAuthStore } from "../store/useAuthStore";
 
 interface LikeButtonsProps {
   postId: string;
@@ -19,7 +20,7 @@ export const LikeButtons = ({
   photoIcon 
 }: LikeButtonsProps) => {
   // Exit early if no postId - render disabled buttons
-  if (!postId ) {
+  if (!postId || useAuthStore.getState().user == null) {
     return (
       <div className="flex w-[30%] gap-2 p-2 rounded-xl justify-center mx-auto">
         <Button 

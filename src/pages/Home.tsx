@@ -30,12 +30,12 @@ const HomePage = () => {
 
   return (
     <div className="flex">
-      <PaintSidebar />
+      <PaintSidebar selectedPage="home" />
       <main className="flex-1 ml-0 min-h-screen w-full !bg-gray-900">
         {/* Tag Selector - Redesigned */}
         <div className="top-0 z-10 !bg-gray-900">
           {/* Tag Filter - Scrollable and Left Aligned */}
-          <div className="bg-gray-800 rounded-3xl m-3 mt-6  border border-gray-700 py-2 px-6 overflow-x-auto flex gap-2 flex-nowrap  ">
+          <div className="bg-gray-800 rounded-xl m-3 mt-6  border border-gray-700 py-2 px-6 overflow-x-auto flex gap-2 flex-nowrap  ">
             {/* Recent/All Posts Chip */}
             <button
               onClick={() => setSelectedTag("")}

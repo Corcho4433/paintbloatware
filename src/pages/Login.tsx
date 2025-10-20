@@ -10,7 +10,7 @@ const RegisterPage = () => {
 
   return (
     <div className="flex overflow-y-hidden">
-      <PaintSidebar />
+      <PaintSidebar selectedPage="login" />
       <section className="flex-1 ml-0 min-h-screen w-full h-full bg-gray-900 flex items-center justify-center px-6 flex-col space-y-4">
         <div className="w-1/3 min-w-[300px] bg-gray-800 rounded-lg shadow border xl:p-0 border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">

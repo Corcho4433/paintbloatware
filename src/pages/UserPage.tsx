@@ -4,7 +4,7 @@ const UserPage = () => {
     
     return (
     <div className="flex">
-        <PaintSidebar />
+        <PaintSidebar selectedPage="user" />
         <main className="flex-1 ml-0 min-h-screen bg-gray-900">
             <User/>
         </main>

@@ -261,6 +261,10 @@ const Drawing = () => {
   };
 
   const handlePost = () => {
+    if (useAuthStore.getState().user == null) {
+      setErrorMessage("You must be logged in to post your drawing.");
+      return;
+    }
     if (ws && ws.readyState === WebSocket.OPEN)
       ws.send(
         JSON.stringify({
@@ -342,7 +346,7 @@ const Drawing = () => {
 
   return (
     <div className="bg-gray-900 text-gray-100 min-h-screen flex">
-      <PaintSidebar />
+      <PaintSidebar selectedPage="draw"  />
       <div className="flex flex-1 gap-6 p-6">
         {/* Editor Column */}
         <div className="flex flex-col w-full">
