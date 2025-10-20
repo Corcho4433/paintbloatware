@@ -53,7 +53,7 @@ const CodeSnippets = ({ snippetImports, setSourceCode }: CodeSnippetsProps) => {
             onClick={() => setActiveSnippet(i)}
             className={`border border-gray-700 rounded-lg transition-all cursor-pointer px-3 py-2 min-w-[120px] max-w-full text-base duration-150
               ${i === activeSnippet
-                ? 'bg-gray-900 text-white font-medium shadow-inner'
+                ? 'bg-gray-900 text-white border-gray-700 font-medium shadow-inner'
                 : 'bg-gray-700 text-gray-300 font-normal shadow-lg hover:bg-gray-800'}
             `}
             style={{ whiteSpace: 'normal', overflow: 'visible' }}
