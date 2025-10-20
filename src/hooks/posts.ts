@@ -11,6 +11,7 @@ interface UsePostsOptions {
   refreshInterval?: number; // in milliseconds
   userId?: string; 
   tag?: string; // Add tag parameter
+  trending?: boolean; // Add trending parameter
 }
 
 export function usePostById(postId: string | null) {
@@ -54,7 +55,8 @@ export function usePosts(options: UsePostsOptions = {}) {
     autoRefresh = false, 
     refreshInterval = 30000, // 30 seconds default
     userId = null,
-    tag = null // Add tag parameter
+    tag = null,
+    trending = false // Add tag parameter
   } = options;
 
   const [posts, setPosts] = useState<PostPage | null>(null);
@@ -89,6 +91,8 @@ export function usePosts(options: UsePostsOptions = {}) {
       url = `${serverPath}/api/posts/user/${userId}?page=${page}`;
     } else if (tag) {
       url = `${serverPath}/api/posts/tag/${encodeURIComponent(tag)}?page=${page}`;
+    } else if (trending) {
+      url = `${serverPath}/api/posts/trending?page=${page}`;
     } else {
       url = `${serverPath}/api/posts?page=${page}`;
     }

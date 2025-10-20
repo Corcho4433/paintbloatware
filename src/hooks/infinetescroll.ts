@@ -11,12 +11,13 @@ interface UseInfiniteScrollProps {
 const useInfiniteScroll = ({
   loadMore,
   isLoading,
-  rootMargin = '200%'
+  rootMargin = '300%'
 }: UseInfiniteScrollProps) => {
   const loadMoreRef = useRef(loadMore);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [noMoreData, setNoMoreData] = useState(false);
   const callingRef = useRef(false); // prevent rapid duplicate calls
+  const pageContainer = document.getElementById("page-container");
 
   useEffect(() => {
     loadMoreRef.current = loadMore;
@@ -51,7 +52,7 @@ const useInfiniteScroll = ({
     if (!sentinel) return;
 
     const observer = new IntersectionObserver(handleIntersect, {
-      root: null,
+      root: pageContainer,
       rootMargin,
       threshold: 0
     });
