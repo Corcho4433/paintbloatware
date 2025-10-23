@@ -41,6 +41,10 @@ const GeminiInput = ({ setSourceCode }: GeminiInputProps) => {
                 return;
             }
             // Try to extract text from Gemini response
+            if (data.error) {
+                setGeminiResult("Error: " + data.error.message || "Unknown error from Gemini.");
+                return;
+            }
             let resultText = "";
             if (data?.result?.candidates?.[0]?.content?.parts?.[0]?.text) {
                 resultText = data.result.candidates[0].content.parts[0].text;
@@ -85,7 +89,7 @@ const GeminiInput = ({ setSourceCode }: GeminiInputProps) => {
                 <button
                     onClick={handleGeminiPrompt}
                     disabled={geminiLoading || !geminiPrompt.trim()}
-                    className={`aspect-square ${geminiLoading ? '' : 'cursor-pointer'} p-2 rounded bg-gray-700 text-white shadow-lg hover:bg-gray-900 disabled:text-gray-400 disabled:bg-gray-700 flex items-center justify-center transition-all duration-200`}
+                    className={`aspect-square ${geminiLoading ? '' : 'cursor-pointer'} p-1.5 rounded bg-gray-700 text-white shadow-lg hover:bg-gray-900 disabled:text-gray-400 disabled:bg-gray-700 flex items-center justify-center transition-all duration-200`}
                 >
                     {geminiLoading ? (
                         <Square className="w-5 h-5 animate-pulse" />

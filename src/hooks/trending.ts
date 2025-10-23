@@ -15,7 +15,7 @@ export async function fetchTrendingPostsForTag(tag: string) {
 }
 
 export async function fetchAllTags() {
-    const response = await fetch("http://localhost:3000/api/tags/", {
+    const response = await fetch("http://localhost:3000/api/trends/", {
     method: "GET",
     headers: {
         "Content-Type": "application/json",
