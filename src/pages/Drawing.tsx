@@ -162,10 +162,21 @@ const Drawing = () => {
     const socket = new WebSocket(ADDRESS);
     socket.onopen = () => {
       console.log("Connected to server");
+      setWs(socket);
+      setErrorMessage(null);
     };
 
     socket.onerror = (error) => {
       console.error("WebSocket Connection Error:", error);
+      setErrorMessage("WebSocket connection error. Live preview unavailable.");
+      setIsRunning(false);
+    };
+
+    socket.onclose = (event) => {
+      console.warn("WebSocket closed:", event);
+      setWs(null);
+      setErrorMessage("WebSocket disconnected. Live preview unavailable.");
+      setIsRunning(false);
     };
 
     socket.onmessage = (event) => {
@@ -187,11 +198,14 @@ const Drawing = () => {
     };
 
     drawFrame(undefined, gridSize);
-    setWs(socket);
+
+    // Don't setWs(socket) here, only in onopen
 
     return () => {
       socket.close();
       stopAnimation();
+      setWs(null);
+      setIsRunning(false);
     };
   }, []); // Empty dependency array - only run once
 
@@ -438,12 +452,19 @@ const Drawing = () => {
                 </div>
 
                 <div className="bg-gray-900 rounded-lg p-6 mb-6 flex justify-center items-center">
-                  <canvas
-                    ref={canvasRef}
-                    width={FIXED_CANVAS_SIZE}
-                    height={FIXED_CANVAS_SIZE}
-                    className="border-2 border-gray-600 bg-black rounded-lg hover:border-gray-500 transition-colors duration-100 shadow-lg [image-rendering:pixelated]"
-                  />
+                  {(!ws || ws.readyState !== WebSocket.OPEN) ? (
+                    <div className="flex flex-col items-center justify-center h-[512px]">
+                      <div className="text-red-400 text-lg font-bold mb-2">WebSocket not connected</div>
+                      <div className="text-gray-400 text-sm">Live preview is unavailable until connection is established.</div>
+                    </div>
+                  ) : (
+                    <canvas
+                      ref={canvasRef}
+                      width={FIXED_CANVAS_SIZE}
+                      height={FIXED_CANVAS_SIZE}
+                      className="border-2 border-gray-600 bg-black rounded-lg hover:border-gray-500 transition-colors duration-100 shadow-lg [image-rendering:pixelated]"
+                    />
+                  )}
                 </div>
 
                 {/* Error Display */}
