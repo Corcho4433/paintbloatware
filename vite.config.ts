@@ -9,8 +9,12 @@ export default defineConfig({
   server: {
     allowedHosts: ['expiration-trackbacks-responsible-conflicts.trycloudflare.com'],
     proxy: {
-      '/api': { target: "http://localhost:3000", changeOrigin: true, secure: false },
-      '/ws': {
+      '/api': {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        secure: false
+      },
+      '/render': {  // ← AGREGAR ESTO
         target: 'ws://localhost:8080',
         ws: true,
       },
