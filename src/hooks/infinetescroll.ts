@@ -31,6 +31,7 @@ const useInfiniteScroll = ({
 
     callingRef.current = true;
     try {
+      console.log('Loading more data...');
       const maybePromise = loadMoreRef.current();
       if (typeof maybePromise !== 'undefined' && maybePromise !== null && typeof (maybePromise as Promise<unknown>).then === 'function') {
         await maybePromise;
@@ -51,7 +52,6 @@ const useInfiniteScroll = ({
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
-    console.log(root);
     const observer = new IntersectionObserver(handleIntersect, {
       root: root,
       rootMargin,
@@ -63,7 +63,7 @@ const useInfiniteScroll = ({
       observer.unobserve(sentinel);
       observer.disconnect();
     };
-  }, [handleIntersect, rootMargin, root]);
+  }, [handleIntersect, rootMargin, root, loadMore]);
 
   return sentinelRef;
 };

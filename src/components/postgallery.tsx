@@ -1,19 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePosts } from '../hooks/posts';
-import useInfiniteScroll from '../hooks/infinetescroll';
 import { PostModal } from './postmodal';
 import { useAuthStore } from '../store/useAuthStore';
 import { Heart, MessageCircle } from 'lucide-react';
 
-export const PostGallery = ({ userId, tag }: { userId?: string; tag?: string }) => {
+export const PostGallery = ({ userId, tag, onLoadMore }: { userId?: string; tag?: string; onLoadMore?: (loadMoreFn: () => void) => void; }) => {
   const { posts, loading, error, loadMore, isLoadingMore } = usePosts({ userId: userId, tag: tag });
   const auth = useAuthStore();
   const id = auth.user?.id; // Adjust this line if your user ID is stored differently
-  const sentinelRef = useInfiniteScroll({
-    loadMore,
-    isLoading: isLoadingMore
-  });
 
+  useEffect(() => {
+    if (onLoadMore) {
+      onLoadMore(loadMore);
+    }
+  }, [loadMore, onLoadMore]);
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const prevUrlRef = useRef<string | null>(null);
 
@@ -228,8 +228,6 @@ export const PostGallery = ({ userId, tag }: { userId?: string; tag?: string }) 
               </div>
             )}
 
-            {/* Sentinel for infinite scroll */}
-            <div ref={sentinelRef} className="col-span-full h-10"></div>
           </div>
         </div>
       </div>

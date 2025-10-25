@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import PaintSidebar from "../components/paintsidebar";
 import { PostGallery } from "../components/postgallery";
 import { fetchAllTags } from "../hooks/trending";
+import useInfiniteScroll from "../hooks/infinetescroll";
 interface Tag {
   name: string;
 }
@@ -9,7 +10,19 @@ interface Tag {
 const HomePage = () => {
   const [selectedTag, setSelectedTag] = useState<string>("");
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const scrollableContainerRef = useRef<HTMLDivElement | null>(null);
+  const [loadMoreFn, setLoadMoreFn] = useState<(() => void) | null>(null);
   const [loading, setLoading] = useState(true);
+  const handleLoadMore = useCallback((fn: () => void) => {
+    setLoadMoreFn(() => fn); // Guardar la función
+    console.log("Load more function set");
+  }, []);
+
+  const sentinelRef = useInfiniteScroll({
+    loadMore: loadMoreFn || (() => {}),
+    isLoading: false, // Puedes también pasar esto desde PostGallery
+    root: scrollableContainerRef.current,
+  });
 
   useEffect(() => {
     const loadTags = async () => {
@@ -30,7 +43,7 @@ const HomePage = () => {
   return (
     <div className="flex">
       <PaintSidebar selectedPage="home" />
-      <main className="flex-1 ml-0 min-h-screen w-full !bg-gray-900">
+      <main ref={scrollableContainerRef} className="flex-1 ml-0 min-h-screen w-full !bg-gray-900">
         {/* Tag Selector - Redesigned */}
         <div className="top-0 z-10 !bg-gray-900">
           {/* Tag Filter - Scrollable and Left Aligned */}
@@ -79,11 +92,11 @@ const HomePage = () => {
 
         {/* Post Gallery */}
         {selectedTag ? (
-          <PostGallery tag={selectedTag || undefined} />
+          <PostGallery onLoadMore={handleLoadMore} tag={selectedTag || undefined} />
         ) : (
-          <PostGallery />
+          <PostGallery onLoadMore={handleLoadMore} />
         )}
-
+        <div  ref={sentinelRef} />
       </main>
     </div>
   );
