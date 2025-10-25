@@ -6,18 +6,19 @@ interface UseInfiniteScrollProps {
   isLoading: boolean;
   max_pages?: number; // Optional maximum number of pages to load
   rootMargin?: string; // How far from the viewport to trigger (e.g., '200px')
+  root?: Element | null; // The scrollable container element
 }
 
 const useInfiniteScroll = ({
   loadMore,
   isLoading,
-  rootMargin = '300%'
+  rootMargin = '300%',
+  root = null,
 }: UseInfiniteScrollProps) => {
   const loadMoreRef = useRef(loadMore);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [noMoreData, setNoMoreData] = useState(false);
   const callingRef = useRef(false); // prevent rapid duplicate calls
-  const pageContainer = document.getElementById("page-container");
 
   useEffect(() => {
     loadMoreRef.current = loadMore;
@@ -50,9 +51,9 @@ const useInfiniteScroll = ({
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
-
+    console.log(root);
     const observer = new IntersectionObserver(handleIntersect, {
-      root: pageContainer,
+      root: root,
       rootMargin,
       threshold: 0
     });
@@ -62,7 +63,7 @@ const useInfiniteScroll = ({
       observer.unobserve(sentinel);
       observer.disconnect();
     };
-  }, [handleIntersect, rootMargin]);
+  }, [handleIntersect, rootMargin, root]);
 
   return sentinelRef;
 };

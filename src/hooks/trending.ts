@@ -1,7 +1,8 @@
+import { serverPath } from "../utils/servers";
 
 
 export async function fetchTrends() {
-  return await fetch("localhost:3000/api/trending/", {
+  return await fetch(`${serverPath}/api/trending/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -15,7 +16,7 @@ export async function fetchTrendingPostsForTag(tag: string) {
 }
 
 export async function fetchAllTags() {
-    const response = await fetch("http://localhost:3000/api/trends/", {
+    const response = await fetch(`${serverPath}/api/trends/`, {
     method: "GET",
     headers: {
         "Content-Type": "application/json",

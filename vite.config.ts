@@ -6,5 +6,21 @@ import flowbiteReact from "flowbite-react/plugin/vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), flowbiteReact()],
-  
+  server: {
+    allowedHosts: ['expiration-trackbacks-responsible-conflicts.trycloudflare.com'],
+    proxy: {
+      '/api': { target: "http://localhost:3000", changeOrigin: true, secure: false },
+      '/ws': {
+        target: 'ws://localhost:8080',
+        ws: true,
+      },
+      '/minio': {
+        target: 'http://localhost:9000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/minio/, ''),
+      }
+
+
+    },
+  },
 })

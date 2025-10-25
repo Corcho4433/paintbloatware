@@ -294,7 +294,7 @@ export function usePosts(options: UsePostsOptions = {}) {
 }
 
 async function createRating(post_id: string, rating: number) {
-  return await fetch("localhost:3000/api/ratings/", {
+  return await fetch(`${serverPath}/api/ratings/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

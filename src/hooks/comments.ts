@@ -61,6 +61,7 @@ export function useComments(postId: string) {
           comments: [...prev.comments, ...data.comments],
         } as PostPageResponse;
       });
+      console.log("Fetched more comments:", data);
     } catch (err) {
       setError(err as Error);
     } finally {

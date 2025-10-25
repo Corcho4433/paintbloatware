@@ -56,6 +56,7 @@ export const PostModal = (
   const [eyeOpen, setEyeOpen] = useState(true);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copyMsg, setCopyMsg] = useState<string>('');
+  const scrollableContainerRef = useRef<HTMLDivElement | null>(null);
   const shareRef = useRef<HTMLDivElement | null>(null); // added
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
@@ -116,10 +117,10 @@ export const PostModal = (
       console.error("Failed to like on double click:", error);
     }
   };
-  const sentinelRef = useInfiniteScroll({
+  const CommentSentinelRef = useInfiniteScroll({
     loadMore,
     isLoading: isLoadingMore || loading,
-    rootMargin: '200px',
+    root: scrollableContainerRef.current,
   });
   const CommentSkeleton = () => (
     <div className="space-y-3">
@@ -227,7 +228,7 @@ export const PostModal = (
             </div>
           </div>
           {/* Comments List */}
-          <div className="px-4 py-4 border-t border-gray-500 flex-1 overflow-y-auto">
+          <div ref={scrollableContainerRef} className=" px-4 py-4 border-t border-gray-500 flex-1 overflow-y-auto">
             {loading && <CommentSkeleton />}
             {error && !loading && (
               <div className="text-red-400 text-sm">Failed to load comments</div>
@@ -236,7 +237,7 @@ export const PostModal = (
               <div className="text-gray-500 text-sm flex-1 flex items-center justify-center md:block md:flex-none">No comments yet. Be the first!</div>
             )}
             {!loading && comments && comments.comments.length > 0 && (
-              <ul className="space-y-3">
+              <ul  className="space-y-3">
                 {comments.comments.map(c => (
                   <CommentWithThreads 
                     key={c.id}
@@ -244,8 +245,8 @@ export const PostModal = (
                     onReply={handleReply}
                     replyingTo={replyingTo}
                   />
-                ))}
-                <div ref={sentinelRef}></div>
+                ) ) }
+                <div ref={CommentSentinelRef}></div>
                 {!loading && isLoadingMore && (
                   <div className="flex items-center gap-2 text-gray-400 text-xs">
                     <svg aria-hidden="true" className="w-4 h-4 animate-spin text-gray-600 fill-blue-500" viewBox="0 0 100 101" fill="none">

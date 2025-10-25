@@ -13,7 +13,7 @@ const snippetImports = import.meta.glob("../code-snippets/*.md", {
 });
 
 const ROUTE = "/render";
-const ADDRESS = `ws://localhost:8080${ROUTE}`;
+const ADDRESS = `${location.origin.replace(/^http/, 'ws')}${ROUTE}`;
 const INITIAL_FRAME = 1;
 const FRAME_RATE = 12; // Reduced from 24 to 12 FPS for less CPU usage
 const MS_TIME = (1 / FRAME_RATE) * 1000;

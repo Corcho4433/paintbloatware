@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import PaintSidebar from "../components/paintsidebar";
 import { PostGallery } from "../components/postgallery";
 import { fetchAllTags } from "../hooks/trending";
-import { Clock } from 'lucide-react'
 interface Tag {
   name: string;
 }
