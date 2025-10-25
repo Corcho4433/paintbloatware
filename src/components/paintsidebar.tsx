@@ -9,8 +9,6 @@ import {
   Menu,
   CircleUser,
   LibraryIcon,
-  ChevronLeft,
-  ChevronRight,
   Settings,
 } from "lucide-react";
 
@@ -26,17 +24,27 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
   const isMobileSidebarOpen = useAuthStore((state) => state.isMobileSidebarOpen);
   const isDesktopSidebarCollapsed = useAuthStore((state) => state.isDesktopSidebarCollapsed);
   const setMobileSidebarOpen = useAuthStore((state) => state.setMobileSidebarOpen);
-  const setDesktopSidebarCollapsed = useAuthStore((state) => state.setDesktopSidebarCollapsed);
 
   return (
     <>
-      {/* Mobile toggle button */}
-      <button
-        onClick={() => setMobileSidebarOpen(!isMobileSidebarOpen)}
-        className="fixed top-4 left-4 z-50 md:hidden bg-gray-800 p-2 rounded-lg"
-      >
-        <Menu className="text-white" />
-      </button>
+      {/* Mobile toggle button - only show when sidebar is closed */}
+      {!isMobileSidebarOpen && (
+        <button
+          onClick={() => setMobileSidebarOpen(true)}
+          className="fixed top-4 left-4 z-50 md:hidden bg-gray-800 p-2 rounded-lg shadow-lg hover:bg-gray-700 transition-colors"
+          aria-label="Open menu"
+        >
+          <Menu className="text-white w-6 h-6" />
+        </button>
+      )}
+
+      {/* Mobile overlay */}
+      {isMobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
 
       <Sidebar
         className={`
@@ -44,7 +52,8 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           md:sticky md:top-0 md:h-screen
           transition-all duration-300 ease-in-out
           ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-          ${isDesktopSidebarCollapsed ? "w-20" : "w-64"}
+          ${isDesktopSidebarCollapsed ? "md:w-20" : "md:w-64"}
+          w-64
           rounded-r-2xl md:rounded-2xl
           z-40 shadow-xl bg-gray-800
           border-r border-gray-700
@@ -52,15 +61,25 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           [&>div]:!bg-gray-800
         `}
       >
+        {/* Mobile close button */}
+        
+
+        {/* Desktop collapse toggle button */}
+      
 
         {/* Navigation */}
-        <SidebarItemGroup className="space-y-2 flex-1 !mt-3">
+        <SidebarItemGroup className="space-y-2 flex-1 md:!mt-3">
           {/* Home */}
-          <SidebarItem href="/home" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" }  !text-gray-300 hover:!bg-gray-700 rounded-lg transition-colors ${selectedPage === "home" ? " cursor-default !text-white" : ""}`}>
+          <SidebarItem 
+            href="/home" 
+            className={`
+              ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
+              !text-gray-300 hover:!bg-gray-700 rounded-lg transition-colors 
+              ${selectedPage === "home" ? "cursor-default !text-white !bg-gray-700" : ""}
+            `}
+          >
             <div className="flex items-center">
-              <House
-                className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
-              />
+              <House className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
               {!isDesktopSidebarCollapsed && (
                 <span className="text-md font-semibold">Home</span>
               )}
@@ -68,9 +87,16 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           </SidebarItem>
 
           {/* Fast Draws */}
-          <SidebarItem href="/fastdraws" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" }rounded-lg  !text-gray-300 hover:!text-white transition-colors  ${selectedPage === "fastdraws" ? "  cursor-default !text-white" : ""} `}>
+          <SidebarItem 
+            href="/fastdraws" 
+            className={`
+              ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
+              rounded-lg !text-gray-300 hover:!bg-gray-700 transition-colors 
+              ${selectedPage === "fastdraws" ? "cursor-default !text-white !bg-gray-700" : ""}
+            `}
+          >
             <div className="flex items-center">
-              <Cat className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`} />
+              <Cat className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
               {!isDesktopSidebarCollapsed && (
                 <span className="text-md font-semibold">Fast Draws</span>
               )}
@@ -78,11 +104,16 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           </SidebarItem>
 
           {/* Draw */}
-          <SidebarItem href="/draw" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 "  : "" } rounded-lg  !text-gray-300 hover:!text-white transition-colors  ${selectedPage === "draw" ? " cursor-default !text-white" : ""}`}>
+          <SidebarItem 
+            href="/draw" 
+            className={`
+              ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
+              rounded-lg !text-gray-300 hover:!bg-gray-700 transition-colors 
+              ${selectedPage === "draw" ? "cursor-default !text-white !bg-gray-700" : ""}
+            `}
+          >
             <div className="flex items-center">
-              <PencilIcon
-                className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
-              />
+              <PencilIcon className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
               {!isDesktopSidebarCollapsed && (
                 <span className="text-md font-semibold">Draw</span>
               )}
@@ -90,64 +121,82 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           </SidebarItem>
 
           {/* Wiki */}
-          <SidebarItem href="/wiki" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" }  rounded-lg  !text-gray-300 hover:!text-white transition-colors ${selectedPage === "wiki" ? "cursor-default !text-white" : ""}`}>
+          <SidebarItem 
+            href="/wiki" 
+            className={`
+              ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
+              rounded-lg !text-gray-300 hover:!bg-gray-700 transition-colors 
+              ${selectedPage === "wiki" ? "cursor-default !text-white !bg-gray-700" : ""}
+            `}
+          >
             <div className="flex items-center">
-              <LibraryIcon
-                className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
-              />
+              <LibraryIcon className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
               {!isDesktopSidebarCollapsed && (
                 <span className="text-md font-semibold">Wiki</span>
               )}
             </div>
           </SidebarItem>
 
-          {/* User (if logged in) */}
+          {/* User Profile (if logged in) */}
           {current_user && (
-            <SidebarItem href={`/user/${current_user.id}`} className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } rounded-lg  !text-gray-300 hover:!text-white transition-colors ${selectedPage === "user" ? "  cursor-default !text-white" : ""}`}>
+            <SidebarItem 
+              href={`/user/${current_user.id}`} 
+              className={`
+                ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
+                rounded-lg !text-gray-300 hover:!bg-gray-700 transition-colors 
+                ${selectedPage === "user" ? "cursor-default !text-white !bg-gray-700" : ""}
+              `}
+            >
               <div className="flex items-center">
-                <CircleUser
-                  className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
-                />
+                <CircleUser className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
                 {!isDesktopSidebarCollapsed && (
                   <span className="text-md font-semibold">Profile</span>
                 )}
               </div>
             </SidebarItem>
           )}
-          {current_user && 
-          <SidebarItem href="/settings" className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } rounded-lg  !text-gray-300 hover:!text-white transition-colors  ${selectedPage === "settings" ? " cursor-default !text-white" : ""}`}>
-            <div className="flex items-center">
-              <Settings
-                className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
-              />
-              {!isDesktopSidebarCollapsed && (
-                <span className="text-md font-semibold">Settings</span>
-              )}
-            </div>
-          </SidebarItem>
-          }
+
+          {/* Settings (if logged in) */}
+          {current_user && (
+            <SidebarItem 
+              href="/settings" 
+              className={`
+                ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
+                rounded-lg !text-gray-300 hover:!bg-gray-700 transition-colors 
+                ${selectedPage === "settings" ? "cursor-default !text-white !bg-gray-700" : ""}
+              `}
+            >
+              <div className="flex items-center">
+                <Settings className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
+                {!isDesktopSidebarCollapsed && (
+                  <span className="text-md font-semibold">Settings</span>
+                )}
+              </div>
+            </SidebarItem>
+          )}
+
           {/* Login / Logout */}
-          <SidebarItem href={current_user ? "/logout" : "/login"} className={`${ isDesktopSidebarCollapsed ? "aspect-square w-12 " : "" } rounded-lg  !text-gray-300 hover:!text-white transition-colors ${selectedPage === "login" ? "  cursor-default !text-white" : ""} `} onClick={current_user ? logout : undefined}>
+          <SidebarItem 
+            href={current_user ? "/logout" : "/login"} 
+            className={`
+              ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
+              rounded-lg !text-gray-300 hover:!bg-gray-700 transition-colors 
+              ${selectedPage === "login" ? "cursor-default !text-white !bg-gray-700" : ""}
+            `}
+            onClick={current_user ? logout : undefined}
+          >
             <div className="flex items-center">
               {current_user ? (
-                <LogOutIcon
-                  className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
-                />
+                <LogOutIcon className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
               ) : (
-                <LogInIcon
-                  className={`${isDesktopSidebarCollapsed ? "w-7 h-7" : "w-7 h-7 mr-4"}`}
-                />
+                <LogInIcon className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
               )}
               {!isDesktopSidebarCollapsed && (
                 <span className="text-md font-semibold">{current_user ? "Logout" : "Login"}</span>
               )}
             </div>
           </SidebarItem>
-          
         </SidebarItemGroup>
-
-        {/* Collapse button (desktop only) */}
-        
       </Sidebar>
     </>
   );

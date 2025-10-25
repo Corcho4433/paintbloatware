@@ -12,7 +12,7 @@ interface UseInfiniteScrollProps {
 const useInfiniteScroll = ({
   loadMore,
   isLoading,
-  rootMargin = '300%',
+  rootMargin = '100%',
   root = null,
 }: UseInfiniteScrollProps) => {
   const loadMoreRef = useRef(loadMore);

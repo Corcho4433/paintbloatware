@@ -73,7 +73,7 @@ export const useLoginMutation = () => {
 
   return useMutation({
     mutationFn: async (loginUser: LoginUserRequest): Promise<LoginUserResponse> => {
-      const response = await fetch(serverPath + "/api/auth/login", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginUser),

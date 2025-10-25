@@ -25,7 +25,7 @@ const themes = getAvailableThemes();
 const Drawing = () => {
   // Get theme from auth store
   // Gemini prompt states
-  
+
   const editorTheme = useAuthStore((state) => state.editorTheme);
   const setEditorTheme = useAuthStore((state) => state.setEditorTheme);
 
@@ -122,7 +122,7 @@ const Drawing = () => {
         });
         observer.observe(syntaxRef.current, { childList: true, subtree: true });
       }
-    } 
+    }
 
     return () => {
       if (observer) {
@@ -360,17 +360,17 @@ const Drawing = () => {
 
   return (
     <div className="bg-gray-900 text-gray-100 min-h-screen flex">
-      <PaintSidebar selectedPage="draw"  />
+      <PaintSidebar selectedPage="draw" />
       <div className="flex flex-1 gap-6 p-6">
         {/* Editor Column */}
-        <div className="flex flex-col w-full">
-          <div className="flex-row flex gap-3 mb-4 w-full">
+        <div className="flex flex-col md:w-full w-[90vw]">
+          <div className="md:flex-row flex-col flex gap-3 mb-4 w-full">
             <div className="flex-1 flex flex-col bg-gray-800 rounded-lg border border-gray-700">
               <div className="mx-6 mt-6">
                 <h2 className="text-2xl font-bold text-white mb-2">Source Code</h2>
                 <p className="text-gray-400 text-sm">Write your Lua code here</p>
               </div>
-              <div className="flex-1 bg-gray-900 m-6 rounded-lg relative overflow-hidden">
+              <div className="flex-1 min-h-[40vh] bg-gray-900 m-6 rounded-lg relative overflow-hidden">
                 {/* Theme selector */}
                 <div className="absolute top-2 right-2 z-10">
                   <select
@@ -462,7 +462,7 @@ const Drawing = () => {
                       ref={canvasRef}
                       width={FIXED_CANVAS_SIZE}
                       height={FIXED_CANVAS_SIZE}
-                      className="border-2 border-gray-600 bg-black rounded-lg hover:border-gray-500 transition-colors duration-100 shadow-lg [image-rendering:pixelated]"
+                      className="border-2 aspect-square  w-full max-w-[70vw] border-gray-600 bg-black rounded-lg hover:border-gray-500 transition-colors duration-100 shadow-lg [image-rendering:pixelated]"
                     />
                   )}
                 </div>

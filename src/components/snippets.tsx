@@ -44,7 +44,7 @@ const CodeSnippets = ({ snippetImports, setSourceCode }: CodeSnippetsProps) => {
   };
 
   return (
-    <div className="bg-gray-800  text-indigo-100 p-4 rounded-lg w-full max-w-full">
+    <div className="bg-gray-800  text-indigo-100 p-4 rounded-lg w-full md:w-[70vw] max-w-full">
       {/* Buttons */}
       <div className="flex flex-wrap gap-2 mb-4 max-w-full pb-1 overflow-x-auto scrollbar-thin">
         {snippets.map((s, i) => (
@@ -67,7 +67,7 @@ const CodeSnippets = ({ snippetImports, setSourceCode }: CodeSnippetsProps) => {
       {snippets[activeSnippet] && (
         <div className="relative">
 
-          <div className="bg-gray-900 rounded-xl p-4 w-full max-w-full break-all whitespace-pre-wrap">
+          <div className="bg-gray-900 rounded-xl p-4 w-full  max-w-full break-all whitespace-pre-wrap">
             <ReactMarkdown
               components={{
                 code({ node, inline, className, children, ...props }) {
