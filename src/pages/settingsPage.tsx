@@ -352,7 +352,7 @@ const SettingsPage = () => {
 
           {/* Preferences Section */}
           {activeSection === 'preferences' && (
-            <div className="bg-gray-800 p-6 border-gray-700 border rounded-xl mb-6">
+            <div className="bg-gray-800 p-6  border-gray-700 border rounded-xl mb-6">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <Palette className="w-5 h-5" />
                 App Preferences
@@ -393,7 +393,7 @@ const SettingsPage = () => {
                 <SyntaxHighlighter
                   language="lua"
                   style={getThemeFromString(editorTheme)}
-                  className="*:!p-0"
+                  className="*:!p-0 w-[70vw] md:w-full"
                   customStyle={{
                     margin: 0,
                     padding: '1.5rem',

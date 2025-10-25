@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Sidebar, SidebarItem, SidebarItemGroup } from "flowbite-react";
 import { BookOpen, Menu, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
