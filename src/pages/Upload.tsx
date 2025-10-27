@@ -180,21 +180,21 @@ export default function Upload() {
 
                 {/* Left column: Preview & Source */}
                 <div className="flex flex-col w-full">
-                    <div className="flex-row flex gap-3  w-full">
+                    <div className="flex-col md:flex-row flex gap-3  w-full">
                         <div className="flex-1 flex flex-col bg-gray-800 rounded-lg border border-gray-700">
                             <div className="mx-6 mt-6">
                                 <h2 className="text-2xl font-bold text-white mb-2">Preview & Source</h2>
                                 <p className="text-gray-400 text-sm">Preview your image and source code before posting</p>
                             </div>
                             <div className="flex-1 aspect-square bg-gray-900 mx-6 mt-6 rounded-lg relative overflow-hidden flex items-center justify-center">
-                                <div className="flex justify-center items-center w-full h-full m-3">
-                                    <div className="relative w-[512px] h-[512px] flex items-center justify-center">
+                                <div className="flex justify-center items-center  w-[300px] h-[300px] md:w-[512px] md:h-[512px] m-3">
+                                    <div className="relative w-[300px] h-[300px] md:w-[512px] md:h-[512px] aspect-square flex items-center justify-center">
                                         <img
                                             width={512}
                                             height={512}
                                             src={savedUrl}
                                             alt="Preview"
-                                            className="border-2 [image-rendering:pixelated] border-gray-600 bg-black rounded-lg shadow-lg w-full h-full object-cover"
+                                            className="border-2 aspect-square w-[300px] md:w-[512px] [image-rendering:pixelated] border-gray-600 bg-black rounded-lg shadow-lg  object-cover"
                                         />
 
                                         {/* Default success overlay: green */}

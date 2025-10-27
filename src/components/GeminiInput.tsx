@@ -111,7 +111,7 @@ const GeminiInput = ({ setSourceCode }: GeminiInputProps) => {
             </div>
         )}
         {(geminiResult && !geminiLoading) && (
-            <div className="w-full bg-gray-900 p-4 rounded-xl overflow-x-auto relative">
+            <div className="w-full bg-gray-900 p-4 rounded-xl  relative">
                 <div className="space-y-1.5 mb-3">
                     <h3 className="font-bold text-lg">Code Result</h3>
                     <p className="text-gray-200 text-sm">Prompt:</p>
@@ -121,7 +121,7 @@ const GeminiInput = ({ setSourceCode }: GeminiInputProps) => {
 
                 <SyntaxHighlighter
                     language="lua"
-                    className="!bg-gray-800 rounded  overflow-y-auto mt-4"
+                    className="!bg-gray-800 rounded w-full overflow-x-auto  overflow-y-auto mt-4"
                     style={getThemeFromString(editorTheme)}
                     customStyle={{
                         padding: '1.5rem',
@@ -141,6 +141,8 @@ const GeminiInput = ({ setSourceCode }: GeminiInputProps) => {
                             maxHeight: '30vh',
                             display: 'inline-block',
                             minWidth: '100%',
+                            maxWidth: '100%',
+                            overflowX: 'auto',
                         }
                     }}
                 >

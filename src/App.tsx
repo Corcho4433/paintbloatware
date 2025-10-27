@@ -19,7 +19,7 @@ function App() {
 
   return (
     <>
-      <div id='page-container' className="page-container">
+      <div id='page-container' className="page-container bg-gray-900">
         <QueryClientProvider client={PaintQueryClient}>
           <BrowserRouter>
             <Routes>
