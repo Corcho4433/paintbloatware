@@ -11,9 +11,6 @@ export async function fetchTrends() {
   })
 }
 
-export async function fetchTrendingPostsForTag(tag: string) {
-    return [];
-}
 
 export async function fetchAllTags() {
     const response = await fetch(`${serverPath}/api/trends/`, {

@@ -1,15 +1,15 @@
 import { useUser } from '../hooks/user';
 import { PostGallery } from '../components/postgallery';
 import { useParams } from 'react-router-dom';
-import { useAuthStore } from '../store/useAuthStore';
+//import { useAuthStore } from '../store/useAuthStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PaintSidebar from "../components/paintsidebar";
 import useInfiniteScroll from '../hooks/infinetescroll';
 
 const UserPage = () => {
     const { id } = useParams<{ id: string }>();
-    const auth = useAuthStore();
-    const loggedId = auth.user?.id;
+    //const auth = useAuthStore();
+    //const loggedId = auth.user?.id;
     const { user, loading } = useUser(id || "");
     const scrollableContainerRef = useRef<HTMLDivElement | null>(null);
     const [loadMoreFn, setLoadMoreFn] = useState<(() => void) | null>(null);

@@ -7,10 +7,11 @@ import flowbiteReact from "flowbite-react/plugin/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss(), flowbiteReact()],
   server: {
-    allowedHosts: ['expiration-trackbacks-responsible-conflicts.trycloudflare.com'],
+    port: 60015,
+    allowedHosts: ['paintbloatware.online'],
     proxy: {
       '/api': {
-        target: "http://localhost:3000",
+        target: "http://localhost:60014",
         changeOrigin: true,
         secure: false
       },
@@ -26,5 +27,6 @@ export default defineConfig({
 
 
     },
+    
   },
 })

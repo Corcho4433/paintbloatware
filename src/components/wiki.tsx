@@ -197,10 +197,12 @@ const Wiki = () => {
                       {children}
                     </blockquote>
                   ),
+                  // @ts-ignore
                   code({ node, inline, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || "");
                     return !inline && match ? (
                       <SyntaxHighlighter
+                      // @ts-ignore
                         style={theme}
                         language={match[1]}
                         PreTag="div"

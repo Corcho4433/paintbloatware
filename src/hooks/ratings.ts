@@ -17,6 +17,7 @@ export function useRatings(postId: string | undefined, initialRatingValue?: numb
       disliked: false,
       toggleDislike: async () => {},
       toggleLike: async () => {},
+      // @ts-ignore
       createRating: async (value: 1 | -1 | 0) => {},
     }
   }
@@ -59,7 +60,7 @@ export function useRatings(postId: string | undefined, initialRatingValue?: numb
         },
         body: JSON.stringify({
           postId,
-          value,
+          value: value,
         }),
         credentials: "include",
       });

@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import PaintSidebar from '../components/paintsidebar';
 // Removed custom CSS, using Tailwind classes
 import styles from '../styles/upload.module.css'
-import { Gem, Rocket, Bolt, ArrowBigUp, ChevronsUp } from 'lucide-react';
+import { Gem, Rocket } from 'lucide-react';
 import { createPost } from '../hooks/posts';
 import { fetchAllTags } from '../hooks/trending';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';

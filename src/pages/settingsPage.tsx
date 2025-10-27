@@ -8,7 +8,6 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/prism';
 import { getAvailableThemes, getThemeFromString } from '../utils/theme';
-import { get } from 'flowbite-react/helpers/get';
 
 const themes = getAvailableThemes();
 // Validation schema for profile form

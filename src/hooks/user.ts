@@ -1,7 +1,6 @@
 import { serverPath } from "../utils/servers";
 import { useState, useEffect } from "react";
 import fetchWithRefresh from "./authorization";
-import { useNavigate } from "react-router-dom";
 
 // Define the type for user response
 type UserResponse = {

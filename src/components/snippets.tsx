@@ -70,10 +70,12 @@ const CodeSnippets = ({ snippetImports, setSourceCode }: CodeSnippetsProps) => {
           <div className="bg-gray-900 rounded-xl p-4 w-full  max-w-full break-all whitespace-pre-wrap">
             <ReactMarkdown
               components={{
+                // @ts-ignore
                 code({ node, inline, className, children, ...props }) {
                   const match = /language-(\w+)/.exec(className || "");
                   return !inline && match ? (
                     <SyntaxHighlighter
+                    // @ts-ignore
                       style={theme}
                       language={match[1]}
                       PreTag="div"
