@@ -22,7 +22,7 @@ const RegisterPage = () => {
             ) : (
               <LoginForm></LoginForm>
             )}
-            <a onClick={() => setRegisteringState(!isRegistering)} className="font-medium text-purple-200 hover:text-purple-300 cursor-pointer"> {isRegistering ? "¿Do you have an account?" : "¿You dont have an account?"} </a>
+            <a onClick={() => setRegisteringState(!isRegistering)} className="font-medium text-purple-200 hocus:text-purple-300 cursor-pointer"> {isRegistering ? "¿Do you have an account?" : "¿You dont have an account?"} </a>
           </div>
         </div>
       </section>
@@ -124,7 +124,7 @@ const RegisterForm = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`border border-gray-700 w-full rounded-lg transition-all cursor-pointer px-3 py-2 max-w-full text-base duration-150 bg-gray-900 text-blue-400 hover:border-blue-400 font-normal shadow-lg hover:bg-gray-800 ${isSubmitting ? "opacity-50 cursor-none" : ""
+            className={`border border-gray-700 w-full rounded-lg transition-all cursor-pointer px-3 py-2 max-w-full text-base duration-150 bg-gray-900 text-blue-400 hocus:border-blue-400 font-normal shadow-lg hocus:bg-gray-800 ${isSubmitting ? "opacity-50 cursor-none" : ""
               }`}
           >
             {isSubmitting ? "Submitting..." : "Register"}
@@ -146,8 +146,8 @@ const RegisterForm = () => {
                   type="button"
                   onClick={() => handleOAuth(p.id)}
                   className={`w-full cursor-pointer text-sm font-medium rounded-lg px-4 py-3 transition-all duration-200 flex items-center justify-center gap-3 border ${isGoogle
-                    ? '!bg-white hover:!bg-gray-300 !text-gray-700 !border-gray-300 hover:!border-gray-400'
-                    : '!bg-gray-900 hover:!bg-gray-700 !text-white !border-gray-600 hover:!border-gray-500'
+                    ? '!bg-white hocus:!bg-gray-300 !text-gray-700 !border-gray-300 hocus:!border-gray-400'
+                    : '!bg-gray-900 hocus:!bg-gray-700 !text-white !border-gray-600 hocus:!border-gray-500'
                     }`}
                 >
                   {isGoogle && (
@@ -206,7 +206,7 @@ const LoginForm = () => {
               id="email"
               name="email"
               type="email"
-              className="bg-gray-700 border border-gray-600 outline-none hover:border-white focus:border-white text-white rounded-lg block w-full p-2.5 placeholder-gray-400"
+              className="bg-gray-700 border border-gray-600 outline-none hocus:border-white focus:border-white text-white rounded-lg block w-full p-2.5 placeholder-gray-400"
               placeholder="paint@mail.com"
               required
             />
@@ -223,7 +223,7 @@ const LoginForm = () => {
               id="password"
               name="password"
               type="password"
-              className="bg-gray-700 border border-gray-600 outline-none hover:border-white focus:border-white text-white rounded-lg block w-full p-2.5 placeholder-gray-400"
+              className="bg-gray-700 border border-gray-600 outline-none hocus:border-white focus:border-white text-white rounded-lg block w-full p-2.5 placeholder-gray-400"
               placeholder="••••••••"
               required
             />
@@ -232,7 +232,7 @@ const LoginForm = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`border border-gray-700 w-full rounded-lg transition-all cursor-pointer px-3 py-2 max-w-full text-base duration-150 bg-gray-900 text-blue-400 hover:border-blue-400 font-normal shadow-lg hover:bg-gray-800 ${isSubmitting ? "opacity-50 cursor-none" : ""
+            className={`border border-gray-700 w-full rounded-lg transition-all cursor-pointer px-3 py-2 max-w-full text-base duration-150 bg-gray-900 text-blue-400 hocus:border-blue-400 font-normal shadow-lg hocus:bg-gray-800 ${isSubmitting ? "opacity-50 cursor-none" : ""
               }`}
           >
             {isSubmitting ? "Submitting..." : "Login"}
@@ -253,8 +253,8 @@ const LoginForm = () => {
                   type="button"
                   onClick={() => handleOAuth(p.id)}
                   className={`w-full cursor-pointer text-sm font-medium rounded-lg px-4 py-3 transition-all duration-200 flex items-center justify-center gap-3 border ${isGoogle
-                    ? '!bg-white hover:!bg-gray-300 !text-gray-700 !border-gray-300 hover:!border-gray-400'
-                    : '!bg-gray-900 hover:!bg-gray-700 !text-white !border-gray-600 hover:!border-gray-500'
+                    ? '!bg-white hocus:!bg-gray-300 !text-gray-700 !border-gray-300 hocus:!border-gray-400'
+                    : '!bg-gray-900 hocus:!bg-gray-700 !text-white !border-gray-600 hocus:!border-gray-500'
                     }`}
                 >
                   {isGoogle && (

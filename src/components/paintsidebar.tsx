@@ -31,7 +31,7 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
       {!isMobileSidebarOpen && (
         <button
           onClick={() => setMobileSidebarOpen(true)}
-          className="fixed top-4 left-4 z-50 md:hidden bg-gray-800 p-2 rounded-lg shadow-lg hover:bg-gray-700 transition-colors"
+          className="fixed top-4 left-4 z-50 md:hidden bg-gray-800 p-2 rounded-lg shadow-lg hocus:bg-gray-700 transition-colors"
           aria-label="Open menu"
         >
           <Menu className="text-white w-6 h-6" />
@@ -74,7 +74,7 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
             href="/home" 
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
-              !text-gray-300 hover:!bg-gray-700 rounded-lg transition-colors 
+              !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 rounded-lg transition-colors 
               ${selectedPage === "home" ? "cursor-default !text-white !bg-gray-700" : ""}
             `}
           >
@@ -91,7 +91,7 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
             href="/fastdraws" 
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
-              rounded-lg !text-gray-300 hover:!bg-gray-700 transition-colors 
+              rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
               ${selectedPage === "fastdraws" ? "cursor-default !text-white !bg-gray-700" : ""}
             `}
           >
@@ -108,7 +108,7 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
             href="/draw" 
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
-              rounded-lg !text-gray-300 hover:!bg-gray-700 transition-colors 
+              rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
               ${selectedPage === "draw" ? "cursor-default !text-white !bg-gray-700" : ""}
             `}
           >
@@ -125,7 +125,7 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
             href="/wiki" 
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
-              rounded-lg !text-gray-300 hover:!bg-gray-700 transition-colors 
+              rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
               ${selectedPage === "wiki" ? "cursor-default !text-white !bg-gray-700" : ""}
             `}
           >
@@ -143,7 +143,7 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
               href={`/user/${current_user.id}`} 
               className={`
                 ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
-                rounded-lg !text-gray-300 hover:!bg-gray-700 transition-colors 
+                rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
                 ${selectedPage === "user" ? "cursor-default !text-white !bg-gray-700" : ""}
               `}
             >
@@ -162,7 +162,7 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
               href="/settings" 
               className={`
                 ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
-                rounded-lg !text-gray-300 hover:!bg-gray-700 transition-colors 
+                rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
                 ${selectedPage === "settings" ? "cursor-default !text-white !bg-gray-700" : ""}
               `}
             >
@@ -180,7 +180,7 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
             href={current_user ? "/logout" : "/login"} 
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
-              rounded-lg !text-gray-300 hover:!bg-gray-700 transition-colors 
+              rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
               ${selectedPage === "login" ? "cursor-default !text-white !bg-gray-700" : ""}
             `}
             onClick={current_user ? logout : undefined}

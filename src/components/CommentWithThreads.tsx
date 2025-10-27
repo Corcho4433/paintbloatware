@@ -124,7 +124,7 @@ export const CommentWithThreads = ({ comment, onReply, replyingTo }: CommentWith
             <button
               onClick={() => onReply(comment.id)}
               className={`text-xs transition-colors ${
-                replyingTo === comment.id ? 'text-blue-400' : 'text-gray-400 hover:text-blue-400'
+                replyingTo === comment.id ? 'text-blue-400' : 'text-gray-400 hocus:text-blue-400'
               }`}
             >
               Reply
@@ -132,7 +132,7 @@ export const CommentWithThreads = ({ comment, onReply, replyingTo }: CommentWith
             {threadCount > 0 && (
               <button
                 onClick={handleToggleExpand}
-                className="flex items-center gap-1 text-xs text-gray-400 hover:text-blue-400 transition-colors"
+                className="flex items-center gap-1 text-xs text-gray-400 hocus:text-blue-400 transition-colors"
               >
                 {expanded ? (
                   <>
@@ -180,7 +180,7 @@ export const CommentWithThreads = ({ comment, onReply, replyingTo }: CommentWith
                   }
                 }}
                 disabled={!replyText.trim() || isSubmitting}
-                className="bg-gray-900 cursor-pointer rounded-md border border-gray-700 aspect-square text-white p-2.5 hover:bg-gray-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-gray-900 cursor-pointer rounded-md border border-gray-700 aspect-square text-white p-2.5 hocus:bg-gray-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <Square className="w-5 h-5 animate-pulse"></Square>

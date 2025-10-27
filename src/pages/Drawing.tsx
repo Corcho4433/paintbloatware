@@ -376,7 +376,7 @@ const Drawing = () => {
                   <select
                     value={editorTheme}
                     onChange={(e) => setEditorTheme(e.target.value)}
-                    className="bg-gray-700 text-white text-xs px-2 py-1 rounded border border-gray-600 hover:bg-gray-600 focus:outline-none focus:border-blue-500"
+                    className="bg-gray-700 text-white text-xs px-2 py-1 rounded border border-gray-600 hocus:bg-gray-600 focus:outline-none focus:border-blue-500"
                   >
                     {themes.map((themeName) => (
                       <option key={themeName} value={themeName}>
@@ -462,7 +462,7 @@ const Drawing = () => {
                       ref={canvasRef}
                       width={FIXED_CANVAS_SIZE}
                       height={FIXED_CANVAS_SIZE}
-                      className="border-2 aspect-square  w-full max-w-[70vw] border-gray-600 bg-black rounded-lg hover:border-gray-500 transition-colors duration-100 shadow-lg [image-rendering:pixelated]"
+                      className="border-2 aspect-square  w-full max-w-[70vw] border-gray-600 bg-black rounded-lg hocus:border-gray-500 transition-colors duration-100 shadow-lg [image-rendering:pixelated]"
                     />
                   )}
                 </div>
@@ -480,7 +480,7 @@ const Drawing = () => {
                       </div>
                       <button
                         onClick={() => setErrorMessage(null)}
-                        className="text-red-400 hover:text-red-300 transition-colors"
+                        className="text-red-400 hocus:text-red-300 transition-colors"
                         title="Dismiss error"
                       >
                         ✕
@@ -494,19 +494,19 @@ const Drawing = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={sendUpdatedSource}
-                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 min-w-[70px] py-2 max-w-full text-base duration-150 bg-gray-700 text-green-400 hover:border-green-400 hover:shadow-green-400/25 font-normal shadow-lg hover:bg-gray-800"
+                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 min-w-[70px] py-2 max-w-full text-base duration-150 bg-gray-700 text-green-400 hocus:border-green-400 hocus:shadow-green-400/25 font-normal shadow-lg hocus:bg-gray-800"
                     >
                       Run
                     </button>
                     <button
                       onClick={handleStep}
-                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 min-w-[70px] py-2 max-w-full text-base duration-150 bg-gray-700 text-blue-400 hover:border-blue-400 hover:shadow-blue-400/25 font-normal shadow-lg hover:bg-gray-800"
+                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 min-w-[70px] py-2 max-w-full text-base duration-150 bg-gray-700 text-blue-400 hocus:border-blue-400 hocus:shadow-blue-400/25 font-normal shadow-lg hocus:bg-gray-800"
                     >
                       Step
                     </button>
                     <button
                       onClick={handlePost}
-                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 min-w-[70px] py-2 max-w-full text-base duration-150 bg-gray-700 text-purple-400 hover:border-purple-400 hover:shadow-purple-400/25  font-normal shadow-lg hover:bg-gray-800"
+                      className="border border-gray-700 rounded-lg transition-all cursor-pointer px-3 min-w-[70px] py-2 max-w-full text-base duration-150 bg-gray-700 text-purple-400 hocus:border-purple-400  hocus:shadow-purple-400/25  font-normal shadow-lg hocus:bg-gray-800"
                     >
                       Post
                     </button>
@@ -527,7 +527,7 @@ const Drawing = () => {
                           Math.min(Math.max(parseInt(e.target.value) || 0, 0), 512)
                         )
                       }
-                      className="focus:!outline-none px-3 py-1 rounded-md border border-gray-600 bg-gray-800 text-white hover:bg-gray-900 focus:bg-gray-700 focus:border-white transition-all duration-200 w-20 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className="focus:!outline-none px-3 py-1 rounded-md border border-gray-600 bg-gray-800 text-white active:!bg-gray-900 hocus:bg-gray-900 focus:bg-gray-700 focus:border-white transition-all duration-200 w-20 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
                 </div>

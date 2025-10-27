@@ -84,7 +84,7 @@ export const PostGallery = ({ userId, tag, onLoadMore }: { userId?: string; tag?
               <p className="text-sm opacity-90 mb-4">You haven't shared any artwork yet. It's time to show your creativity to the world!</p>
               <button
                 onClick={() => window.location.href = '/draw'}
-                className="bg-white cursor-pointer text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
+                className="bg-white cursor-pointer text-purple-600 px-4 py-2 rounded-lg font-semibold hocus:bg-gray-100 transition-colors duration-200"
               >
                 Create my first artwork ✨
               </button>
@@ -111,7 +111,7 @@ export const PostGallery = ({ userId, tag, onLoadMore }: { userId?: string; tag?
               <p className="text-sm opacity-90 mb-4">No posts yet! Be the first to share your amazing artwork with the community.</p>
               <button
                 onClick={() => window.location.href = '/draw'}
-                className="bg-white cursor-pointer text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
+                className="bg-white cursor-pointer text-purple-600 px-4 py-2 rounded-lg font-semibold hocus:bg-gray-100 transition-colors duration-200"
               >
                 Start Drawing ✨
               </button>
@@ -164,7 +164,7 @@ export const PostGallery = ({ userId, tag, onLoadMore }: { userId?: string; tag?
             }}
           />
           {/* Hover overlay with stats */}
-          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50 opacity-0 group-hocus:opacity-100 transition-opacity duration-200 flex items-center justify-center">
             <div className="flex items-center gap-4 p-4 text-white">
               <div className="flex items-center gap-1">
                 <Heart className="w-5 h-5" fill="currentColor" />
@@ -199,9 +199,9 @@ export const PostGallery = ({ userId, tag, onLoadMore }: { userId?: string; tag?
                 <div
                   key={index}
                   onClick={() => handlePostPreview(index)}
-                  className="bg-gray-800 overflow-hidden hover:shadow-xl h-[350px] w-[350px] cursor-pointer rounded-lg"
+                  className="bg-gray-800 overflow-hidden hocus:shadow-xl h-[350px] w-[350px] cursor-pointer rounded-lg"
                 >
-                  <div className="bg-gradient-to-br from-gray-900 to-black w-full h-full flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300 rounded-lg">
+                  <div className="bg-gradient-to-br from-gray-900 to-black w-full h-full flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hocus:border-gray-500 transition-all duration-300 rounded-lg">
                     {renderContent(index)}
                   </div>
                 </div>
@@ -209,9 +209,9 @@ export const PostGallery = ({ userId, tag, onLoadMore }: { userId?: string; tag?
               : Array(isNoPostsError ? 1 : 12).fill(null).map((_, index) => (
                 <div
                   key={index}
-                  className="bg-gray-800 overflow-hidden hover:shadow-xl h-[350px] w-[350px] duration-300 rounded-lg"
+                  className="bg-gray-800 overflow-hidden hocus:shadow-xl h-[350px] w-[350px] duration-300 rounded-lg"
                 >
-                  <div className="bg-gradient-to-br from-gray-900 to-black w-full h-full flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300 rounded-lg">
+                  <div className="bg-gradient-to-br from-gray-900 to-black w-full h-full flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hocus:border-gray-500 transition-all duration-300 rounded-lg">
                     {renderContent(index)}
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 @import "tailwindcss";
-
+@tailwind utilities;
+@custom-variant hocus (&:is(:hover, :focus, :active));
 @layer base {
   /* Aplica a todo el documento */
   ::-webkit-scrollbar {

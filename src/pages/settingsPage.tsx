@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import PaintSidebar from '../components/paintsidebar';
 import { useAuthStore } from '../store/useAuthStore';
-import { deleteProfile } from '../hooks/user';
+import { deleteProfile, UserInfo } from '../hooks/user';
 import { User, Settings, Shield, Palette, Save, Eye, EyeOff, Upload } from 'lucide-react';
 import { useUserInfo, updateProfileInfo, uploadProfileImageFile } from '../hooks/user';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
@@ -43,12 +43,11 @@ const callDeleteProfile = (userId: string) => {
 };
 
 const SettingsPage = () => {
-  const auth = useAuthStore();
-  const authUser = auth.user;
-  const { user, loading } = useUserInfo(authUser?.id);
+  const authUser = useAuthStore((state) => state.user);
+  const { user, loading, error } = useUserInfo(authUser?.id);
   const editorTheme = useAuthStore((state) => state.editorTheme);
   const setEditorTheme = useAuthStore((state) => state.setEditorTheme);
-  
+
   // Profile picture state (file upload only)
   const [uploadingImage, setUploadingImage] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
@@ -134,7 +133,7 @@ const SettingsPage = () => {
   return (
     <div className="flex">
       <PaintSidebar selectedPage="settings" />
-      <main className="flex-1 ml-0 min-h-screen bg-gray-900 p-6">
+      <main className="flex-1 ml-0 w-full min-h-screen bg-gray-900 p-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="bg-gray-800 border-gray-700 border p-6 rounded-xl mb-6">
@@ -146,13 +145,13 @@ const SettingsPage = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="bg-gray-800 border-gray-700 border p-2 rounded-xl mb-6">
+          <div className="bg-gray-800 overflow-x-auto border-gray-700 border p-2 rounded-xl mb-6">
             <div className="flex gap-2">
               <button
                 onClick={() => setActiveSection('profile')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeSection === 'profile'
                   ? '!bg-blue-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:!bg-gray-700'
+                  : 'text-gray-400 hocus:text-white hocus:!bg-gray-700'
                   }`}
               >
                 <User className="w-4 h-4" />
@@ -162,7 +161,7 @@ const SettingsPage = () => {
                 onClick={() => setActiveSection('preferences')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeSection === 'preferences'
                   ? '!bg-blue-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:!bg-gray-700'
+                  : 'text-gray-400 hocus:text-white hocus:!bg-gray-700'
                   }`}
               >
                 <Palette className="w-4 h-4" />
@@ -172,7 +171,7 @@ const SettingsPage = () => {
                 onClick={() => setActiveSection('account')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeSection === 'account'
                   ? '!bg-blue-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:!bg-gray-700'
+                  : 'text-gray-400 hocus:text-white hocus:!bg-gray-700'
                   }`}
               >
                 <Shield className="w-4 h-4" />
@@ -225,7 +224,7 @@ const SettingsPage = () => {
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
                             disabled={uploadingImage}
-                            className="flex items-center gap-2 px-3 py-2 !bg-gray-600 text-white text-sm rounded hover:!bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 px-3 py-2 !bg-gray-600 text-white text-sm rounded hocus:!bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <Upload className="w-4 h-4" />
                             {uploadingImage ? 'Uploading...' : 'Choose File'}
@@ -336,7 +335,7 @@ const SettingsPage = () => {
                         disabled={isSubmitting}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isSubmitting
                           ? '!bg-gray-600 text-gray-400 cursor-not-allowed'
-                          : '!bg-blue-600 text-white hover:!bg-blue-700'
+                          : '!bg-blue-600 text-white hocus:!bg-blue-700'
                           }`}
                       >
                         <Save className="w-4 h-4" />
@@ -380,7 +379,7 @@ const SettingsPage = () => {
                   <select
                     value={editorTheme}
                     onChange={(e) => setEditorTheme(e.target.value)}
-                    className="bg-gray-700 text-white text-xs px-2 py-1 rounded border border-gray-600 hover:bg-gray-600 focus:outline-none focus:border-blue-500"
+                    className="bg-gray-700 text-white text-xs px-2 py-1 rounded border border-gray-600 hocus:bg-gray-600 focus:outline-none focus:border-blue-500"
                   >
                     {themes.map((themeName) => (
                       <option key={themeName} value={themeName}>
@@ -490,7 +489,7 @@ end`}
 
                     <button
                       onClick={handleChangePassword}
-                      className="flex items-center gap-2 px-4 py-2 !bg-blue-600 text-white rounded-lg hover:!bg-blue-700 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 !bg-blue-600 text-white rounded-lg hocus:!bg-blue-700 transition-colors"
                     >
                       <Save className="w-4 h-4" />
                       Change Password
@@ -503,7 +502,7 @@ end`}
                   <h3 className="text-lg font-medium text-red-400 mb-3">Danger Zone</h3>
                   <div className="space-y-3">
 
-                    <button onClick={() => callDeleteProfile(user!.id)} className="w-full px-4 py-2 !bg-red-700 text-white rounded-lg hover:!bg-red-800 transition-colors">
+                    <button onClick={() => callDeleteProfile(user!.id)} className="w-full px-4 py-2 !bg-red-700 text-white rounded-lg hocus:!bg-red-800 transition-colors">
                       Delete Account
                     </button>
                   </div>

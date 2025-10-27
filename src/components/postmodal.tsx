@@ -149,7 +149,7 @@ export const PostModal = (
         {/* Close button for mobile */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 md:hidden bg-black/50 rounded-full p-2 text-white hover:bg-black/70 transition-colors"
+          className="absolute top-4 right-4 z-10 md:hidden bg-black/50 rounded-full p-2 text-white hocus:bg-black/70 transition-colors"
         >
           <X className="w-6 h-6" />
         </button>
@@ -221,7 +221,7 @@ export const PostModal = (
                 />
               )}
               <div className="flex-1">
-                <h3 className="font-bold text-lg"><Link className='!text-white hover:!underline' to={"/user/" + post.user?.id}>{post.user?.name || 'Unknown User'}</Link> </h3>
+                <h3 className="font-bold text-lg"><Link className='!text-white hocus:!underline' to={"/user/" + post.user?.id}>{post.user?.name || 'Unknown User'}</Link> </h3>
                 <p className="text-gray-400 text-sm">{post.description}</p>
               </div>
               <p className="text-gray-400 text-sm ml-auto">{new Date(post.created_at).toLocaleDateString()}</p>
@@ -267,7 +267,7 @@ export const PostModal = (
                 type="button"
                 onClick={handleToggleLike}
                 className={`p-2 rounded transition-colors ${
-                  liked ? 'text-red-500' : 'text-white hover:text-gray-400'
+                  liked ? 'text-red-500' : 'text-white hocus:text-gray-400'
                 }`}
                 aria-pressed={liked}
                 aria-label="Like"
@@ -284,7 +284,7 @@ export const PostModal = (
                 type="button"
                 onClick={handleToggleDislike}
                 className={`p-2 rounded transition-colors ${
-                  disliked ? 'text-blue-400' : 'text-white hover:text-gray-400'
+                  disliked ? 'text-blue-400' : 'text-white hocus:text-gray-400'
                 }`}
                 aria-pressed={disliked}
                 aria-label="Dislike"
@@ -302,7 +302,7 @@ export const PostModal = (
                   const el = document.getElementById('comment-input');
                   el?.focus();
                 }}
-                className="p-2 rounded  text-white hover:text-gray-400  transition-colors"
+                className="p-2 rounded  text-white hocus:text-gray-400  transition-colors"
                 aria-label="Comment"
               >
                 <MessageCircle className="w-6 h-6" strokeWidth={2} />
@@ -310,7 +310,7 @@ export const PostModal = (
               
               <button
                 type="button"
-                className={`p-2 rounded transition-colors text-white hover:text-gray-400`}
+                className={`p-2 rounded transition-colors text-white hocus:text-gray-400`}
                 aria-label={eyeOpen ? "Disable view" : "Enable view"}
                 aria-pressed={!eyeOpen}
                 onClick={() => setEyeOpen(o => !o)}
@@ -326,7 +326,7 @@ export const PostModal = (
               <div ref={shareRef} className="relative"> {/* added wrapper */}
                 <button
                   type="button"
-                  className="p-2 rounded  text-white hover:text-gray-400 transition-colors"
+                  className="p-2 rounded  text-white hocus:text-gray-400 transition-colors"
                   aria-label="Share"
                   onClick={() => setShowShareMenu(o => !o)}
                 >
@@ -338,7 +338,7 @@ export const PostModal = (
                     className="absolute left-full bottom-full ml-2 w-40 bg-gray-800 border border-gray-600 rounded shadow-lg z-20 text-xs"
                   >
                     <button
-                      className="w-full text-left px-3 py-2 hover:bg-gray-700"
+                      className="w-full text-left px-3 py-2 hocus:bg-gray-700"
                       onClick={() =>
                         handleCopy(
                           `${window.location.origin}/post/${post.id}`,
@@ -349,7 +349,7 @@ export const PostModal = (
                       Copy link
                     </button>
                     <button
-                      className="w-full text-left px-3 py-2 hover:bg-gray-700"
+                      className="w-full text-left px-3 py-2 hocus:bg-gray-700"
                       onClick={() =>
                         handleCopy(post.content || '', 'Post code')
                       }
@@ -399,7 +399,7 @@ export const PostModal = (
                   }
                 }}
                 disabled={loadingComment || !inputValue.trim()}
-                className="bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer rounded-md border border-gray-700 aspect-square text-white p-2.5  hover:bg-gray-700 transition-colors text-sm font-medium"
+                className="bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer rounded-md border border-gray-700 aspect-square text-white p-2.5  hocus:bg-gray-700 transition-colors text-sm font-medium"
               > {
                 loadingComment ? (
                   <Square className="w-5 h-5 animate-pulse" />

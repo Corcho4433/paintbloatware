@@ -51,7 +51,7 @@ const UserPage = () => {
                     renderSkeleton()
                 ) : (
                     <div>
-                        <div className="flex items-center space-x-6 border m-3 border-gray-700 bg-gray-800 p-6 rounded-xl">
+                        <div className="flex w-[94vw] md:w-full overflow-x-auto items-center space-x-6 border m-3 border-gray-700 bg-gray-800 p-6 rounded-xl">
                             {user?.urlPfp ? (
                                 <img
                                     src={user.urlPfp}

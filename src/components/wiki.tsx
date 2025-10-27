@@ -67,7 +67,7 @@ const WikiSidebar = ({ selected, setSelected, articles, isOpen, setIsOpen }: Wik
               cursor-pointer
               ${selected === title
                 ? "bg-gray-600 text-white"
-                : "hover:bg-gray-700 text-gray-300"
+                : "hocus:bg-gray-700 text-gray-300"
               }
             `}
             onClick={() => {
@@ -122,7 +122,7 @@ const Wiki = () => {
 
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 right-4 z-53 p-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg hover:bg-gray-700 transition-colors"
+        className="lg:hidden fixed top-4 right-4 z-53 p-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg hocus:bg-gray-700 transition-colors"
         aria-label="Toggle wiki menu"
       >
         {isOpen ? (

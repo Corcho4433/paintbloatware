@@ -62,18 +62,18 @@ export const LikeButtons = ({
         onClick={handleLike}
         className={`border-gray-500 group cursor-pointer !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-green-500 ${
           liked ? 'border-green-500' : ''
-        } hover:!border-green-500`}
+        } hocus:!border-green-500`}
       >
-        <Laugh className={`${photoIcon} group-hover:text-green-400 group-focus:text-green-400`} />
+        <Laugh className={`${photoIcon} group-hocus:text-green-400 group-focus:text-green-400`} />
       </Button>
 
       <Button 
         onClick={handleDislike}
-        className={`border-gray-500 group cursor-pointer !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-red-800 hover:!border-red-800 ${
+        className={`border-gray-500 group cursor-pointer !bg-black !border-2 focus:outline-none focus:ring-0 focus:!border-red-800 hocus:!border-red-800 ${
           disliked ? 'border-red-800' : ''
         }`}
       >
-        <Angry className={`${photoIcon} group-hover:text-red-500 group-focus:text-red-500`} />
+        <Angry className={`${photoIcon} group-hocus:text-red-500 group-focus:text-red-500`} />
       </Button>
     </div>
   );

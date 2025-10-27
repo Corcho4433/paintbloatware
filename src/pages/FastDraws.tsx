@@ -195,7 +195,7 @@ const FastDraws = () => {
   };
 
   let photoIcon =
-    "ease-in-out group-hover:scale-116  group-focus:scale-116 group-hover:opacity-100 transition-all duration-600";
+    "ease-in-out group-hocus:scale-116  group-focus:scale-116 group-hocus:opacity-100 transition-all duration-600";
 
   const CommentSkeleton = () => (
     <div className="space-y-3">
@@ -312,7 +312,7 @@ const FastDraws = () => {
       <section className="flex-1 ml-0 min-h-screen w-full h-full bg-gray-900 flex items-center justify-center px-6 flex-col space-y-4">
         <div className="flex relative gap-4">
           <div className={`flex flex-col ${animations[isAnimating ? 'out' : 'in']}`}>
-            <section className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hover:border-gray-500 transition-all duration-300">
+            <section className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hocus:border-gray-500 transition-all duration-300">
               <div className="w-full h-full">
                 {renderContent()}
               </div>
@@ -332,7 +332,7 @@ const FastDraws = () => {
           <section className="absolute right-[0px] translate-x-3/2 translate-y-2/4 h-[200px] justify-around flex flex-col bg-gray-800 p-2 rounded-xl">
             <Button
               onClick={() => setShowComments(!showComments)}
-              className="focus:!border-white hover:!border-white cursor-pointer group focus:outline-none focus:ring-0 !bg-black !border-2 border-gray-500 aspect-square !p-0 h-12"
+              className="focus:!border-white hocus:!border-white cursor-pointer group focus:outline-none focus:ring-0 !bg-black !border-2 border-gray-500 aspect-square !p-0 h-12"
             >
               <MessageCircle className={photoIcon} />
             </Button>
@@ -341,14 +341,14 @@ const FastDraws = () => {
                 <div ref={shareRef} className="relative">
                   <Button
                     onClick={() => setShowShareMenu(o => !o)}
-                    className="cursor-pointer group focus:outline-none border-gray-500  !bg-black !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12"
+                    className="cursor-pointer group focus:outline-none border-gray-500  !bg-black !border-2 focus:ring-0 focus:!border-white hocus:!border-white aspect-square !p-0 h-12"
                   >
                     <Send color={"white"} className={photoIcon} />
                   </Button>
                   {(showShareMenu || copyMsg) && currentPost && (
                     <div className="absolute left-full bottom-0 ml-2 w-40 bg-gray-800 border border-gray-600 rounded shadow-lg z-20 text-xs text-white">
                       <button
-                        className="w-full text-left px-3 py-2 hover:bg-gray-700"
+                        className="w-full text-left px-3 py-2 hocus:bg-gray-700"
                         onClick={() =>
                           handleCopy(
                             `${window.location.origin}/post/${currentPost.id}`,
@@ -359,7 +359,7 @@ const FastDraws = () => {
                         Copy link
                       </button>
                       <button
-                        className="w-full text-left px-3 py-2 hover:bg-gray-700"
+                        className="w-full text-left px-3 py-2 hocus:bg-gray-700"
                         onClick={() =>
                           handleCopy(currentPost.content || '', 'Post code')
                         }
@@ -376,7 +376,7 @@ const FastDraws = () => {
                 </div>
                 <Button
                   onClick={() => setEyeOpen(o => !o)}
-                  className="cursor-pointer border-gray-500 group focus:outline-none !bg-black !border-2 focus:ring-0 focus:!border-white hover:!border-white aspect-square !p-0 h-12"
+                  className="cursor-pointer border-gray-500 group focus:outline-none !bg-black !border-2 focus:ring-0 focus:!border-white hocus:!border-white aspect-square !p-0 h-12"
                 >
                   {eyeOpen ? (
                     <Eye className={photoIcon} />
@@ -410,7 +410,7 @@ const FastDraws = () => {
                   )}
                   <div className="flex-1">
                     <h3 className="font-bold text-white">
-                      <Link className='!text-white hover:!underline' to={"/user/" + currentPost.user?.id}>
+                      <Link className='!text-white hocus:!underline' to={"/user/" + currentPost.user?.id}>
                         {currentPost.user?.name || 'Unknown User'}
                       </Link>
                     </h3>
@@ -427,7 +427,7 @@ const FastDraws = () => {
                 <h3 className="text-white font-bold">Comments</h3>
                 <button
                   onClick={() => setShowComments(false)}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hocus:text-white transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -475,14 +475,14 @@ const FastDraws = () => {
                         <div ref={shareRef} className="relative">
                           <button
                             onClick={() => setShowShareMenu(o => !o)}
-                            className="p-2 rounded cursor-pointer  text-white hover:text-gray-400  transition-colors"
+                            className="p-2 rounded cursor-pointer  text-white hocus:text-gray-400  transition-colors"
                           >
                             <Send className={photoIcon} />
                           </button>
                           {(showShareMenu || copyMsg) && currentPost && (
                             <div className="absolute left-full bottom-0 ml-2 w-40 bg-gray-800 border border-gray-600 rounded shadow-lg z-20 text-xs text-white">
                               <button
-                                className="w-full text-left px-3 py-2 hover:bg-gray-700"
+                                className="w-full text-left px-3 py-2 hocus:bg-gray-700"
                                 onClick={() =>
                                   handleCopy(
                                     `${window.location.origin}/post/${currentPost.id}`,
@@ -493,7 +493,7 @@ const FastDraws = () => {
                                 Copy link
                               </button>
                               <button
-                                className="w-full text-left px-3 py-2 hover:bg-gray-700"
+                                className="w-full text-left px-3 py-2 hocus:bg-gray-700"
                                 onClick={() =>
                                   handleCopy(currentPost.content || '', 'Post code')
                                 }
@@ -510,7 +510,7 @@ const FastDraws = () => {
                         </div>
                         <button
                           onClick={() => setEyeOpen(o => !o)}
-                          className="cursor-pointer p-2  text-white hover:text-gray-400  transition-colors"
+                          className="cursor-pointer p-2  text-white hocus:text-gray-400  transition-colors"
                         >
                           {eyeOpen ? (
                             <Eye className={photoIcon} />
@@ -536,7 +536,7 @@ const FastDraws = () => {
                             input.value = '';
                           }
                         }}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 transition-colors text-sm font-medium"
+                        className="bg-blue-500 text-white px-4 py-2 rounded-r hocus:bg-blue-600 transition-colors text-sm font-medium"
                       >
                         Post
                       </button>

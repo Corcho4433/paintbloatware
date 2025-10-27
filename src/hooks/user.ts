@@ -1,5 +1,5 @@
 import { serverPath } from "../utils/servers";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import fetchWithRefresh from "./authorization";
 
 // Define the type for user response
@@ -11,7 +11,7 @@ type UserResponse = {
   // Add more fields as they become available from the server
 };
 
-type UserInfo = {
+export type UserInfo = {
   id: string;
   email: string;
   name: string;
@@ -68,43 +68,38 @@ export const useUser = (userId: string) => {
   return { user, loading, error };
 };
 
-export const useUserInfo = (userId: string | undefined) => {
+export const useUserInfo = (userId?: string) => {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetchWithRefresh(`${serverPath}/api/users/info/${userId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include'
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data');
-        }
 
-  const data = await response.json();
-  // Support both { user: {...} } and flat user object
-  setUser(data.user || data);
-  console.log(data.user || data);
-  setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error'));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (userId) {
-      fetchUser();
+  const fetchUser = useCallback(async () => {
+    if (!userId) return;
+    setLoading(true);
+    try {
+      const response = await fetchWithRefresh(`${serverPath}/api/users/info/${userId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch user data');
+      const data = await response.json();
+      setUser(data.user || data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Unknown error'));
+    } finally {
+      setLoading(false);
     }
   }, [userId]);
 
-  return { user, loading, error };
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
+  return { user, loading, error, fetchUser };
 };
+
 
 // API function to update profile information (name, email, bio)
 export const updateProfileInfo = async (profileData: ProfileUpdateData): Promise<UserInfo> => {

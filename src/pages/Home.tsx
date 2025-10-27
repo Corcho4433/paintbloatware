@@ -54,7 +54,7 @@ const HomePage = () => {
               className={`flex flex-row items-center justify-center gap-2 rounded-full px-3 py-2 transition-all duration-150
     ${selectedTag === ""
                   ? "text-white underline underline-offset-4"
-                  : "text-gray-400 cursor-pointer hover:text-white"
+                  : "text-gray-400 cursor-pointer hocus:text-white"
                 }`}
             >
              Recent
@@ -79,7 +79,7 @@ const HomePage = () => {
                   className={`flex flex-row items-center justify-center gap-2 rounded-full px-3 py-2 transition-all duration-150
         ${selectedTag === tag.name
                       ? "text-white underline underline-offset-4"
-                      : "text-gray-400 cursor-pointer hover:text-white"
+                      : "text-gray-400 cursor-pointer hocus:text-white"
                     }`}
                 >
                   {tag.name}

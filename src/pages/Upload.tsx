@@ -161,7 +161,7 @@ export default function Upload() {
 
                                 <a
                                     href="/comprar-nitro"
-                                    className="bg-gray-800 hover:bg-gray-900 p-2 border hover:text-violet-400 border-gray-700 rounded-md hover:shadow-violet-400/50 shadow-lg hover:border-violet-400 transition-all duration-300 text-lg"
+                                    className="bg-gray-800 hocus:bg-gray-900 p-2 border hocus:text-violet-400 border-gray-700 rounded-md hocus:shadow-violet-400/50 shadow-lg hocus:border-violet-400 transition-all duration-300 text-lg"
                                 >
                                     ¡Quiero Paint Nitro!
                                 </a>
@@ -169,7 +169,7 @@ export default function Upload() {
 
                             <button
                                 onClick={() => setShowNitroCard(false)}
-                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-200 transition z-20"
+                                className="absolute top-4 right-4 text-gray-400 hocus:text-gray-200 transition z-20"
                             >
                                 ✕
                             </button>
@@ -217,15 +217,15 @@ export default function Upload() {
                                 </div>
                             </div>
                             <div className="flex gap-3 p-4 align-center justify-center">
-                                <button className="px-4 py-2 border border-gray-700 rounded-lg transition-all cursor-pointer max-w-full text-base duration-150 bg-gray-700 hover:text-green-400 hover:shadow-green-400/25 hover:border-green-400 font-normal shadow-lg hover:bg-gray-900" onClick={handlePost} disabled={!savedUrl}>
+                                <button className="px-4 py-2 border border-gray-700 rounded-lg transition-all cursor-pointer max-w-full text-base duration-150 bg-gray-700 hocus:text-green-400 hocus:shadow-green-400/25 hocus:border-green-400 font-normal shadow-lg hocus:bg-gray-900" onClick={handlePost} disabled={!savedUrl}>
                                     Post Now
                                 </button>
                                 <button
                                     className={`
     px-4 py-2 rounded-lg border transition-all duration-150 cursor-pointer max-w-full text-base font-normal  shadow-lg
     ${!sourceHidden
-                                            ? 'border-gray-700 bg-gray-700 text-white hover:bg-gray-900 hover:border-violet-400 hover:text-violet-400 hover:shadow-violet-400/25'
-                                            : 'bg-gray-900 border-violet-400 text-violet-400 shadow-violet-400/25 hover:bg-gray-800 hover:border-violet-300 hover:shadow-violet-300/25'
+                                            ? 'border-gray-700 bg-gray-700 text-white hocus:bg-gray-900 hocus:border-violet-400 hocus:text-violet-400 hocus:shadow-violet-400/25'
+                                            : 'bg-gray-900 border-violet-400 text-violet-400 shadow-violet-400/25 hocus:bg-gray-800 hocus:border-violet-300 hocus:shadow-violet-300/25'
                                         }
     disabled:opacity-50 disabled:cursor-not-allowed
   `}
@@ -286,7 +286,7 @@ export default function Upload() {
                                                 className={`px-4 py-2 rounded-lg border border-gray-700 text-sm font-medium transition-all duration-150 shadow-lg max-w-full
                                                     ${selectedTags.includes(tag.name)
                                                         ? 'bg-gray-900 text-blue-400 !border-blue-400 shadow-blue-600/25'
-                                                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white hover:border-gray-600'}
+                                                        : 'bg-gray-800 text-gray-300 hocus:bg-gray-700 hocus:text-white hocus:border-gray-600'}
                                                 `}
                                                 onClick={() => toggleTag(tag.name)}
                                                 type="button"
