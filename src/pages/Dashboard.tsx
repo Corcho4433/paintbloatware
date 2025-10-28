@@ -123,7 +123,7 @@ const TagsTab = ({
                             <button
                                 onClick={handleSubmit}
                                 disabled={isSubmitting || !tagName.trim()}
-                                className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                                className="px-6 py-2.5 bg-gray-700 text-white rounded-lg font-medium border-gray-600 hover:cursor-pointer hover:bg-gray-800 hover:border-blue-400 shadow-lg hover:shadow-blue-400/25 disabled:opacity-50 border disabled:cursor-not-allowed transition-all flex items-center gap-2"
                             >
                                 <Plus className="w-5 h-5" />
                                 {isSubmitting ? 'Creando...' : 'Crear'}
