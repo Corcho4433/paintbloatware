@@ -178,3 +178,29 @@ export const useDeletePost = async (postId: string): Promise<boolean> => {
   await response;
   return response.ok;
 };
+
+export const useCreateAdmin = async (userId: string): Promise<boolean> => {
+  const response = await fetchWithRefresh(`/api/admin/admin/${userId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+  if (!response.ok) {
+    return false;
+  }
+  await response;
+  return response.ok;
+};
+
+export const useDeleteAdmin = async (userId: string): Promise<boolean> => {
+  const response = await fetchWithRefresh(`/api/admin/admin/${userId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+  if (!response.ok) {
+    return false;
+  }
+  await response;
+  return response.ok;
+};

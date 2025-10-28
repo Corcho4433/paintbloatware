@@ -10,6 +10,7 @@ import {
   CircleUser,
   LibraryIcon,
   Settings,
+  Compass,
 } from "lucide-react";
 
 
@@ -155,7 +156,24 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
               </div>
             </SidebarItem>
           )}
-
+          {/* Dashboard if admin*/}
+          {current_user?.admin && (
+            <SidebarItem 
+              href="/dashboard" 
+              className={`
+                ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
+                rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
+                ${selectedPage === "dashboard" ? "cursor-default !text-white !bg-gray-700" : ""}
+              `}
+            >
+              <div className="flex items-center">
+                <Compass className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
+                {!isDesktopSidebarCollapsed && (
+                  <span className="text-md font-semibold">Dashboard</span>
+                )}
+              </div>
+            </SidebarItem>
+          )}
           {/* Settings (if logged in) */}
           {current_user && (
             <SidebarItem 

@@ -1,10 +1,11 @@
 import { useState, useEffect, KeyboardEvent, MouseEvent } from 'react';
 import { Trash2, Users, MessageSquare, FileText, TrendingUp, ChevronLeft, ChevronRight, Tag, Plus, Shield } from 'lucide-react';
-import { DashboardData, useCreateTag, useDashboardData, useDeleteComment, useDeletePost, useDeleteTag, useDeleteUser, useGetAllComments, useGetAllPosts, useGetAllTags, useGetAllUsers, verifyAdmin } from '../hooks/admin';
+import { DashboardData, useCreateAdmin, useCreateTag, useDashboardData, useDeleteAdmin, useDeleteComment, useDeletePost, useDeleteTag, useDeleteUser, useGetAllComments, useGetAllPosts, useGetAllTags, useGetAllUsers, verifyAdmin } from '../hooks/admin';
 import { GetAllTagsResponse, PostPage } from '../types/requests';
 import { UserPageResponse } from '../types/requests';
 import { CommentPageResponse } from '../types/requests';
 import { useAuthStore } from '../store/useAuthStore';
+import PaintSidebar from '../components/paintsidebar';
 interface PaginationProps {
     currentPage: number;
     maxPages: number;
@@ -269,7 +270,7 @@ export default function AdminDashboard() {
     const [tags, setTags] = useState<GetAllTagsResponse | null>(null);
     const [activeTab, setActiveTab] = useState('overview');
     const setAdmin = useAuthStore((state) => state.setAdmin);
-
+    const loggedId = useAuthStore((state) => state.user?.id);
     const reloadTags = async () => {
         const tagsData = await useGetAllTags();
         setTags(tagsData);
@@ -385,10 +386,39 @@ export default function AdminDashboard() {
         }
     };
 
+    const handleAdminToggle = async (userId: string, desiredState: boolean) => {
+        if (userId === loggedId) {
+            alert('No puedes cambiar tus propios permisos de administrador.');
+            return;
+        };
+        if (desiredState === true) {
+            const response = await useCreateAdmin(userId);
+            if (!response) {
+                alert('Error al otorgar permisos de administrador.');
+                return;
+            }
+            setUsers(users
+                ? { ...users, users: users.users.map(u => u.id === userId ? { ...u, isAdmin: true } : u) }
+                : null
+            );
+        } else {
+            const response = await useDeleteAdmin(userId);
+            if (!response) {
+                alert('Error al revocar permisos de administrador.');
+                return;
+            } 
+                setUsers(users
+                    ? { ...users, users: users.users.map(u => u.id === userId ? { ...u, isAdmin: false } : u) }
+                    : null
+                );
+            
+
+        }
+    }
+
     const handleDeleteComment = async (commentId: string) => {
         if (window.confirm('¿Estás seguro de eliminar este comentario?')) {
             const success = await useDeleteComment(commentId);
-            console.log("Delete comment success:", success);
             if (success) {
                 setComments(comments
                     ? { ...comments, comments: comments.comments.filter(c => c.id !== commentId) }
@@ -424,245 +454,249 @@ export default function AdminDashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-900 p-6">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
-                    <p className="text-gray-400">Panel de administración y gestión de contenido</p>
-                </div>
+        <div className="flex">
+            <PaintSidebar selectedPage='dashboard'></PaintSidebar>
+            <div className="min-h-screen w-full bg-gray-900 p-6">
 
-                {/* Navigation Tabs */}
-                <div className="flex gap-2 mb-6 flex-wrap">
-                    {[
-                        { id: 'overview', label: 'Vista General' },
-                        { id: 'users', label: 'Usuarios' },
-                        { id: 'posts', label: 'Posts' },
-                        { id: 'comments', label: 'Comentarios' },
-                        { id: 'createTag', label: 'Crear Tag' }
-                    ].map(tab => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`px-4 py-2 rounded-lg font-medium transition-all duration-150 ${activeTab === tab.id
-                                ? 'bg-gray-700 text-white border border-gray-600'
-                                : 'bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700 hover:text-white'
-                                }`}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
+                <div className="max-w-7xl mx-auto">
+                    {/* Header */}
+                    <div className="mb-6">
+                        <h1 className="text-3xl font-bold text-white mb-2">Admin Dashboard</h1>
+                        <p className="text-gray-400">Panel de administración y gestión de contenido</p>
+                    </div>
 
-                {/* Overview Tab */}
-                {activeTab === 'overview' && dashboardData && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Navigation Tabs */}
+                    <div className="flex gap-2 mb-6 flex-wrap">
                         {[
-                            { icon: Users, label: 'Usuarios', count: dashboardData.userCount, color: 'blue' },
-                            { icon: FileText, label: 'Posts', count: dashboardData.postCount, color: 'green' },
-                            { icon: MessageSquare, label: 'Comentarios', count: dashboardData.commentCount, color: 'purple' },
-                            { icon: TrendingUp, label: 'Ratings', count: dashboardData.ratingCount, color: 'yellow' }
-                        ].map((stat, idx) => (
-                            <div key={idx} className="bg-gray-800 rounded-lg border border-gray-700 p-6 hover:border-gray-600 transition-colors">
-                                <div className="flex items-center justify-between mb-4">
-                                    <stat.icon className={`w-8 h-8 text-${stat.color}-400`} />
-                                </div>
-                                <div className="text-3xl font-bold text-white mb-1">{stat.count}</div>
-                                <div className="text-gray-400 text-sm">{stat.label}</div>
-                            </div>
+                            { id: 'overview', label: 'Vista General' },
+                            { id: 'users', label: 'Usuarios' },
+                            { id: 'posts', label: 'Posts' },
+                            { id: 'comments', label: 'Comentarios' },
+                            { id: 'createTag', label: 'Crear Tag' }
+                        ].map(tab => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-150 ${activeTab === tab.id
+                                    ? 'bg-gray-700 text-white border border-gray-600'
+                                    : 'bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700 hover:text-white'
+                                    }`}
+                            >
+                                {tab.label}
+                            </button>
                         ))}
                     </div>
-                )}
 
-                {activeTab === 'createTag' && tags && (
-                    <TagsTab
-                        tags={tags}
-                        onTagCreated={reloadTags}
-                        onTagDeleted={handleDeleteTag}
-                    />
-                )}
-
-
-
-
-
-                {/* Users Tab */}
-                {activeTab === 'users' && (
-                    <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-                        <div className="flex items-center gap-2 mb-6">
-                            <Users className="w-6 h-6 text-blue-400" />
-                            <h2 className="text-2xl font-bold text-white">Usuarios</h2>
+                    {/* Overview Tab */}
+                    {activeTab === 'overview' && dashboardData && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {[
+                                { icon: Users, label: 'Usuarios', count: dashboardData.userCount, color: 'blue' },
+                                { icon: FileText, label: 'Posts', count: dashboardData.postCount, color: 'green' },
+                                { icon: MessageSquare, label: 'Comentarios', count: dashboardData.commentCount, color: 'purple' },
+                                { icon: TrendingUp, label: 'Ratings', count: dashboardData.ratingCount, color: 'yellow' }
+                            ].map((stat, idx) => (
+                                <div key={idx} className="bg-gray-800 rounded-lg border border-gray-700 p-6 hover:border-gray-600 transition-colors">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <stat.icon className={`w-8 h-8 text-${stat.color}-400`} />
+                                    </div>
+                                    <div className="text-3xl font-bold text-white mb-1">{stat.count}</div>
+                                    <div className="text-gray-400 text-sm">{stat.label}</div>
+                                </div>
+                            ))}
                         </div>
-                        <div>
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-semibold text-white">Lista de Usuarios</h3>
-                                <span className="text-gray-400 text-sm">
-                                    Total: {users && users.totalCount} usuarios
-                                </span>
+                    )}
+
+                    {activeTab === 'createTag' && tags && (
+                        <TagsTab
+                            tags={tags}
+                            onTagCreated={reloadTags}
+                            onTagDeleted={handleDeleteTag}
+                        />
+                    )}
+
+
+
+
+
+                    {/* Users Tab */}
+                    {activeTab === 'users' && (
+                        <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+                            <div className="flex items-center gap-2 mb-6">
+                                <Users className="w-6 h-6 text-blue-400" />
+                                <h2 className="text-2xl font-bold text-white">Usuarios</h2>
                             </div>
-                            <div className="space-y-3">
-                                {users && users.users.map(user => (
-                                    <div
-                                        key={user.id}
-                                        className="bg-gray-900 rounded-lg p-4 flex items-center justify-between border border-gray-700 hover:border-gray-600 transition-colors group"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className="bg-blue-900/30 p-2 rounded-lg">
-                                                <Users className="w-4 h-4 text-blue-400" />
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-white font-medium">{user.name}</span>
-                                                    {user.isAdmin && (
-                                                        <span className="bg-purple-900/30 text-purple-400 text-xs px-2 py-1 rounded-full border border-purple-700/50 font-medium">
-                                                            Admin
-                                                        </span>
-                                                    )}
+                            <div>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-semibold text-white">Lista de Usuarios</h3>
+                                    <span className="text-gray-400 text-sm">
+                                        Total: {users && users.totalCount} usuarios
+                                    </span>
+                                </div>
+                                <div className="space-y-3">
+                                    {users && users.users.map(user => (
+                                        <div
+                                            key={user.id}
+                                            className="bg-gray-900 rounded-lg p-4 flex items-center justify-between border border-gray-700 hover:border-gray-600 transition-colors group"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="bg-blue-900/30 p-2 rounded-lg">
+                                                    <Users className="w-4 h-4 text-blue-400" />
                                                 </div>
-                                                <div className="text-gray-400 text-sm">{user.email}</div>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-white font-medium">{user.name}</span>
+                                                        {user.isAdmin && (
+                                                            <span className="bg-purple-900/30 text-purple-400 text-xs px-2 py-1 rounded-full border border-purple-700/50 font-medium">
+                                                                Admin
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-gray-400 text-sm">{user.email}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => console.log('Toggle admin:', user.id)}
-                                                className={`p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100 ${user.isAdmin
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => handleAdminToggle(user.id, !user.isAdmin)}
+                                                    className={`p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100 ${user.isAdmin
                                                         ? 'text-purple-400 hover:text-purple-300 hover:bg-purple-900/20'
                                                         : 'text-emerald-400 hover:text-emerald-300 hover:bg-emerald-900/20'
-                                                    }`}
-                                                title={user.isAdmin ? 'Quitar permisos de admin' : 'Hacer admin'}
-                                            >
-                                                <Shield className="w-5 h-5" />
-                                            </button>
+                                                        }`}
+                                                    title={user.isAdmin ? 'Quitar permisos de admin' : 'Hacer admin'}
+                                                >
+                                                    <Shield className="w-5 h-5" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteUser(user.id)}
+                                                    className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                                >
+                                                    <Trash2 className="w-5 h-5" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                {users && users.maxPages > 1 && (
+                                    <Pagination
+                                        currentPage={users.currentPage}
+                                        maxPages={users.maxPages}
+                                        onPageChange={handleUserPage}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Posts Tab */}
+                    {activeTab === 'posts' && posts && posts.posts.length > 0 && (
+                        <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+                            <div className="flex items-center gap-2 mb-6">
+                                <FileText className="w-6 h-6 text-green-400" />
+                                <h2 className="text-2xl font-bold text-white">Posts</h2>
+                            </div>
+
+                            <div>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-semibold text-white">Lista de Posts</h3>
+                                    <span className="text-gray-400 text-sm">
+                                        Total: {posts && posts.totalCount} posts
+                                    </span>
+                                </div>
+
+                                <div className="space-y-3">
+                                    {posts && posts.posts.map(post => (
+                                        <div
+                                            key={post.id}
+                                            className="bg-gray-900 rounded-lg p-4 flex items-start justify-between border border-gray-700 hover:border-gray-600 transition-colors group"
+                                        >
+                                            <div className="flex gap-4 flex-1">
+                                                <div className="flex gap-4 flex-1">
+                                                    <div className="h-[120px] w-[120px] flex-shrink-0">
+                                                        <img
+                                                            src={post.url_bucket}
+                                                            alt={post.description || 'Post Image'}
+                                                            className="object-cover h-full w-full rounded-md [image-rendering:pixelated]"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-white font-medium mb-1">{post.description}</div>
+                                                        <div className="text-gray-400 text-sm">por {post.user.name}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <button
-                                                onClick={() => handleDeleteUser(user.id)}
                                                 className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                                onClick={() => handleDeletePost(post.id)}
                                             >
                                                 <Trash2 className="w-5 h-5" />
                                             </button>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
+
+                                {posts && posts.maxPages > 1 && (
+                                    <Pagination
+                                        currentPage={posts.currentPage}
+                                        maxPages={posts.maxPages}
+                                        onPageChange={handlePostPage}
+                                    />
+                                )}
                             </div>
-                            {users && users.maxPages > 1 && (
-                                <Pagination
-                                    currentPage={users.currentPage}
-                                    maxPages={users.maxPages}
-                                    onPageChange={handleUserPage}
-                                />
-                            )}
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* Posts Tab */}
-                {activeTab === 'posts' && posts && posts.posts.length > 0 && (
-                    <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-                        <div className="flex items-center gap-2 mb-6">
-                            <FileText className="w-6 h-6 text-green-400" />
-                            <h2 className="text-2xl font-bold text-white">Posts</h2>
-                        </div>
-
-                        <div>
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-semibold text-white">Lista de Posts</h3>
-                                <span className="text-gray-400 text-sm">
-                                    Total: {posts && posts.totalCount} posts
-                                </span>
+                    {/* Comments Tab */}
+                    {activeTab === 'comments' && (
+                        <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+                            <div className="flex items-center gap-2 mb-6">
+                                <MessageSquare className="w-6 h-6 text-purple-400" />
+                                <h2 className="text-2xl font-bold text-white">Comentarios</h2>
                             </div>
 
-                            <div className="space-y-3">
-                                {posts && posts.posts.map(post => (
-                                    <div
-                                        key={post.id}
-                                        className="bg-gray-900 rounded-lg p-4 flex items-start justify-between border border-gray-700 hover:border-gray-600 transition-colors group"
-                                    >
-                                        <div className="flex gap-4 flex-1">
-                                            <div className="flex gap-4 flex-1">
-                                                <div className="h-[120px] w-[120px] flex-shrink-0">
-                                                    <img
-                                                        src={post.url_bucket}
-                                                        alt={post.description || 'Post Image'}
-                                                        className="object-cover h-full w-full rounded-md [image-rendering:pixelated]"
-                                                    />
+                            <div>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-semibold text-white">Lista de Comentarios</h3>
+                                    <span className="text-gray-400 text-sm">
+                                        Total: {comments && comments.totalCount} comentarios
+                                    </span>
+                                </div>
+
+                                <div className="space-y-3">
+                                    {comments && comments.comments.map(comment => (
+                                        <div
+                                            key={comment.id}
+                                            className="bg-gray-900 rounded-lg p-4 flex items-center justify-between border border-gray-700 hover:border-gray-600 transition-colors group"
+                                        >
+                                            <div className="flex items-start gap-3 flex-1">
+                                                <div className="bg-purple-900/30 p-2 rounded-lg">
+                                                    <MessageSquare className="w-4 h-4 text-purple-400" />
                                                 </div>
-                                                <div>
-                                                    <div className="text-white font-medium mb-1">{post.description}</div>
-                                                    <div className="text-gray-400 text-sm">por {post.user.name}</div>
+                                                <div className="flex-1">
+                                                    <div className="text-white text-sm mb-1">{comment.content}</div>
+                                                    <div className="text-gray-400 text-xs">por {comment.user.name}</div>
                                                 </div>
                                             </div>
+                                            <button
+                                                className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                                onClick={() => handleDeleteComment(comment.id)}
+                                            >
+                                                <Trash2 className="w-5 h-5" />
+                                            </button>
                                         </div>
-                                        <button
-                                            className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                                            onClick={() => handleDeletePost(post.id)}
-                                        >
-                                            <Trash2 className="w-5 h-5" />
-                                        </button>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
+
+                                {comments && comments.maxPages > 1 && (
+                                    <Pagination
+                                        currentPage={comments.currentPage}
+                                        maxPages={comments.maxPages}
+                                        onPageChange={handleCommentPage}
+                                    />
+                                )}
                             </div>
-
-                            {posts && posts.maxPages > 1 && (
-                                <Pagination
-                                    currentPage={posts.currentPage}
-                                    maxPages={posts.maxPages}
-                                    onPageChange={handlePostPage}
-                                />
-                            )}
                         </div>
-                    </div>
-                )}
-
-                {/* Comments Tab */}
-                {activeTab === 'comments' && (
-                    <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-                        <div className="flex items-center gap-2 mb-6">
-                            <MessageSquare className="w-6 h-6 text-purple-400" />
-                            <h2 className="text-2xl font-bold text-white">Comentarios</h2>
-                        </div>
-
-                        <div>
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-semibold text-white">Lista de Comentarios</h3>
-                                <span className="text-gray-400 text-sm">
-                                    Total: {comments && comments.totalCount} comentarios
-                                </span>
-                            </div>
-
-                            <div className="space-y-3">
-                                {comments && comments.comments.map(comment => (
-                                    <div
-                                        key={comment.id}
-                                        className="bg-gray-900 rounded-lg p-4 flex items-center justify-between border border-gray-700 hover:border-gray-600 transition-colors group"
-                                    >
-                                        <div className="flex items-start gap-3 flex-1">
-                                            <div className="bg-purple-900/30 p-2 rounded-lg">
-                                                <MessageSquare className="w-4 h-4 text-purple-400" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <div className="text-white text-sm mb-1">{comment.content}</div>
-                                                <div className="text-gray-400 text-xs">por {comment.user.name}</div>
-                                            </div>
-                                        </div>
-                                        <button
-                                            className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                                            onClick={() => handleDeleteComment(comment.id)}
-                                        >
-                                            <Trash2 className="w-5 h-5" />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {comments && comments.maxPages > 1 && (
-                                <Pagination
-                                    currentPage={comments.currentPage}
-                                    maxPages={comments.maxPages}
-                                    onPageChange={handleCommentPage}
-                                />
-                            )}
-                        </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );
