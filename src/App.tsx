@@ -12,6 +12,7 @@ import OAuthSuccessPopup from './pages/OAuthSuccess';
 import SinglePost from './pages/singlePost';
 import SettingsPage from './pages/settingsPage';
 import LogoutPage from './pages/Logout';
+import AdminDashboard from './pages/Dashboard';
 
 function App() {
   const PaintQueryClient = new QueryClient();
@@ -25,6 +26,7 @@ function App() {
             <Routes>
               <Route path='/' element={<Navigate to="/home" replace />} />
               <Route path='/login' element={<RegisterPage></RegisterPage>} />
+              <Route path='/dashboard' element={<AdminDashboard />} />
               <Route path='/home' element={<HomePage></HomePage>} />
               <Route path='/fastdraws' element={<FastDraws></FastDraws>} />
               <Route path='/draw' element={<Drawing></Drawing>} />
