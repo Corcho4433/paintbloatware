@@ -547,7 +547,7 @@ export default function AdminDashboard() {
                                 <Pagination
                                     currentPage={users.currentPage}
                                     maxPages={users.maxPages}
-                                    onPageChange={(page) => console.log('User page:', page)}
+                                    onPageChange={handleUserPage}
                                 />
                             )}
                         </div>
@@ -593,6 +593,7 @@ export default function AdminDashboard() {
                                         </div>
                                         <button
                                             className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                            onClick={() => handleDeletePost(post.id)}
                                         >
                                             <Trash2 className="w-5 h-5" />
                                         </button>
@@ -604,7 +605,7 @@ export default function AdminDashboard() {
                                 <Pagination
                                     currentPage={posts.currentPage}
                                     maxPages={posts.maxPages}
-                                    onPageChange={(page) => console.log('Post page:', page)}
+                                    onPageChange={handlePostPage}
                                 />
                             )}
                         </div>
@@ -644,6 +645,7 @@ export default function AdminDashboard() {
                                         </div>
                                         <button
                                             className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                            onClick={() => handleDeleteComment(comment.id)}
                                         >
                                             <Trash2 className="w-5 h-5" />
                                         </button>
@@ -655,7 +657,7 @@ export default function AdminDashboard() {
                                 <Pagination
                                     currentPage={comments.currentPage}
                                     maxPages={comments.maxPages}
-                                    onPageChange={(page) => console.log('Comment page:', page)}
+                                    onPageChange={handleCommentPage}
                                 />
                             )}
                         </div>

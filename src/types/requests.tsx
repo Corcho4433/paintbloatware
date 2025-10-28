@@ -30,6 +30,7 @@ export type UserResponse = {
 };
 
 export type UserInfo = {
+  isAdmin: any;
   id: string;
   email: string;
   name: string;
