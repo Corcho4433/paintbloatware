@@ -21,6 +21,22 @@ export interface PostResponse {
 	ratingValue: number // 1 | -1 | 0 for like/dislike by current user
 }
 
+export type UserResponse = {
+  id?: string;
+  name: string;
+  urlPfp?: string; // Add this to match backend response
+  description?: string;
+  // Add more fields as they become available from the server
+};
+
+export type UserInfo = {
+  id: string;
+  email: string;
+  name: string;
+  description: string;
+  urlPfp: string;
+  oauth: boolean;
+}
 // Base Comment interface
 export interface Comment {
   id: string;
@@ -47,6 +63,13 @@ export interface CommentThread {
     id?: number;
     urlPfp?: string;
   };
+}
+
+export interface GetAllTagsResponse {
+  tags: { id: string; name: string }[];
+  totalTags: number;
+  currentPage: number;
+  maxPages: number;
 }
 
 // Response for comment threads pagination
@@ -84,7 +107,7 @@ export interface CreatePostResponse extends Post {
 export interface GetCommentByIdResponse extends Comment {
   // This returns the comment object directly based on your router
 }
-export type PostPageResponse = {
+export type CommentPageResponse = {
 
   comments: Comment[];
   currentPage: number;
@@ -93,6 +116,12 @@ export type PostPageResponse = {
 
 }
 
+export type UserPageResponse = {
+  users: UserInfo[];
+  currentPage: number;
+  maxPages: number;
+  totalCount: number;
+}
 
 
 

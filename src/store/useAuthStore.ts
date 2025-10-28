@@ -6,11 +6,13 @@ import { LogoutUser } from "../hooks/user";
 export interface AuthStorageUser {
     id: string;
     pfp?: string;
+    admin?: boolean;
 }
 
 interface AuthStore {
     user: AuthStorageUser | null;
     setUser: (user: AuthStorageUser) => void;
+    setAdmin: (isAdmin:boolean) => void;
     logout: () => Promise<void>;
     // Sidebar state
     isMobileSidebarOpen: boolean;
@@ -33,6 +35,7 @@ export const useAuthStore = create<AuthStore>()(
         (set) => ({
             user: null,
             setUser: (user: AuthStorageUser) => set({ user }),
+            setAdmin: (isAdmin: boolean) => set((state) => ({ user: state.user ? { ...state.user, admin: isAdmin} : null })),
             // Sidebar state
             isMobileSidebarOpen: false,
             gridSize: 64,

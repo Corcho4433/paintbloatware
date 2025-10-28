@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { PostPageResponse } from "../types/requests";
+import { CommentPageResponse } from "../types/requests";
 import { serverPath } from "../utils/servers";
 import { NoMoreDataAvailableError } from "../types/errors";
 import fetchWithRefresh from "./authorization";
 
 export function useComments(postId: string) {
-  const [comments, setComments] = useState<PostPageResponse | null>(null);
+  const [comments, setComments] = useState<CommentPageResponse | null>(null);
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ export function useComments(postId: string) {
           credentials: "include",
         });
         if (!res.ok) throw new Error("Failed to fetch comments");
-        const data: PostPageResponse = await res.json();
+        const data: CommentPageResponse = await res.json();
         setComments(data);
         setMaxPages(data.maxPages);
         console.log("Fetched comments:", data);
@@ -52,14 +52,14 @@ export function useComments(postId: string) {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch more comments");
-      const data: PostPageResponse = await res.json();
+      const data: CommentPageResponse = await res.json();
       setPage(nextPage);
       setComments((prev) => {
         if (!prev) return data;
         return {
           ...data,
           comments: [...prev.comments, ...data.comments],
-        } as PostPageResponse;
+        } as CommentPageResponse;
       });
       console.log("Fetched more comments:", data);
     } catch (err) {
@@ -79,7 +79,7 @@ export function useComments(postId: string) {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch comments");
-      const data: PostPageResponse = await res.json();
+      const data: CommentPageResponse = await res.json();
       setComments(data);
     } catch (err) {
       setError(err as Error);
@@ -103,7 +103,7 @@ export function useComments(postId: string) {
       if (comments) {
         setComments({ ...comments, comments: [...comments.comments, data.new_comment] });
       } else {
-        setComments({ comments: [data.new_comment] } as PostPageResponse);
+        setComments({ comments: [data.new_comment] } as CommentPageResponse);
       }
 
       return data.new_comment;

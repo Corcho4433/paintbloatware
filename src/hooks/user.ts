@@ -1,24 +1,11 @@
 import { serverPath } from "../utils/servers";
 import { useState, useEffect, useCallback } from "react";
 import fetchWithRefresh from "./authorization";
-
+import { type UserInfo, type UserResponse } from "../types/requests";
 // Define the type for user response
-type UserResponse = {
-  id?: string;
-  name: string;
-  urlPfp?: string; // Add this to match backend response
-  description?: string;
-  // Add more fields as they become available from the server
-};
 
-export type UserInfo = {
-  id: string;
-  email: string;
-  name: string;
-  description: string;
-  urlPfp: string;
-  oauth: boolean;
-}
+
+
 
 // Profile update types
 export type ProfileUpdateData = {

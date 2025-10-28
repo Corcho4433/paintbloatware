@@ -1,13 +1,12 @@
-import { PostPage } from "../types/requests";
-import { UserInfo } from "./user";
-import { Comment as CommentResponse } from "../types/requests";
+import { GetAllTagsResponse, PostPage, UserPageResponse } from "../types/requests";
+import { CommentPageResponse } from "../types/requests";
 import fetchWithRefresh from "./authorization";
 
-export interface DashboardData { 
-    userCount: number;
-    postCount: number;
-    commentCount: number;
-    ratingCount: number;
+export interface DashboardData {
+  userCount: number;
+  postCount: number;
+  commentCount: number;
+  ratingCount: number;
 }
 
 export const verifyAdmin = async (): Promise<boolean> => {
@@ -20,12 +19,12 @@ export const verifyAdmin = async (): Promise<boolean> => {
     return false;
   }
   await response.json();
-  
+
   return response.status === 200;
 };
 
-export const useDashboardData = async ():Promise<DashboardData | null> => {
-    const response = await fetchWithRefresh("/api/admin/dashboard", {
+export const useDashboardData = async (): Promise<DashboardData | null> => {
+  const response = await fetchWithRefresh("/api/admin/dashboard", {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -37,17 +36,27 @@ export const useDashboardData = async ():Promise<DashboardData | null> => {
   return data;
 };
 
-export const useGetAllUsers = async (page: number = 1, limit: number = 10): Promise<{ data: UserInfo[] | null; loadMore: () => Promise<UserInfo[] | null> }> => {
-    const response = await fetchWithRefresh(`/api/admin/users?page=${page}&limit=${limit}`, {
+export const useCreateTag = async (name: string): Promise<boolean> => {
+  const response = await fetchWithRefresh("/api/admin/tags", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ name }),
+  });
+  return response.ok;
+};
+
+export const useGetAllUsers = async (page: number = 1, limit: number = 10): Promise<{ data: UserPageResponse | null; loadPage: (page: number) => Promise<UserPageResponse | null> }> => {
+  const response = await fetchWithRefresh(`/api/admin/users?page=${page}&limit=${limit}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
-  
+
   const data = !response.ok ? null : await response.json();
-  
-  const loadMore = async (): Promise<UserInfo[] | null> => {
-    const nextResponse = await fetchWithRefresh(`/api/admin/users?page=${page + 1}&limit=${limit}`, {
+
+  const loadPage = async (targetPage: number): Promise<UserPageResponse | null> => {
+    const nextResponse = await fetchWithRefresh(`/api/admin/users?page=${targetPage}&limit=${limit}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -57,21 +66,33 @@ export const useGetAllUsers = async (page: number = 1, limit: number = 10): Prom
     }
     return await nextResponse.json();
   };
-  
-  return { data, loadMore };
+
+  return { data, loadPage };
 };
 
-export const useGetAllPosts = async (page: number = 1, limit: number = 10): Promise<{ data: PostPage | null; loadMore: () => Promise<PostPage | null> }> => {
-    const response = await fetchWithRefresh(`/api/admin/posts?page=${page}&limit=${limit}`, {
+export const useGetAllTags = async (): Promise<GetAllTagsResponse | null> => {
+  const response = await fetchWithRefresh(`/api/admin/tags`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
-  
+  if (!response.ok) {
+    return null;
+  }
+  return await response.json();
+};
+
+export const useGetAllPosts = async (page: number = 1, limit: number = 10): Promise<{ data: PostPage | null; loadPage: (page: number) => Promise<PostPage | null> }> => {
+  const response = await fetchWithRefresh(`/api/admin/posts?page=${page}&limit=${limit}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+
   const data = !response.ok ? null : await response.json() as PostPage;
-  
-  const loadMore = async (): Promise<PostPage | null> => {
-    const nextResponse = await fetchWithRefresh(`/api/admin/posts?page=${page + 1}&limit=${limit}`, {
+
+  const loadPage = async (targetPage: number): Promise<PostPage | null> => {
+    const nextResponse = await fetchWithRefresh(`/api/admin/posts?page=${targetPage}&limit=${limit}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -81,21 +102,21 @@ export const useGetAllPosts = async (page: number = 1, limit: number = 10): Prom
     }
     return await nextResponse.json() as PostPage;
   };
-  
-  return { data, loadMore };
+
+  return { data, loadPage };
 };
 
-export const useGetAllComments = async (page: number = 1, limit: number = 10): Promise<{ data: CommentResponse[] | null; loadMore: () => Promise<CommentResponse[] | null> }> => {
-    const response = await fetchWithRefresh(`/api/admin/comments?page=${page}&limit=${limit}`, {
+export const useGetAllComments = async (page: number = 1, limit: number = 10): Promise<{ data: CommentPageResponse | null; loadPage: (page: number) => Promise<CommentPageResponse | null> }> => {
+  const response = await fetchWithRefresh(`/api/admin/comments?page=${page}&limit=${limit}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
   });
-  
+
   const data = !response.ok ? null : await response.json();
-  
-  const loadMore = async (): Promise<CommentResponse[] | null> => {
-    const nextResponse = await fetchWithRefresh(`/api/admin/comments?page=${page + 1}&limit=${limit}`, {
+
+  const loadPage = async (targetPage: number): Promise<CommentPageResponse | null> => {
+    const nextResponse = await fetchWithRefresh(`/api/admin/comments?page=${targetPage}&limit=${limit}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -105,12 +126,11 @@ export const useGetAllComments = async (page: number = 1, limit: number = 10): P
     }
     return await nextResponse.json();
   };
-  
-  return { data, loadMore };
-};
 
+  return { data, loadPage };
+};
 export const useDeleteUser = async (userId: string): Promise<boolean> => {
-    const response = await fetchWithRefresh(`/api/admin/users/${userId}`, {
+  const response = await fetchWithRefresh(`/api/admin/users/${userId}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -118,12 +138,12 @@ export const useDeleteUser = async (userId: string): Promise<boolean> => {
   if (!response.ok) {
     return false;
   }
-  await response.json();
-  return response.status === 200;
+  await response;
+  return response.ok;
 };
 
 export const useDeleteComment = async (commentId: string): Promise<boolean> => {
-    const response = await fetchWithRefresh(`/api/admin/comments/${commentId}`, {
+  const response = await fetchWithRefresh(`/api/admin/comment/${commentId}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -131,12 +151,11 @@ export const useDeleteComment = async (commentId: string): Promise<boolean> => {
   if (!response.ok) {
     return false;
   }
-  await response.json();
-  return response.status === 200;
+  await response;
+  return response.ok;
 };
-
-export const useDeletePost = async (postId: string): Promise<boolean> => {
-    const response = await fetchWithRefresh(`/api/admin/posts/${postId}`, {
+export const useDeleteTag = async (tagName: string): Promise<boolean> => {
+  const response = await fetchWithRefresh(`/api/admin/tag/${tagName}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -144,6 +163,18 @@ export const useDeletePost = async (postId: string): Promise<boolean> => {
   if (!response.ok) {
     return false;
   }
-  await response.json();
-  return response.status === 200;
+  await response;
+  return response.ok;
+};
+export const useDeletePost = async (postId: string): Promise<boolean> => {
+  const response = await fetchWithRefresh(`/api/admin/posts/${postId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+  if (!response.ok) {
+    return false;
+  }
+  await response;
+  return response.ok;
 };
