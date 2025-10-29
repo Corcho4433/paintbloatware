@@ -14,13 +14,32 @@ export function useCommentThreads(commentId: string) {
   const [error, setError] = useState<Error | null>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
 
+  const useDeleteThread = async (threadId: string): Promise<boolean> => {
+    try {
+      const response = await fetchWithRefresh(`${serverPath}/api/admin/thread/${threadId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setThreads((prev) => prev.filter(thread => thread.id !== threadId)); // ← Esto ya actualiza el estado
+        setTotalCount((prev) => prev - 1);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      setError(err as Error);
+      return false;
+    }
+  };
   const loadThreads = async (pageToLoad: number = 1) => {
     if (pageToLoad === 1) {
       setLoading(true);
     } else {
       setIsLoadingMore(true);
     }
-    
+
     try {
       const res = await fetch(
         `${serverPath}/api/comment-threads/comment/${commentId}?page=${pageToLoad}`,
@@ -30,18 +49,18 @@ export function useCommentThreads(commentId: string) {
           credentials: "include",
         }
       );
-      
+
       if (!res.ok) throw new Error("Failed to fetch threads");
-      
+
       const data: CommentThreadsResponse = await res.json();
-      
+
       if (pageToLoad === 1) {
         setThreads(data.threads);
         setHasLoaded(true);
       } else {
         setThreads((prev) => [...prev, ...data.threads]);
       }
-      
+
       setMaxPages(data.maxPages);
       setTotalCount(data.totalCount);
       setPage(pageToLoad);
@@ -55,11 +74,11 @@ export function useCommentThreads(commentId: string) {
 
   const loadMore = async () => {
     if (isLoadingMore || loading) return;
-    
+
     if (maxPages !== null && page >= maxPages) {
       throw new NoMoreDataAvailableError("No more threads available");
     }
-    
+
     await loadThreads(page + 1);
   };
 
@@ -71,15 +90,15 @@ export function useCommentThreads(commentId: string) {
         credentials: "include",
         body: JSON.stringify({ content, id_comment: commentId }),
       });
-      
+
       if (!res.ok) throw new Error("Failed to create thread");
-      
+
       const data = await res.json();
       console.log("Created thread:", data);
       // Add the new thread to the beginning of the array
       setThreads((prev) => [...prev, data.thread]);
       setTotalCount((prev) => prev + 1);
-      
+
       return data.thread;
     } catch (err) {
       setError(err as Error);
@@ -103,5 +122,6 @@ export function useCommentThreads(commentId: string) {
     loadMore,
     addThread,
     initializeThreads,
+    useDeleteThread,
   };
 }

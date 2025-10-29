@@ -1,6 +1,6 @@
 import { useState, useEffect, KeyboardEvent, MouseEvent } from 'react';
 import { Trash2, Users, MessageSquare, FileText, TrendingUp, ChevronLeft, ChevronRight, Tag, Plus, Shield, ChevronDown } from 'lucide-react';
-import { DashboardData, useCreateAdmin, useCreateTag, useDashboardData, useDeleteAdmin, useDeleteComment, useDeletePost, useDeleteTag, useDeleteThread, useDeleteUser, useGetAllComments, useGetAllPosts, useGetAllTags, useGetAllUsers, verifyAdmin } from '../hooks/admin';
+import { DashboardData, useCreateAdmin, useCreateTag, useDashboardData, useDeleteAdmin, useDeleteComment, useDeletePost, useDeleteTag, useDeleteUser, useGetAllComments, useGetAllPosts, useGetAllTags, useGetAllUsers, verifyAdmin } from '../hooks/admin';
 import { GetAllTagsResponse, PostPage } from '../types/requests';
 import { UserPageResponse } from '../types/requests';
 import { CommentPageResponse } from '../types/requests';
@@ -24,6 +24,7 @@ function CommentItem({ comment, onDelete }: {
     loading, 
     hasLoaded, 
     initializeThreads, 
+    useDeleteThread
   } = useCommentThreads(comment.id);
 
   const handleToggleThreads = async () => {

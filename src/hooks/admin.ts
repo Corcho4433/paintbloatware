@@ -144,18 +144,7 @@ export const useDeleteUser = async (userId: string): Promise<boolean> => {
   return response.ok;
 };
 
-export const useDeleteThread = async (threadId: string): Promise<boolean> => {
-  const response = await fetchWithRefresh(`/api/admin/thread/${threadId}`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-  });
-  if (!response.ok) {
-    return false;
-  }
-  await response;
-  return response.ok;
-};
+
 
 export const useDeleteComment = async (commentId: string): Promise<boolean> => {
   const response = await fetchWithRefresh(`/api/admin/comment/${commentId}`, {

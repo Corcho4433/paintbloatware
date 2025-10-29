@@ -9,7 +9,7 @@ import { CommentWithThreads } from "./CommentWithThreads";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { useAuthStore } from "../store/useAuthStore";
 // Import all themes
-import { 
+import {
   dracula,
   vscDarkPlus,
   oneDark,
@@ -47,7 +47,7 @@ export const PostModal = (
 ) => {
   if (!post) return null;
   const editorTheme = useAuthStore((state) => state.editorTheme);
-  const { comments, loading, error, addComment, loadMore , isLoadingMore } = useComments(post.id);
+  const { comments, loading, error, addComment, loadMore, isLoadingMore } = useComments(post.id);
   const [loadingComment, setLoadingComment] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const { liked, disliked, toggleLike, toggleDislike } = useRatings(post.id, post.ratingValue);
@@ -88,7 +88,7 @@ export const PostModal = (
   };
   const handleToggleDislike = async () => {
     triggerDislikePop();
-    
+
     try {
       await toggleDislike();
     } catch (error) {
@@ -98,7 +98,7 @@ export const PostModal = (
 
   const handleToggleLike = async () => {
     triggerLikePop();
-    
+
     try {
       await toggleLike();
     } catch (error) {
@@ -157,36 +157,36 @@ export const PostModal = (
         {/* Image Section */}
         <div onDoubleClick={handleImageDoubleClick} className="bg-gradient-to-br from-gray-900 to-black w-full md:w-[512px] h-[300px] md:h-[512px] flex items-center justify-center relative overflow-hidden border-2 border-gray-700 flex-shrink-0">
           {eyeOpen ?
-          <img
-            src={post.url_bucket}
-            className="[image-rendering:pixelated] w-full h-full object-cover"
-            alt="Post Image"
-            draggable={false} 
-          /> :
-          <div className="w-full h-full bg-gray-900 flex justify-left items-center overflow-y-auto">
-            {post.content ? (
-              <SyntaxHighlighter 
-                language="lua" 
-                style={themes[editorTheme as keyof typeof themes] || themes.dracula}
-                customStyle={{
-                  margin: 0,
-                  padding: '1rem',
-                  background: '!transparent',
-                  fontSize: '0.875rem',
-                  width: '100%',
-                }}
-                className="*:!bg-transparent text-xl wrap-anywhere"
-              >
-                {post.content}
-              </SyntaxHighlighter>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <span className="text-violet-400 text-lg font-semibold text-center">El contenido de este post ha sido ocultado.</span>
-              </div>
-            )}
-          </div>
+            <img
+              src={post.url_bucket}
+              className="[image-rendering:pixelated] w-full h-full object-cover"
+              alt="Post Image"
+              draggable={false}
+            /> :
+            <div className="w-full h-full bg-gray-900 flex justify-left items-center overflow-y-auto">
+              {post.content ? (
+                <SyntaxHighlighter
+                  language="lua"
+                  style={themes[editorTheme as keyof typeof themes] || themes.dracula}
+                  customStyle={{
+                    margin: 0,
+                    padding: '1rem',
+                    background: '!transparent',
+                    fontSize: '0.875rem',
+                    width: '100%',
+                  }}
+                  className="*:!bg-transparent text-xl wrap-anywhere"
+                >
+                  {post.content}
+                </SyntaxHighlighter>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-violet-400 text-lg font-semibold text-center">El contenido de este post ha sido ocultado.</span>
+                </div>
+              )}
+            </div>
           }
-          
+
           {disliked && dislikePop && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <HeartCrack className="w-40 h-40 text-blue-400 opacity-80 animate-ping" fill="currentColor" />
@@ -198,7 +198,7 @@ export const PostModal = (
                 className="w-40 h-40 text-red-500 opacity-80 animate-ping"
                 fill="currentColor"
               />
-              
+
             </div>
           )}
         </div>
@@ -237,21 +237,21 @@ export const PostModal = (
               <div className="text-gray-500 text-sm flex-1 flex items-center justify-center md:block md:flex-none">No comments yet. Be the first!</div>
             )}
             {!loading && comments && comments.comments.length > 0 && (
-              <ul  className="space-y-3">
+              <ul className="space-y-3">
                 {comments.comments.map(c => (
-                  <CommentWithThreads 
+                  <CommentWithThreads
                     key={c.id}
                     comment={c}
                     onReply={handleReply}
                     replyingTo={replyingTo}
                   />
-                ) ) }
+                ))}
                 <div ref={CommentSentinelRef}></div>
                 {!loading && isLoadingMore && (
                   <div className="flex items-center gap-2 text-gray-400 text-xs">
                     <svg aria-hidden="true" className="w-4 h-4 animate-spin text-gray-600 fill-blue-500" viewBox="0 0 100 101" fill="none">
-                      <path d="M100 50.59c0 27.614-22.386 50-50 50s-50-22.386-50-50 22.386-50 50-50 50 22.386 50 50ZM9.08 50.59c0 22.598 18.32 40.919 40.92 40.919 22.598 0 40.919-18.321 40.919-40.919C90.919 27.992 72.598 9.672 50 9.672 27.401 9.672 9.081 27.992 9.081 50.59Z" fill="currentColor"/>
-                      <path d="M93.968 39.04c2.425-.637 3.895-3.129 3.04-5.486-1.715-4.731-4.137-9.185-7.191-13.206-3.972-5.229-8.934-9.624-14.605-12.935C69.541 4.101 63.275 1.94 56.77 1.051 51.767.368 46.698.447 41.734 1.279c-2.473.415-3.922 2.919-3.285 5.344.637 2.426 3.119 3.849 5.6 3.485 3.801-.559 7.669-.58 11.49-.057 5.324.727 10.453 2.496 15.093 5.205 4.64 2.71 8.701 6.307 11.951 10.586 2.332 3.071 4.214 6.45 5.595 10.035.902 2.34 3.361 3.803 5.787 3.165Z" fill="currentFill"/>
+                      <path d="M100 50.59c0 27.614-22.386 50-50 50s-50-22.386-50-50 22.386-50 50-50 50 22.386 50 50ZM9.08 50.59c0 22.598 18.32 40.919 40.92 40.919 22.598 0 40.919-18.321 40.919-40.919C90.919 27.992 72.598 9.672 50 9.672 27.401 9.672 9.081 27.992 9.081 50.59Z" fill="currentColor" />
+                      <path d="M93.968 39.04c2.425-.637 3.895-3.129 3.04-5.486-1.715-4.731-4.137-9.185-7.191-13.206-3.972-5.229-8.934-9.624-14.605-12.935C69.541 4.101 63.275 1.94 56.77 1.051 51.767.368 46.698.447 41.734 1.279c-2.473.415-3.922 2.919-3.285 5.344.637 2.426 3.119 3.849 5.6 3.485 3.801-.559 7.669-.58 11.49-.057 5.324.727 10.453 2.496 15.093 5.205 4.64 2.71 8.701 6.307 11.951 10.586 2.332 3.071 4.214 6.45 5.595 10.035.902 2.34 3.361 3.803 5.787 3.165Z" fill="currentFill" />
                     </svg>
                     <span>Loading more...</span>
                   </div>
@@ -266,9 +266,8 @@ export const PostModal = (
               <button
                 type="button"
                 onClick={handleToggleLike}
-                className={`p-2 rounded transition-colors ${
-                  liked ? 'text-red-500' : 'text-white hocus:text-gray-400'
-                }`}
+                className={`p-2 rounded transition-colors ${liked ? 'text-red-500' : 'text-white hocus:text-gray-400'
+                  }`}
                 aria-pressed={liked}
                 aria-label="Like"
               >
@@ -283,9 +282,8 @@ export const PostModal = (
               <button
                 type="button"
                 onClick={handleToggleDislike}
-                className={`p-2 rounded transition-colors ${
-                  disliked ? 'text-blue-400' : 'text-white hocus:text-gray-400'
-                }`}
+                className={`p-2 rounded transition-colors ${disliked ? 'text-blue-400' : 'text-white hocus:text-gray-400'
+                  }`}
                 aria-pressed={disliked}
                 aria-label="Dislike"
               >
@@ -307,7 +305,7 @@ export const PostModal = (
               >
                 <MessageCircle className="w-6 h-6" strokeWidth={2} />
               </button>
-              
+
               <button
                 type="button"
                 className={`p-2 rounded transition-colors text-white hocus:text-gray-400`}
@@ -316,12 +314,12 @@ export const PostModal = (
                 onClick={() => setEyeOpen(o => !o)}
               >
 
-                  {eyeOpen ? (
-                    <Eye className="w-6 h-6" strokeWidth={2} />
-                  ) : (
-                    <EyeOff className="w-6 h-6" strokeWidth={2} />
-                  )}
-                  
+                {eyeOpen ? (
+                  <Eye className="w-6 h-6" strokeWidth={2} />
+                ) : (
+                  <EyeOff className="w-6 h-6" strokeWidth={2} />
+                )}
+
               </button>
               <div ref={shareRef} className="relative"> {/* added wrapper */}
                 <button
@@ -332,7 +330,7 @@ export const PostModal = (
                 >
                   <Share2 className="w-6 h-6" strokeWidth={2} />
                 </button>
-                
+
                 {(showShareMenu || copyMsg) && (
                   <div
                     className="absolute left-full bottom-full ml-2 w-40 bg-gray-800 border border-gray-600 rounded shadow-lg z-20 text-xs"
@@ -374,40 +372,35 @@ export const PostModal = (
                 autoComplete="off"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                disabled={loadingComment }
+                disabled={loadingComment}
                 onKeyDown={async (e) => {
-                  if (e.key === 'Enter') {
-                    const input = e.currentTarget as HTMLInputElement;
-                    if (input && input.value.trim()) {
-                      setLoadingComment(true);
-                      await addComment(input.value.trim());
-                      setLoadingComment(false);
-                      input.value = '';
-                    }
+                  if (e.key === 'Enter' && inputValue.trim()) {
+                    setLoadingComment(true);
+                    await addComment(inputValue.trim());
+                    setLoadingComment(false);
+                    setInputValue(''); // ← Usa setInputValue en lugar de input.value
                   }
                 }}
               />
-
               <button
                 onClick={async () => {
-                  const input = document.getElementById('comment-input') as HTMLInputElement;
-                  if (input && input.value.trim()) {
+                  if (inputValue.trim()) {
                     setLoadingComment(true);
-                    await addComment(input.value.trim());
+                    await addComment(inputValue.trim());
                     setLoadingComment(false);
-                    input.value = '';
+                    setInputValue(''); // ← Usa setInputValue en lugar de input.value
                   }
                 }}
                 disabled={loadingComment || !inputValue.trim()}
-                className="bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer rounded-md border border-gray-700 aspect-square text-white p-2.5  hocus:bg-gray-700 transition-colors text-sm font-medium"
-              > {
-                loadingComment ? (
+                className="bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer rounded-md border border-gray-700 aspect-square text-white p-2.5 hocus:bg-gray-700 transition-colors text-sm font-medium"
+              >
+                {loadingComment ? (
                   <Square className="w-5 h-5 animate-pulse" />
                 ) : (
                   <ArrowRight className="w-5 h-5" />
-                )
-              }
+                )}
               </button>
+
             </div>
           </div>
         </div>
