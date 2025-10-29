@@ -132,7 +132,7 @@ export const useGetAllComments = async (page: number = 1, limit: number = 10): P
 
 
 export const useDeleteUser = async (userId: string): Promise<boolean> => {
-  const response = await fetchWithRefresh(`/api/admin/users/${userId}`, {
+  const response = await fetchWithRefresh(`/api/admin/user/${userId}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
