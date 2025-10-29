@@ -171,7 +171,7 @@ export const useDeleteTag = async (tagName: string): Promise<boolean> => {
   return response.ok;
 };
 export const useDeletePost = async (postId: string): Promise<boolean> => {
-  const response = await fetchWithRefresh(`/api/admin/posts/${postId}`, {
+  const response = await fetchWithRefresh(`/api/admin/post/${postId}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
