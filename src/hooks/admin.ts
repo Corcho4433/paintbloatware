@@ -129,8 +129,23 @@ export const useGetAllComments = async (page: number = 1, limit: number = 10): P
 
   return { data, loadPage };
 };
+
+
 export const useDeleteUser = async (userId: string): Promise<boolean> => {
   const response = await fetchWithRefresh(`/api/admin/users/${userId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+  if (!response.ok) {
+    return false;
+  }
+  await response;
+  return response.ok;
+};
+
+export const useDeleteThread = async (threadId: string): Promise<boolean> => {
+  const response = await fetchWithRefresh(`/api/admin/thread/${threadId}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     credentials: "include",

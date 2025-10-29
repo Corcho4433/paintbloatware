@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, use } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PaintSidebar from '../components/paintsidebar';
 import { useAuthStore } from '../store/useAuthStore';
-import { deleteProfile, UserInfo } from '../hooks/user';
+import { deleteProfile } from '../hooks/user';
 import { User, Settings, Shield, Palette, Save, Eye, EyeOff, Upload } from 'lucide-react';
 import { useUserInfo, updateProfileInfo, uploadProfileImageFile } from '../hooks/user';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
@@ -44,7 +44,7 @@ const callDeleteProfile = (userId: string) => {
 
 const SettingsPage = () => {
   const authUser = useAuthStore((state) => state.user);
-  const { user, loading, error } = useUserInfo(authUser?.id);
+  const { user, loading } = useUserInfo(authUser?.id);
   const editorTheme = useAuthStore((state) => state.editorTheme);
   const setEditorTheme = useAuthStore((state) => state.setEditorTheme);
 

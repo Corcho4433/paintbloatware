@@ -32,6 +32,7 @@ export default function Upload() {
     const [serverResponse, setServerResponse] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     const editorTheme = useAuthStore(state => state.editorTheme);
+    const [disabled, setDisabled] = useState(false);
     // Effect 1: Only for session storage data
     useEffect(() => {
         const urlFromParams = sessionStorage.getItem("post_bucket_url");
@@ -99,6 +100,7 @@ export default function Upload() {
                     }, 1500);
                 }
             });
+            setDisabled(false);
         }
     };
 
@@ -217,7 +219,8 @@ export default function Upload() {
                                 </div>
                             </div>
                             <div className="flex gap-3 p-4 align-center justify-center">
-                                <button className="px-4 py-2 border border-gray-700 rounded-lg transition-all cursor-pointer max-w-full text-base duration-150 bg-gray-700 hocus:text-green-400 hocus:shadow-green-400/25 hocus:border-green-400 font-normal shadow-lg hocus:bg-gray-900" onClick={handlePost} disabled={!savedUrl}>
+                                <button className="px-4 py-2 border border-gray-700 rounded-lg transition-all cursor-pointer max-w-full text-base duration-150 bg-gray-700 hocus:text-green-400 hocus:shadow-green-400/25 hocus:border-green-400 font-normal shadow-lg hocus:bg-gray-900" 
+                                onClick={() => {handlePost; setDisabled(true)}} disabled={!savedUrl || disabled}>
                                     Post Now
                                 </button>
                                 <button

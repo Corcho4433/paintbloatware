@@ -1,17 +1,127 @@
 import { useState, useEffect, KeyboardEvent, MouseEvent } from 'react';
-import { Trash2, Users, MessageSquare, FileText, TrendingUp, ChevronLeft, ChevronRight, Tag, Plus, Shield } from 'lucide-react';
-import { DashboardData, useCreateAdmin, useCreateTag, useDashboardData, useDeleteAdmin, useDeleteComment, useDeletePost, useDeleteTag, useDeleteUser, useGetAllComments, useGetAllPosts, useGetAllTags, useGetAllUsers, verifyAdmin } from '../hooks/admin';
+import { Trash2, Users, MessageSquare, FileText, TrendingUp, ChevronLeft, ChevronRight, Tag, Plus, Shield, ChevronDown } from 'lucide-react';
+import { DashboardData, useCreateAdmin, useCreateTag, useDashboardData, useDeleteAdmin, useDeleteComment, useDeletePost, useDeleteTag, useDeleteThread, useDeleteUser, useGetAllComments, useGetAllPosts, useGetAllTags, useGetAllUsers, verifyAdmin } from '../hooks/admin';
 import { GetAllTagsResponse, PostPage } from '../types/requests';
 import { UserPageResponse } from '../types/requests';
 import { CommentPageResponse } from '../types/requests';
 import { useAuthStore } from '../store/useAuthStore';
 import PaintSidebar from '../components/paintsidebar';
+import { useCommentThreads } from '../hooks/commentThreads';
+import { Comment } from '../types/requests';
 interface PaginationProps {
     currentPage: number;
     maxPages: number;
     onPageChange: (page: number) => void;
 }
 
+function CommentItem({ comment, onDelete }: { 
+  comment: Comment; 
+  onDelete: (id: string) => void;
+}) {
+  const [showThreads, setShowThreads] = useState(false);
+  const { 
+    threads, 
+    loading, 
+    hasLoaded, 
+    initializeThreads, 
+  } = useCommentThreads(comment.id);
+
+  const handleToggleThreads = async () => {
+    if (!showThreads && !hasLoaded) {
+      await initializeThreads();
+    }
+    setShowThreads(!showThreads);
+  };
+
+  const handleDeleteThread = async (threadId: string) => {
+    if (window.confirm('¿Estás seguro de eliminar esta respuesta?')) {
+      const success = await useDeleteThread(threadId);
+      if (success) {
+        // Opcional: Mostrar mensaje de éxito
+        console.log("Thread eliminado exitosamente");
+      } else {
+        alert("Error al eliminar la respuesta");
+      }
+    }
+  };
+  
+  const threadCount = comment._count?.CommentThread || 0;
+  
+  return (
+    <div className="bg-gray-900 rounded-lg border border-gray-700">
+      <div className="p-4 flex items-center justify-between hover:border-gray-600 transition-colors group">
+        <div className="flex items-start gap-3 flex-1">
+          <div className="bg-purple-900/30 p-2 rounded-lg">
+            <MessageSquare className="w-4 h-4 text-purple-400" />
+          </div>
+          <div className="flex-1">
+            <div className="text-white text-sm mb-1">{comment.content}</div>
+            <div className="text-gray-400 text-xs">por {comment.user.name}</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {threadCount > 0 && (
+            <button
+              onClick={handleToggleThreads}
+              className="px-3 py-1.5 text-sm text-purple-400 hover:text-purple-300 hover:bg-purple-900/20 rounded-lg transition-all flex items-center gap-1"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span>{threadCount} {threadCount === 1 ? 'respuesta' : 'respuestas'}</span>
+              <ChevronDown className={`w-4 h-4 transition-transform ${showThreads ? 'rotate-180' : ''}`} />
+            </button>
+          )}
+          <button
+            className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+            onClick={() => onDelete(comment.id)}
+          >
+            <Trash2 className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      {showThreads && (
+        <div className="border-t border-gray-700 p-4 bg-gray-800/50">
+          {loading ? (
+            <div className="text-center text-gray-400 py-4">
+              Cargando respuestas...
+            </div>
+          ) : threads.length === 0 ? (
+            <div className="text-center text-gray-400 py-4">
+              No hay respuestas aún
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {threads.map(thread => (
+                <div
+                  key={thread.id}
+                  className="bg-gray-900/50 rounded-lg p-3 flex items-start justify-between group/thread hover:bg-gray-900 transition-colors"
+                >
+                  <div className="flex items-start gap-2 flex-1">
+                    <div className="bg-blue-900/30 p-1.5 rounded">
+                      <MessageSquare className="w-3 h-3 text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-gray-200 text-sm">{thread.content}</div>
+                      <div className="text-gray-500 text-xs mt-1">
+                        por {thread.user?.name || 'Usuario'}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded transition-all opacity-0 group-hover/thread:opacity-100"
+                    onClick={() => handleDeleteThread(thread.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const TagsTab = ({
     tags,
@@ -652,7 +762,6 @@ export default function AdminDashboard() {
                                 <MessageSquare className="w-6 h-6 text-purple-400" />
                                 <h2 className="text-2xl font-bold text-white">Comentarios</h2>
                             </div>
-
                             <div>
                                 <div className="flex justify-between items-center mb-4">
                                     <h3 className="text-lg font-semibold text-white">Lista de Comentarios</h3>
@@ -660,32 +769,15 @@ export default function AdminDashboard() {
                                         Total: {comments && comments.totalCount} comentarios
                                     </span>
                                 </div>
-
                                 <div className="space-y-3">
                                     {comments && comments.comments.map(comment => (
-                                        <div
+                                        <CommentItem
                                             key={comment.id}
-                                            className="bg-gray-900 rounded-lg p-4 flex items-center justify-between border border-gray-700 hover:border-gray-600 transition-colors group"
-                                        >
-                                            <div className="flex items-start gap-3 flex-1">
-                                                <div className="bg-purple-900/30 p-2 rounded-lg">
-                                                    <MessageSquare className="w-4 h-4 text-purple-400" />
-                                                </div>
-                                                <div className="flex-1">
-                                                    <div className="text-white text-sm mb-1">{comment.content}</div>
-                                                    <div className="text-gray-400 text-xs">por {comment.user.name}</div>
-                                                </div>
-                                            </div>
-                                            <button
-                                                className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                                                onClick={() => handleDeleteComment(comment.id)}
-                                            >
-                                                <Trash2 className="w-5 h-5" />
-                                            </button>
-                                        </div>
+                                            comment={comment}
+                                            onDelete={handleDeleteComment}
+                                        />
                                     ))}
                                 </div>
-
                                 {comments && comments.maxPages > 1 && (
                                     <Pagination
                                         currentPage={comments.currentPage}
