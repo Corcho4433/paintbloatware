@@ -65,7 +65,7 @@ export function usePosts(options: UsePostsOptions = {}) {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const intervalRef = useRef<number | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Cache for prefetched pages

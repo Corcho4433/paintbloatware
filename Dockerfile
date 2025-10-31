@@ -1,4 +1,3 @@
-# paintbloatware/Dockerfile
 FROM oven/bun:latest AS builder
 
 WORKDIR /app
@@ -12,24 +11,19 @@ RUN bun install --frozen-lockfile
 # Copiar código
 COPY . .
 
-# Build de producción (compila TS y genera bundle en dist/)
+# Build de producción
 RUN bun run build
 
-# Imagen final para servir
-FROM oven/bun:latest
+# Imagen final con nginx
+FROM nginx:alpine
 
-WORKDIR /app
+# Copiar los archivos built a nginx
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Instalar vite globalmente para el comando preview
-RUN bun add -g vite
-
-# Copiar solo el build generado y archivos necesarios
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/vite.config.ts ./
+# Copiar configuración personalizada de nginx para el proxy
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Exponer puerto
-EXPOSE 60015
+EXPOSE 80
 
-# Servir con vite preview
-CMD ["vite", "preview", "--host", "0.0.0.0", "--port", "60015"]
+CMD ["nginx", "-g", "daemon off;"]

@@ -217,7 +217,7 @@ const Drawing = () => {
 
   const startAnimation = () => {
     stopAnimation();
-    animationInterval.current = setInterval(nextFrame, MS_TIME);
+    animationInterval.current = Number(setInterval(nextFrame, MS_TIME));
   };
 
   const stopAnimation = () => {
