@@ -52,7 +52,7 @@ const handleOAuth = (providerId: string) => {
 
 const RegisterForm = () => {
   const registerMutation = useRegisterMutation();
-
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   return (
     <Formik
       initialValues={{ name: "", email: "", password: "" }}
@@ -61,7 +61,8 @@ const RegisterForm = () => {
           await registerMutation.mutateAsync(values);
         } catch (error) {
           if (error instanceof Error) {
-            alert(error.message);
+            setErrorMessage(error.message);
+            setTimeout(() => setErrorMessage(null), 4000);
           }
         } finally {
           setSubmitting(false);
@@ -129,7 +130,9 @@ const RegisterForm = () => {
           >
             {isSubmitting ? "Submitting..." : "Register"}
           </button>
-
+          {errorMessage && (
+            <div className="mt-2 bg-red-900/20 border border-red-500 rounded-lg p-4 text-sm text-red-500">{errorMessage}</div>
+          )}
           <div className="flex items-center gap-2 pt-2">
             <div className="h-px bg-gray-600 flex-1" />
             <span className="text-gray-400 text-xs">OR</span>
@@ -176,7 +179,7 @@ const RegisterForm = () => {
 
 const LoginForm = () => {
   const loginMutation = useLoginMutation();
-
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   return (
     <Formik
       initialValues={{ email: "", password: "" }}
@@ -185,9 +188,9 @@ const LoginForm = () => {
           await loginMutation.mutateAsync(values);
         } catch (error) {
           if (error instanceof Error) {
-            alert(error.message);
+            setErrorMessage(error.message);
+            setTimeout(() => setErrorMessage(null), 4000);
           }
-          console.error("Login error:", error);
         } finally {
           setSubmitting(false);
         }
@@ -237,6 +240,9 @@ const LoginForm = () => {
           >
             {isSubmitting ? "Submitting..." : "Login"}
           </button>
+          {errorMessage && (
+            <div className="mt-2 bg-red-900/20 border border-red-500 rounded-lg p-4 text-sm text-red-500">{errorMessage}</div>
+          )}
           <div className="flex items-center gap-2 pt-2">
             <div className="h-px bg-gray-600 flex-1" />
             <span className="text-gray-400 text-xs">OR</span>

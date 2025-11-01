@@ -40,7 +40,7 @@ const fetchWithRefresh = async (input: RequestInfo | URL, init?: RequestInit) =>
 export const useRegisterMutation = () => {
   const navigate = useNavigate();
   const setUser = useAuthStore((state) => state.setUser);
-
+  
   return useMutation({
     mutationFn: async (newUser: RegisterUserRequest): Promise<RegisterUserResponse> => {
       const response = await fetch(serverPath + "/api/auth/register", {
@@ -50,10 +50,13 @@ export const useRegisterMutation = () => {
         },
         body: JSON.stringify(newUser),
       });
-
+      
       if (!response.ok) {
-        throw new Error("Registration failed");
+        const errorData = await response.json();
+        // Lanza el error con el mensaje del servidor
+        throw new Error(errorData.error.message || errorData.error.code || "Registration failed");
       }
+      
       const responseJSON = await response.json();
       return responseJSON;
     },
@@ -80,7 +83,10 @@ export const useLoginMutation = () => {
         credentials: "include",
       });
       if (!response.ok) {
-        throw new Error("Login failed");
+        const errorData = await response.json();
+        // Lanza el error con el mensaje del servidor
+        console.log("Error data from server:", errorData);
+        throw new Error(errorData.error.message || errorData.error.code || "Login failed");
       }
       return response.json();
     },

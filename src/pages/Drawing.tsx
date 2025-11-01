@@ -159,11 +159,20 @@ const Drawing = () => {
   }, [gridSize]);
 
   useEffect(() => {
+  let retryCount = 0;
+  const maxRetries = 3;
+  let retryTimeout: NodeJS.Timeout;
+  let currentSocket: WebSocket | null = null;
+
+  const connect = () => {
     const socket = new WebSocket(ADDRESS);
+    currentSocket = socket;
+
     socket.onopen = () => {
       console.log("Connected to server");
       setWs(socket);
       setErrorMessage(null);
+      retryCount = 0; // Reset retry count on successful connection
     };
 
     socket.onerror = (error) => {
@@ -175,39 +184,55 @@ const Drawing = () => {
     socket.onclose = (event) => {
       console.warn("WebSocket closed:", event);
       setWs(null);
-      setErrorMessage("WebSocket disconnected. Live preview unavailable.");
       setIsRunning(false);
+
+      // Retry logic
+      if (retryCount < maxRetries) {
+        retryCount++;
+        const delay = Math.min(1000 * Math.pow(2, retryCount - 1), 5000); // Exponential backoff
+        setErrorMessage(`Connection lost. Retrying (${retryCount}/${maxRetries})...`);
+        console.log(`Retrying connection in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
+        
+        retryTimeout = setTimeout(() => {
+          connect();
+        }, delay);
+      } else {
+        setErrorMessage("WebSocket disconnected. Max retries reached. Live preview unavailable.");
+      }
     };
 
     socket.onmessage = (event) => {
       const newData = JSON.parse(event.data) as processorResponse;
-
       if (newData.action === "FrameData") {
         console.log(newData.data.frame);
         saveFrame(newData.data.frame);
-        setErrorMessage(null); // Clear error on successful frame
+        setErrorMessage(null);
       } else if (newData.action === "Error") {
         console.error("Error:", newData.data.message);
         setErrorMessage(newData.data.message);
-        setIsRunning(false); // Stop animation on error
+        setIsRunning(false);
       } else if (newData.action === "UploadSuccess") {
         sessionStorage.setItem("post_bucket_url", newData.data.urlBucket);
         sessionStorage.setItem("post_source_code", sourceRef.current);
         window.location.href = `/upload`;
       }
     };
+  };
 
-    drawFrame(undefined, gridSize);
+  // Initial connection
+  connect();
+  drawFrame(undefined, gridSize);
 
-    // Don't setWs(socket) here, only in onopen
-
-    return () => {
-      socket.close();
-      stopAnimation();
-      setWs(null);
-      setIsRunning(false);
-    };
-  }, []); // Empty dependency array - only run once
+  return () => {
+    clearTimeout(retryTimeout);
+    if (currentSocket) {
+      currentSocket.close();
+    }
+    stopAnimation();
+    setWs(null);
+    setIsRunning(false);
+  };
+}, []);
 
   useEffect(() => {
     if (isRunning) startAnimation();

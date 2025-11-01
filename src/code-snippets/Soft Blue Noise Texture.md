@@ -5,7 +5,7 @@ Generates a fog-like blue noise texture with random brightness.
 ```lua
 local size = 64
 local max = size - 1
-math.randomseed(os.time())
+math.randomseed()
 
 for x = 0, max do
     for y = 0, max do

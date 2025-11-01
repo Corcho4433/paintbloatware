@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import PaintSidebar from "../components/paintsidebar";
-import { usePosts, usePostById } from "../hooks/posts";
+import { usePostById, useRandomizedPosts } from "../hooks/posts";
 import { useAuthStore } from "../store/useAuthStore";
 import { useComments } from "../hooks/comments";
 import { CommentWithThreads } from "../components/CommentWithThreads";
@@ -58,7 +58,8 @@ const animations = {
 };
 
 const FastDraws = () => {
-  const { posts, loading, error, loadMore, isLoadingMore, setPosts } = usePosts();
+  const loggedUser = useAuthStore((state) => state.user);
+  const { posts, loading, error, loadMore, isLoadingMore, setPosts } = useRandomizedPosts({userId: loggedUser?.id});
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPostIndex, setCurrentPostIndex] = useState<number | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
