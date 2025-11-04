@@ -13,6 +13,7 @@ import SinglePost from './pages/singlePost';
 import SettingsPage from './pages/settingsPage';
 import LogoutPage from './pages/Logout';
 import AdminDashboard from './pages/Dashboard';
+import NitroPage from './pages/NitroPage';
 
 function App() {
   const PaintQueryClient = new QueryClient();
@@ -37,6 +38,7 @@ function App() {
               <Route path='/oauth/success' element={<OAuthSuccessPopup></OAuthSuccessPopup>} />
               <Route path='/settings' element={<SettingsPage />}  />
               <Route path='/logout' element={<LogoutPage />} />
+              <Route path="/comprar-nitro" element={<NitroPage />} />
             </Routes>
 
           </BrowserRouter>
