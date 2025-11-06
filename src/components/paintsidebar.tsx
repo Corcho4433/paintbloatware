@@ -11,6 +11,7 @@ import {
   LibraryIcon,
   Settings,
   Compass,
+  Crown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -64,16 +65,16 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
         `}
       >
         {/* Mobile close button */}
-        
+
 
         {/* Desktop collapse toggle button */}
-      
+
 
         {/* Navigation */}
         <SidebarItemGroup className="space-y-2 flex-1 md:!mt-3">
           {/* Home */}
-          <SidebarItem 
-            onClick={()=> navigate("/home")}
+          <SidebarItem
+            onClick={() => navigate("/home")}
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
               !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 rounded-lg transition-colors 
@@ -89,8 +90,8 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           </SidebarItem>
 
           {/* Fast Draws */}
-          <SidebarItem 
-            onClick={()=> navigate("/fastdraws")}
+          <SidebarItem
+            onClick={() => navigate("/fastdraws")}
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
               rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
@@ -106,8 +107,8 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           </SidebarItem>
 
           {/* Draw */}
-          <SidebarItem 
-            onClick={()=> navigate("/draw")}
+          <SidebarItem
+            onClick={() => navigate("/draw")}
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
               rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
@@ -123,8 +124,8 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           </SidebarItem>
 
           {/* Wiki */}
-          <SidebarItem 
-            onClick={()=> navigate("/wiki")}
+          <SidebarItem
+            onClick={() => navigate("/wiki")}
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
               rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
@@ -141,8 +142,8 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
 
           {/* User Profile (if logged in) */}
           {current_user && (
-            <SidebarItem 
-              onClick={()=> navigate(`/user/${current_user.id}`)}
+            <SidebarItem
+              onClick={() => navigate(`/user/${current_user.id}`)}
               className={`
                 ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
                 rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
@@ -159,8 +160,8 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           )}
           {/* Dashboard if admin*/}
           {current_user?.admin && (
-            <SidebarItem 
-              onClick={()=> navigate("/dashboard")}
+            <SidebarItem
+              onClick={() => navigate("/dashboard")}
               className={`
                 ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
                 rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
@@ -177,8 +178,8 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           )}
           {/* Settings (if logged in) */}
           {current_user && (
-            <SidebarItem 
-            onClick={()=> navigate("/settings")}
+            <SidebarItem
+              onClick={() => navigate("/settings")}
               className={`
                 ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
                 rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
@@ -193,10 +194,36 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
               </div>
             </SidebarItem>
           )}
+          {/* Comprar nitro */}
+          
+          <SidebarItem
+            onClick={() =>{ !current_user ? navigate("/comprar-nitro") : null}}
+            className={`
+            ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
+            rounded-lg 
+            !text-gray-300
+            
+            active:!bg-gradient-to-r active:from-violet-700 active:to-fuchsia-700
+            ${!current_user?.nitro ? "" : "bg-gradient-to-r from-violet-700 to-fuchsia-700" }
+            hocus:!bg-gradient-to-r hocus:from-violet-700 hocus:to-fuchsia-700
+            hocus:shadow-lg
+            transition-all 
+            active:scale-95 
+            cursor-pointer
+          `}
+                  >
+            <div className="flex items-center">
+              <Crown className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
+              {!isDesktopSidebarCollapsed && (
+                <span className="text-md font-semibold">{!current_user?.nitro ? "Get Nitro" : "Nitro Active"}</span>
+              )}
+            </div>
+          </SidebarItem>
+          
 
           {/* Login / Logout */}
-          <SidebarItem 
-            onClick={()=> {navigate(current_user ? "/logout" : "/login");current_user ? logout : undefined}}
+          <SidebarItem
+            onClick={() => { navigate(current_user ? "/logout" : "/login"); current_user ? logout : undefined }}
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
               rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 

@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/prism';
 import { usePaymentHistory, useSubscription, cancelSubscription } from '../hooks/payments';
 import { getAvailableThemes, getThemeFromString } from '../utils/theme';
-import { redirect } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('es-AR', {
@@ -43,6 +43,7 @@ const profileValidationSchema = Yup.object({
 });
 
 const callDeleteProfile = (userId: string) => {
+  const navigate = useNavigate();
   if (!userId) {
     alert('User ID is missing. Cannot delete profile.');
   }
@@ -52,7 +53,7 @@ const callDeleteProfile = (userId: string) => {
         alert('Profile deleted successfully.');
         // Optionally, redirect to homepage or login page
         
-        redirect('/')
+        navigate('/')
       })
       .catch((error) => {
         console.error('Error deleting profile:', error);

@@ -3,10 +3,11 @@ import { serverPath } from "../utils/servers";
 import { useAuthStore } from "../store/useAuthStore";
 import { LoginUserRequest, LoginUserResponse, RegisterUserRequest, RegisterUserResponse } from "../types/requests";
 import { fetchAuthMe } from "./user";
-import { redirect } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 
 const fetchWithRefresh = async (input: RequestInfo | URL, init?: RequestInit) => {
   let res = await fetch(input, init);
+ 
 
   if (res.status === 401) {
     // Try to refresh the tokens
@@ -23,12 +24,12 @@ const fetchWithRefresh = async (input: RequestInfo | URL, init?: RequestInit) =>
       if (res.status === 401) {
         // Clear auth state and redirect to login
         useAuthStore.getState().logout();
-        redirect("/login")
+        window.location.href = "/login"
         throw new Error("Session expired, please log in again");
       }
     } else {
       useAuthStore.getState().logout();
-      redirect("/login")
+      window.location.href = "/login"
       throw new Error("Session expired, please log in again");
     }
   }
@@ -38,7 +39,7 @@ const fetchWithRefresh = async (input: RequestInfo | URL, init?: RequestInit) =>
 
 // Custom hook for user registration
 export const useRegisterMutation = () => {
-
+  const navigate = useNavigate()
   
   return useMutation({
     mutationFn: async (newUser: RegisterUserRequest): Promise<RegisterUserResponse> => {
@@ -62,7 +63,7 @@ export const useRegisterMutation = () => {
     onSuccess: async (response) => {
       if (response.success) {
         await fetchAuthMe();
-        redirect("/");
+        navigate("/");
       }
     },
   });
@@ -70,8 +71,7 @@ export const useRegisterMutation = () => {
 
 // Custom hook for user login
 export const useLoginMutation = () => {
-
-
+  const navigate = useNavigate();
   return useMutation({
     mutationFn: async (loginUser: LoginUserRequest): Promise<LoginUserResponse> => {
       const response = await fetch("/api/auth/login", {
@@ -93,7 +93,7 @@ export const useLoginMutation = () => {
       if (!response.success) {
         throw new Error("Login failed");
       }
-      redirect("/");
+      navigate("/");
     },
   });
 };
