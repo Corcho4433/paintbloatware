@@ -1,9 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Crown, Sparkles, Zap, Palette, Users, Star } from "lucide-react";
 import fetchWithRefresh from "../hooks/authorization";
 
 const NitroPage = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
+  const [randomText, setRandomText] = useState("");
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const generateRandomCharacter = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    return chars[Math.floor(Math.random() * chars.length)];
+  };
+
+  useEffect(() => {
+    const container = document.getElementById('scroll-container');
+    if (!container) return;
+    const generateRandomText = () => {
+      let string = "";
+      for (let i = 0; i < 8000; i++) {
+        string += generateRandomCharacter();
+      }
+      return string;
+    };
+
+    const handleMouseMove = (event: any) => {
+      setRandomText(generateRandomText());
+      setMousePosition({ x: event.clientX, y: event.clientY });
+    };
+
+    let lastCall = 0;
+
+    const handleScroll = () => {
+      const now = Date.now();
+      if (now - lastCall > 20) { // cada 100 ms
+        setRandomText(generateRandomText());
+        lastCall = now;
+      }
+    };
+
+    container.addEventListener('mousemove', handleMouseMove);
+    container.addEventListener('scroll', handleScroll);
+    setRandomText(generateRandomText());
+
+    return () => {
+      container.removeEventListener('mousemove', handleMouseMove);
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const handleSubscribe = async () => {
     try {
@@ -14,15 +58,15 @@ const NitroPage = () => {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           plan: "PAINT_NITRO",
-          amount: 15, 
-          email: "test_user_1844090774305363860@testuser.com" 
+          amount: 15,
+          email: "test_user_1844090774305363860@testuser.com"
         }),
       });
 
       const data = await res.json();
-
+      console.log(data)
       if (!res.ok) {
         throw new Error(data.error.message || "Error al crear la suscripción");
       }
@@ -38,18 +82,141 @@ const NitroPage = () => {
     }
   };
 
+  const features = [
+    { icon: Crown, text: "Badge exclusivo de Nitro" },
+    { icon: Sparkles, text: "Acceso anticipado" },
+    { icon: Palette, text: "Herramientas premium" },
+    { icon: Zap, text: "Prioridad en soporte" },
+    { icon: Users, text: "Comunidad exclusiva" },
+    { icon: Star, text: "Sin anuncios" }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center gap-6">
-      <h1 className="text-3xl font-bold text-purple-400">Paint Nitro</h1>
-      <p className="text-gray-400">Suscribite por $15/mes para acceder a funciones premium.</p>
-      <button
-        onClick={handleSubscribe}
-        disabled={loading}
-        className="px-5 py-3 bg-purple-500 rounded-lg text-white font-semibold hover:bg-purple-600 transition disabled:opacity-50"
-      >
-        {loading ? "Creando suscripción..." : "Suscribirme"}
-      </button>
-      {error && <p className="text-red-400 mt-2">{error}</p>}
+    <div className="relative min-h-screen bg-black text-white overflow-hidden">
+      {/* Background con texto random y máscara */}
+      <div id="scroll-container" className="h-screen overflow-y-auto">
+      <div className="fixed inset-0 pointer-events-none select-none bg-black z-0">
+        {/* Máscara circular que sigue el mouse */}
+        <div
+          className="absolute w-96 h-96 rounded-full -translate-x-1/2 -translate-y-1/2 z-20"
+          style={{
+            left: `${mousePosition.x}px`,
+            top: `${mousePosition.y}px`,
+            background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)',
+            mixBlendMode: 'screen'
+          }}
+        />
+        {/* Texto random visible solo en la máscara */}
+        <div
+          className="absolute inset-0 text-purple-400 text-2xl leading-relaxed break-all font-mono overflow-hidden"
+          style={{
+            maskImage: `radial-gradient(circle 200px at ${mousePosition.x}px ${mousePosition.y}px, black, transparent)`,
+            WebkitMaskImage: `radial-gradient(circle 200px at ${mousePosition.x}px ${mousePosition.y}px, black, transparent)`
+          }}
+        >
+          {randomText}
+        </div>
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-20">
+        {/* Title con marquee mejorado */}
+        <div className="mb-16 overflow-hidden border-y-8 border-purple-500 py-8 bg-gradient-to-r from-purple-900/20 via-purple-500/20 to-purple-900/20 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/10 to-transparent animate-pulse"></div>
+          <div className="flex whitespace-nowrap animate-[scroll_20s_linear_infinite] relative z-10">
+            <span className="inline-block text-9xl font-black mx-12 text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-purple-400 bg-clip-text drop-shadow-[0_0_30px_rgba(168,85,247,0.8)]">
+              PAINT NITRO
+            </span>
+            <span className="inline-block text-9xl font-black mx-12 text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-purple-400 bg-clip-text drop-shadow-[0_0_30px_rgba(168,85,247,0.8)]">
+              PAINT NITRO
+            </span>
+
+          </div>
+        </div>
+
+        <div className="text-center mb-16">
+          <p className="text-4xl text-gray-300 mb-12 font-black max-w-3xl mx-auto leading-tight">
+            DESBLOQUEA EL <span className="text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-purple-400 bg-clip-text">PODER COMPLETO</span> DE TU CREATIVIDAD
+          </p>
+          <div className="flex flex-col">
+            {/* Precio con efecto glitch */}
+            <div className="relative inline-block mx-auto w-[50%] mb-12">
+              <div className="absolute inset-0 bg-purple-500 blur-xl opacity-40"></div>
+              <div className="relative border-4 border-purple-500 rounded-none p-12 bg-black font-mono">
+                <div className="text-7xl font-black mb-2 text-white">
+                  $15<span className="text-2xl text-gray-500">/MES</span>
+                </div>
+                <div className="text-purple-400 text-sm font-bold tracking-widest">
+                  ► CANCELÁ CUANDO QUIERAS ◄
+                </div>
+              </div>
+            </div>
+
+            {/* CTA Button estilo retro oscuro */}
+            <div className="relative inline-block">
+
+              <button
+                onClick={handleSubscribe}
+                disabled={loading}
+                className="cursor-pointer relative group px-12 py-6 bg-black text-white text-xl font-black border-4 border-purple-500 shadow-[8px_8px_0px_0px_rgba(168,85,247,1)] hover:shadow-[4px_4px_0px_0px_rgba(168,85,247,1)] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-3">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    PROCESANDO...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-3">
+                    <Crown className="w-5 h-5" />
+                    SUSCRIBIRME AHORA
+                    <Sparkles className="w-5 h-5" />
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+          {error && (
+            <div className="mt-6 p-4 border-4 border-red-500 bg-red-500/10 text-red-400 font-mono max-w-md mx-auto">
+              ⚠ {error}
+            </div>
+          )}
+        </div>
+
+        {/* Features con estilo lista */}
+        <div className="max-w-3xl mx-auto mb-16">
+          <h3 className="text-3xl font-black mb-8 text-center border-b-4 border-purple-500 pb-4">
+            ¿QUÉ INCLUYE NITRO?
+          </h3>
+          <ul className="space-y-4">
+            {features.map((feature, index) => (
+              <li
+                key={index}
+                className="flex items-center gap-4 p-6 border-2 border-purple-500/50 bg-purple-950/50 hover:border-purple-400 hover:bg-purple-950/40 transition-all duration-300 group"
+              >
+                <div className="flex-shrink-0 w-12 h-12 bg-purple-600 flex items-center justify-center border-2 border-purple-400 group-hover:scale-110 transition-transform">
+                  <feature.icon className="w-6 h-6" />
+                </div>
+                <span className="text-xl font-bold">{feature.text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Footer */}
+        <footer className="text-center border-t-4 border-purple-500 pt-8 font-mono">
+          <p className="text-gray-500 text-sm mb-2">🔒 PAGOS SEGUROS CON MERCADO PAGO</p>
+          <p className="text-purple-400 text-xs">
+            © 2024 PAINT BLOATWARE - TODOS LOS DERECHOS RESERVADOS
+          </p>
+        </footer>
+      </div>
+
+      <style>{`
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+      `}</style>
+      </div>
     </div>
   );
 };

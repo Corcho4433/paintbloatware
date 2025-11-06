@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import PaintSidebar from '../components/paintsidebar';
 // Removed custom CSS, using Tailwind classes
-import styles from '../styles/upload.module.css'
-import { Gem, Rocket } from 'lucide-react';
+import { Crown, Gem, Rocket, Sparkles } from 'lucide-react';
 import { createPost } from '../hooks/posts';
 import { fetchAllTags } from '../hooks/trending';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -27,7 +26,7 @@ export default function Upload() {
     const [sourceHidden, setSourceHidden] = useState(false);
     console.log("Source hidden state: ", sourceHidden);
     // TODO: Replace with real Nitro check
-    const hasNitro = true;
+    const hasNitro = useAuthStore(state => state.user?.nitro);
     const [showNitroCard, setShowNitroCard] = useState(false);
     const [serverResponse, setServerResponse] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
@@ -67,8 +66,9 @@ export default function Upload() {
             const sentPacket = {
                 image: savedUrl,
                 description: description,
-                source: !sourceHidden ? sourceCode : '',
+                source: sourceCode,
                 tags: selectedTags,
+                sourceHidden: sourceHidden
             }
 
             await createPost(sentPacket, (data: any) => {
@@ -101,7 +101,7 @@ export default function Upload() {
                     }, 1500);
                 }
             });
-            
+
         }
     };
 
@@ -116,7 +116,7 @@ export default function Upload() {
     };
 
     const handleHideSource = () => {
-        
+
         if (!hasNitro) {
             setShowNitroCard(true);
             setSourceHidden(false);
@@ -136,46 +136,108 @@ export default function Upload() {
                 {/* Nitro Upsell Card */}
                 {showNitroCard && !hasNitro && (
                     <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fadeIn"
                         onClick={() => setShowNitroCard(false)}
                     >
+                        {/* Glow effect background */}
+                        
                         <div
-                            className={`${styles.box} max-w-lg w-full text-center flex flex-col items-center justify-center relative`}
+                            className="relative max-w-lg w-full mx-4 animate-slideUp"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="content text-gray-200 px-8 py-10 relative z-10 flex flex-col items-center">
-                                <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400 mb-4">
-                                    Paint Nitro
-                                </h2>
 
-                                <p className="text-gray-100 mb-6 text-lg">
-                                    Lleva tu experiencia al siguiente nivel con funciones exclusivas.
-                                </p>
+                            <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-purple-600 opacity-30 rounded-3xl blur-2xl animate-pulse" />
+                            {/* Main card */}
+                            <div className={` relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl border-2 border-violet-500/30 overflow-hidden shadow-2xl`}>
+                                {/* Animated border gradient */}
+                                <div className="absolute inset-0 rounded-3xl overflow-hidden">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-purple-500 animate-spin-slow opacity-20"
+                                        style={{ animationDuration: '6s' }} />
+                                </div>
 
-                                <ul className="text-left space-y-3 mb-8 text-gray-300">
-                                    <li className="flex items-center gap-2">
-                                        <Gem className="w-5 h-5 text-violet-400" /> Oculta el código fuente de tus posts.
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <Rocket className="w-5 h-5 text-violet-400" /> Posteos con interacciones elevadas.
-                                    </li>
-
-                                </ul>
-
-                                <a
-                                    href="/comprar-nitro"
-                                    className="bg-gray-800 hocus:bg-gray-900 p-2 border hocus:text-violet-400 border-gray-700 rounded-md hocus:shadow-violet-400/50 shadow-lg hocus:border-violet-400 transition-all duration-300 text-lg"
+                                {/* Close button */}
+                                <button
+                                    onClick={() => setShowNitroCard(false)}
+                                    className="absolute top-4 right-4 z-20 p-2 rounded-full bg-gray-800/80 hover:bg-gray-700 text-gray-400 hover:text-white transition-all duration-300 hover:rotate-90"
                                 >
-                                    ¡Quiero Paint Nitro!
-                                </a>
-                            </div>
+                                    ✕
+                                </button>
 
-                            <button
-                                onClick={() => setShowNitroCard(false)}
-                                className="absolute top-4 right-4 text-gray-400 hocus:text-gray-200 transition z-20"
-                            >
-                                ✕
-                            </button>
+                                {/* Content */}
+                                <div className="relative z-10 px-8 py-12 text-center">
+                                    {/* Crown icon with animation */}
+                                    <div className="mb-6 flex justify-center">
+                                        <div className="relative">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-violet-400 to-fuchsia-400 rounded-full blur-xl opacity-50 animate-pulse" />
+                                            <Crown className="w-16 h-16 text-violet-400 relative animate-bounce" style={{ animationDuration: '2s' }} />
+                                        </div>
+                                    </div>
+
+                                    {/* Title */}
+                                    <h2 className="text-5xl font-extrabold mb-3 animate-fadeInUp">
+                                        <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-purple-400 bg-clip-text text-transparent">
+                                            Paint Nitro
+                                        </span>
+                                    </h2>
+
+                                    {/* Subtitle */}
+                                    <p className="text-gray-300 mb-8 text-lg animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+                                        Lleva tu experiencia al siguiente nivel con funciones exclusivas
+                                    </p>
+
+                                    {/* Features */}
+                                    <div className="space-y-4 mb-8">
+                                        <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-800/50 border border-violet-500/20 hover:border-violet-500/40 transition-all duration-300 hover:scale-105 animate-fadeInUp"
+                                            style={{ animationDelay: '0.2s' }}>
+                                            <div className="p-2 rounded-lg bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20">
+                                                <Gem className="w-6 h-6 text-violet-400" />
+                                            </div>
+                                            <span className="text-gray-200 text-left flex-1">Oculta el código fuente de tus posts</span>
+                                        </div>
+
+                                        <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-800/50 border border-violet-500/20 hover:border-violet-500/40 transition-all duration-300 hover:scale-105 animate-fadeInUp"
+                                            style={{ animationDelay: '0.3s' }}>
+                                            <div className="p-2 rounded-lg bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20">
+                                                <Rocket className="w-6 h-6 text-violet-400" />
+                                            </div>
+                                            <span className="text-gray-200 text-left flex-1">Posteos con interacciones elevadas</span>
+                                        </div>
+
+                                        <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-800/50 border border-violet-500/20 hover:border-violet-500/40 transition-all duration-300 hover:scale-105 animate-fadeInUp"
+                                            style={{ animationDelay: '0.4s' }}>
+                                            <div className="p-2 rounded-lg bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20">
+                                                <Sparkles className="w-6 h-6 text-violet-400" />
+                                            </div>
+                                            <span className="text-gray-200 text-left flex-1">Badge exclusivo de Nitro</span>
+                                        </div>
+                                    </div>
+
+                                    {/* CTA Button */}
+                                    <Link to="/comprar-nitro" className="inline-block relative group animate-fadeInUp"
+                                        style={{ animationDelay: '0.5s' }}>
+                                        {/* Button glow effect */}
+                                        <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-300 animate-pulse" />
+
+                                        {/* Button */}
+                                        <button className="cursor-pointer relative px-8 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl text-white font-bold text-lg hover:scale-105 transition duration-300 shadow-lg">
+                                            <span className="flex items-center gap-2">
+                                                <Sparkles className="w-5 h-5" />
+                                                ¡Quiero Paint Nitro!
+                                                <Sparkles className="w-5 h-5" />
+                                            </span>
+                                        </button>
+                                    </Link>
+
+                                    {/* Price tag */}
+                                    <p className="mt-4 text-gray-400 text-sm animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
+                                        Solo $100 ARS/mes
+                                    </p>
+                                </div>
+
+                                {/* Decorative elements */}
+                                <div className="absolute top-0 left-0 w-32 h-32 bg-violet-500/10 rounded-full blur-3xl" />
+                                <div className="absolute bottom-0 right-0 w-40 h-40 bg-fuchsia-500/10 rounded-full blur-3xl" />
+                            </div>
                         </div>
                     </div>
                 )}
@@ -211,7 +273,7 @@ export default function Upload() {
                                                 }}
                                             >
                                                 <span className="text-white text-3xl font-bold drop-shadow-lg tracking-wide text-center select-none">
-                                                   {!sourceHidden ? '¡Post Exitoso!' : '¡Post Oculto Exitoso!'}
+                                                    {!sourceHidden ? '¡Post Exitoso!' : '¡Post Oculto Exitoso!'}
                                                 </span>
                                             </div>
                                         )}
@@ -220,8 +282,8 @@ export default function Upload() {
                                 </div>
                             </div>
                             <div className="flex gap-3 p-4 align-center justify-center">
-                                <button className="px-4 py-2 border border-gray-700 rounded-lg transition-all cursor-pointer max-w-full text-base duration-150 bg-gray-700 hocus:text-green-400 hocus:shadow-green-400/25 hocus:border-green-400 font-normal shadow-lg hocus:bg-gray-900" 
-                                onClick={() => {handlePost(); setDisabled(true)}} disabled={!savedUrl || disabled}>
+                                <button className="px-4 py-2 border border-gray-700 rounded-lg transition-all cursor-pointer max-w-full text-base duration-150 bg-gray-700 hocus:text-green-400 hocus:shadow-green-400/25 hocus:border-green-400 font-normal shadow-lg hocus:bg-gray-900"
+                                    onClick={() => { handlePost(); setDisabled(true) }} disabled={!savedUrl || disabled}>
                                     Post Now
                                 </button>
                                 <button

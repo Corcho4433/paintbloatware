@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Comment } from "../types/requests";
 import { useCommentThreads } from "../hooks/commentThreads";
 import { Link } from "react-router-dom";
-import { ArrowRight, ChevronDown, ChevronUp, Square } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronUp, Crown, Square } from "lucide-react";
 import useInfiniteScroll from "../hooks/infinetescroll";
 
 // Helper function to format relative time
@@ -57,7 +57,6 @@ export const CommentWithThreads = ({ comment, onReply, replyingTo }: CommentWith
     }
     setExpanded(!expanded);
   };
-
   // TODO: Implementar funcionalidad de likes para comentarios en el backend
   // const handleCommentLike = () => {
   //   setCommentLiked(!commentLiked);
@@ -100,10 +99,17 @@ export const CommentWithThreads = ({ comment, onReply, replyingTo }: CommentWith
           />
         )}
         <div className='flex-1 min-w-0'>
-          <div className="flex items-start gap-1">
-            <h3 className="text-sm font-medium">
+          <div className="flex items-baseline gap-1">
+            <h3 className="text-sm font-medium ">
               <Link to={"/user/" + comment.user?.id}>{comment.user?.name || 'Unknown User'}</Link>
+              
             </h3>
+            
+            {comment.user.nitro &&
+                    <div className="px-1.5 py-0.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded text-white text-xs flex items-center gap-1">
+                      <Crown className="w-2.5 h-2.5" />
+                    </div>
+                }
             <span className="text-xs text-gray-500">· {getRelativeTime(comment.created_at)}</span>
           </div>
           <div className="text-sm wrap-anywhere">{comment.content}</div>
@@ -213,10 +219,15 @@ export const CommentWithThreads = ({ comment, onReply, replyingTo }: CommentWith
                     />
                   )}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start gap-1">
+                    <div className="flex items-baseline gap-1">
                       <h3 className="text-xs font-medium">
                         <Link to={"/user/" + thread.user?.id}>{thread.user?.name || 'Unknown User'}</Link>
                       </h3>
+                      {thread.user.nitro &&
+                      <div className="px-1.5 py-0.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded text-white text-xs  flex items-center gap-1">
+                        <Crown className="w-2.5 h-2.5" />
+                      </div>
+                    }
                       <span className="text-xs text-gray-500">· {getRelativeTime(thread.created_at)}</span>
                     </div>
                     <div className="text-xs wrap-anywhere text-gray-300">{thread.content}</div>

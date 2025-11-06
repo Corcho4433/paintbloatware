@@ -6,6 +6,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { getAvailableThemes, getThemeFromString } from "../utils/theme";
 import GeminiInput from "../components/GeminiInput";
+import { useNavigate } from "react-router-dom";
 
 const snippetImports = import.meta.glob("../code-snippets/*.md", {
   query: "?raw",
@@ -25,7 +26,7 @@ const themes = getAvailableThemes();
 const Drawing = () => {
   // Get theme from auth store
   // Gemini prompt states
-
+  const navigate = useNavigate()
   const editorTheme = useAuthStore((state) => state.editorTheme);
   const setEditorTheme = useAuthStore((state) => state.setEditorTheme);
 
@@ -214,7 +215,7 @@ const Drawing = () => {
       } else if (newData.action === "UploadSuccess") {
         sessionStorage.setItem("post_bucket_url", newData.data.urlBucket);
         sessionStorage.setItem("post_source_code", sourceRef.current);
-        window.location.href = `/upload`;
+        navigate("/upload")
       }
     };
   };

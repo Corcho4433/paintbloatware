@@ -12,6 +12,7 @@ import {
   Settings,
   Compass,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 
 interface PaintSidebarProps {
@@ -20,7 +21,7 @@ interface PaintSidebarProps {
 const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
   const current_user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
-  
+  const navigate = useNavigate()
   // Use persistent sidebar state from store
   const isMobileSidebarOpen = useAuthStore((state) => state.isMobileSidebarOpen);
   const isDesktopSidebarCollapsed = useAuthStore((state) => state.isDesktopSidebarCollapsed);
@@ -72,11 +73,11 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
         <SidebarItemGroup className="space-y-2 flex-1 md:!mt-3">
           {/* Home */}
           <SidebarItem 
-            href="/home" 
+            onClick={()=> navigate("/home")}
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
               !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 rounded-lg transition-colors 
-              ${selectedPage === "home" ? "cursor-default !text-white !bg-gray-700" : ""}
+              ${selectedPage === "home" ? "cursor-default !text-white !bg-gray-700" : "cursor-pointer"}
             `}
           >
             <div className="flex items-center">
@@ -89,11 +90,11 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
 
           {/* Fast Draws */}
           <SidebarItem 
-            href="/fastdraws" 
+            onClick={()=> navigate("/fastdraws")}
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
               rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
-              ${selectedPage === "fastdraws" ? "cursor-default !text-white !bg-gray-700" : ""}
+              ${selectedPage === "fastdraws" ? "cursor-default !text-white !bg-gray-700" : "cursor-pointer"}
             `}
           >
             <div className="flex items-center">
@@ -106,11 +107,11 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
 
           {/* Draw */}
           <SidebarItem 
-            href="/draw" 
+            onClick={()=> navigate("/draw")}
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
               rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
-              ${selectedPage === "draw" ? "cursor-default !text-white !bg-gray-700" : ""}
+              ${selectedPage === "draw" ? "cursor-default !text-white !bg-gray-700" : "cursor-pointer"}
             `}
           >
             <div className="flex items-center">
@@ -123,11 +124,11 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
 
           {/* Wiki */}
           <SidebarItem 
-            href="/wiki" 
+            onClick={()=> navigate("/wiki")}
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
               rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
-              ${selectedPage === "wiki" ? "cursor-default !text-white !bg-gray-700" : ""}
+              ${selectedPage === "wiki" ? "cursor-default !text-white !bg-gray-700" : "cursor-pointer"}
             `}
           >
             <div className="flex items-center">
@@ -141,11 +142,11 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           {/* User Profile (if logged in) */}
           {current_user && (
             <SidebarItem 
-              href={`/user/${current_user.id}`} 
+              onClick={()=> navigate(`/user/${current_user.id}`)}
               className={`
                 ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
                 rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
-                ${selectedPage === "user" ? "cursor-default !text-white !bg-gray-700" : ""}
+                ${selectedPage === "user" ? "cursor-default !text-white !bg-gray-700" : "cursor-pointer"}
               `}
             >
               <div className="flex items-center">
@@ -159,11 +160,11 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           {/* Dashboard if admin*/}
           {current_user?.admin && (
             <SidebarItem 
-              href="/dashboard" 
+              onClick={()=> navigate("/dashboard")}
               className={`
                 ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
                 rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
-                ${selectedPage === "dashboard" ? "cursor-default !text-white !bg-gray-700" : ""}
+                ${selectedPage === "dashboard" ? "cursor-default !text-white !bg-gray-700" : "cursor-pointer"}
               `}
             >
               <div className="flex items-center">
@@ -177,11 +178,11 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           {/* Settings (if logged in) */}
           {current_user && (
             <SidebarItem 
-              href="/settings" 
+            onClick={()=> navigate("/settings")}
               className={`
                 ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
                 rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
-                ${selectedPage === "settings" ? "cursor-default !text-white !bg-gray-700" : ""}
+                ${selectedPage === "settings" ? "cursor-default !text-white !bg-gray-700" : "cursor-pointer"}
               `}
             >
               <div className="flex items-center">
@@ -195,13 +196,12 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
 
           {/* Login / Logout */}
           <SidebarItem 
-            href={current_user ? "/logout" : "/login"} 
+            onClick={()=> {navigate(current_user ? "/logout" : "/login");current_user ? logout : undefined}}
             className={`
               ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
               rounded-lg !text-gray-300 active:!bg-gray-700 hocus:!bg-gray-700 transition-colors 
-              ${selectedPage === "login" ? "cursor-default !text-white !bg-gray-700" : ""}
+              ${selectedPage === "login" ? "cursor-default !text-white !bg-gray-700" : "cursor-pointer"}
             `}
-            onClick={current_user ? logout : undefined}
           >
             <div className="flex items-center">
               {current_user ? (

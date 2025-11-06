@@ -1,12 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 import { serverPath } from "../utils/servers";
 import { useAuthStore } from "../store/useAuthStore";
 import { LoginUserRequest, LoginUserResponse, RegisterUserRequest, RegisterUserResponse } from "../types/requests";
 import { fetchAuthMe } from "./user";
+import { redirect } from "react-router-dom";
 
 const fetchWithRefresh = async (input: RequestInfo | URL, init?: RequestInit) => {
-  
   let res = await fetch(input, init);
 
   if (res.status === 401) {
@@ -24,12 +23,12 @@ const fetchWithRefresh = async (input: RequestInfo | URL, init?: RequestInit) =>
       if (res.status === 401) {
         // Clear auth state and redirect to login
         useAuthStore.getState().logout();
-        window.location.href = "/login";
+        redirect("/login")
         throw new Error("Session expired, please log in again");
       }
     } else {
       useAuthStore.getState().logout();
-      window.location.href = "/login";
+      redirect("/login")
       throw new Error("Session expired, please log in again");
     }
   }
@@ -39,7 +38,7 @@ const fetchWithRefresh = async (input: RequestInfo | URL, init?: RequestInit) =>
 
 // Custom hook for user registration
 export const useRegisterMutation = () => {
-  const navigate = useNavigate();
+
   
   return useMutation({
     mutationFn: async (newUser: RegisterUserRequest): Promise<RegisterUserResponse> => {
@@ -63,7 +62,7 @@ export const useRegisterMutation = () => {
     onSuccess: async (response) => {
       if (response.success) {
         await fetchAuthMe();
-        navigate("/");
+        redirect("/");
       }
     },
   });
@@ -71,7 +70,7 @@ export const useRegisterMutation = () => {
 
 // Custom hook for user login
 export const useLoginMutation = () => {
-  const navigate = useNavigate();
+
 
   return useMutation({
     mutationFn: async (loginUser: LoginUserRequest): Promise<LoginUserResponse> => {
@@ -94,7 +93,7 @@ export const useLoginMutation = () => {
       if (!response.success) {
         throw new Error("Login failed");
       }
-      navigate("/");
+      redirect("/");
     },
   });
 };

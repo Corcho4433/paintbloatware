@@ -2,7 +2,7 @@ import { PostResponse } from "../types/requests";
 import { useComments } from "../hooks/comments";
 import { useRatings } from "../hooks/ratings";
 import { Link } from "react-router-dom";
-import { Heart, MessageCircle, Share2, Eye, EyeOff, HeartCrack, X, ArrowRight, Square } from "lucide-react";
+import { Heart, MessageCircle, Share2, Eye, EyeOff, HeartCrack, X, ArrowRight, Square, Crown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import useInfiniteScroll from "../hooks/infinetescroll";
 import { CommentWithThreads } from "./CommentWithThreads";
@@ -59,7 +59,6 @@ export const PostModal = (
   const scrollableContainerRef = useRef<HTMLDivElement | null>(null);
   const shareRef = useRef<HTMLDivElement | null>(null); // added
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
-
   useEffect(() => { // added
     const handler = (e: MouseEvent) => {
       if (showShareMenu && shareRef.current && !shareRef.current.contains(e.target as Node)) {
@@ -221,7 +220,17 @@ export const PostModal = (
                 />
               )}
               <div className="flex-1">
-                <h3 className="font-bold text-lg"><Link className='!text-white hocus:!underline' to={"/user/" + post.user?.id}>{post.user?.name || 'Unknown User'}</Link> </h3>
+                <h3 className="font-bold text-lg flex items-baseline gap-2">
+                  <Link className='!text-white hocus:!underline' to={"/user/" + post.user?.id}>
+                    {post.user?.name || 'Unknown User'}
+                  </Link>
+                  {post.user.nitro &&
+                    <div className="px-1.5 py-0.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded text-white text-xs font-bold flex items-center gap-1">
+                      <Crown className="w-2.5 h-2.5" />
+                      NITRO
+                    </div>
+                  }
+                </h3>
                 <p className="text-gray-400 text-sm">{post.description}</p>
               </div>
               <p className="text-gray-400 text-sm ml-auto">{new Date(post.created_at).toLocaleDateString()}</p>

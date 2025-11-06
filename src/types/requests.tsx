@@ -14,6 +14,7 @@ export interface PostResponse {
     name: string,
     id: number,
     urlPfp?: string,
+    nitro: boolean
   },
   _count: {
     comments: number,
@@ -26,6 +27,7 @@ export type UserResponse = {
   name: string;
   urlPfp?: string; // Add this to match backend response
   description?: string;
+  nitro: boolean;
   // Add more fields as they become available from the server
 };
 
@@ -47,6 +49,7 @@ export interface Comment {
     name: string,
     id: number,
     urlPfp?: string,
+    nitro: boolean
   },
   _count?: {
     CommentThread: number;
@@ -63,6 +66,7 @@ export interface CommentThread {
     name: string;
     id?: number;
     urlPfp?: string;
+    nitro: boolean;
   };
 }
 

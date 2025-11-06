@@ -3,12 +3,13 @@ import { usePosts } from '../hooks/posts';
 import { PostModal } from './postmodal';
 import { useAuthStore } from '../store/useAuthStore';
 import { Heart, MessageCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const PostGallery = ({ userId, tag, onLoadMore }: { userId?: string; tag?: string; onLoadMore?: (loadMoreFn: () => void) => void; }) => {
   const { posts, loading, error, loadMore, isLoadingMore } = usePosts({ userId: userId, tag: tag });
   const auth = useAuthStore();
   const id = auth.user?.id; // Adjust this line if your user ID is stored differently
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (onLoadMore) {
       onLoadMore(loadMore);
@@ -83,7 +84,7 @@ export const PostGallery = ({ userId, tag, onLoadMore }: { userId?: string; tag?
               <h3 className="text-xl font-bold mb-2">Your gallery is empty!</h3>
               <p className="text-sm opacity-90 mb-4">You haven't shared any artwork yet. It's time to show your creativity to the world!</p>
               <button
-                onClick={() => window.location.href = '/draw'}
+                onClick={() => navigate("/draw")}
                 className="bg-white cursor-pointer text-purple-600 px-4 py-2 rounded-lg font-semibold hocus:bg-gray-100 transition-colors duration-200"
               >
                 Create my first artwork ✨
@@ -110,7 +111,7 @@ export const PostGallery = ({ userId, tag, onLoadMore }: { userId?: string; tag?
               <h3 className="text-xl font-bold mb-2">Ready to Create?</h3>
               <p className="text-sm opacity-90 mb-4">No posts yet! Be the first to share your amazing artwork with the community.</p>
               <button
-                onClick={() => window.location.href = '/draw'}
+                onClick={() =>  navigate("/draw")}
                 className="bg-white cursor-pointer text-purple-600 px-4 py-2 rounded-lg font-semibold hocus:bg-gray-100 transition-colors duration-200"
               >
                 Start Drawing ✨

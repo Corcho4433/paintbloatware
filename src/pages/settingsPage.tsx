@@ -7,37 +7,27 @@ import { useUserInfo, updateProfileInfo, uploadProfileImageFile } from '../hooks
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/prism';
+import { usePaymentHistory, useSubscription, cancelSubscription } from '../hooks/payments';
 import { getAvailableThemes, getThemeFromString } from '../utils/theme';
+import { redirect } from 'react-router-dom';
 
 const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-AR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const formatCurrency = (amount: number, currency : string = 'ARS') => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: currency
-    }).format(amount);
-  };
-const mockPayments = [
-  { id: '1', date: '2024-11-01', amount: 999, status: 'completed', plan: 'PAINT_NITRO' },
-  { id: '2', date: '2024-10-01', amount: 999, status: 'completed', plan: 'PAINT_NITRO' },
-  { id: '3', date: '2024-09-01', amount: 999, status: 'failed', plan: 'PAINT_NITRO' },
-];
-
-const mockSubscription = {
-  active: true,
-  plan: 'PAINT_NITRO',
-  startDate: '2024-08-01',
-  nextBillingDate: '2024-12-01',
-  status: 'ACTIVE',
-  amount: 999,
-  currency: 'ARS'
+  return new Date(dateString).toLocaleDateString('es-AR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 };
+
+const formatCurrency = (amount: number, currency: string = 'ARS') => {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: currency
+  }).format(amount);
+};
+
+
+
 const themes = getAvailableThemes();
 // Validation schema for profile form
 const profileValidationSchema = Yup.object({
@@ -61,7 +51,8 @@ const callDeleteProfile = (userId: string) => {
       .then(() => {
         alert('Profile deleted successfully.');
         // Optionally, redirect to homepage or login page
-        window.location.href = '/';
+        
+        redirect('/')
       })
       .catch((error) => {
         console.error('Error deleting profile:', error);
@@ -73,10 +64,23 @@ const callDeleteProfile = (userId: string) => {
 
 const SettingsPage = () => {
   const authUser = useAuthStore((state) => state.user);
+  const { payments } = usePaymentHistory();
+  const { subscription, refetch } = useSubscription();
   const { user, loading } = useUserInfo(authUser?.id);
   const editorTheme = useAuthStore((state) => state.editorTheme);
   const setEditorTheme = useAuthStore((state) => state.setEditorTheme);
 
+  const handleCancelSubscription = async () => {
+    if (confirm('¿Estás seguro de que quieres cancelar tu suscripción?')) {
+      try {
+        await cancelSubscription();
+        alert('Suscripción cancelada exitosamente');
+        refetch(); // Refrescar datos
+      } catch (error) {
+        alert('Error al cancelar la suscripción');
+      }
+    }
+  };
   // Profile picture state (file upload only)
   const [uploadingImage, setUploadingImage] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
@@ -404,7 +408,7 @@ const SettingsPage = () => {
                 Subscription Management
               </h2>
 
-              {mockSubscription.active ? (
+              {subscription && new Date(subscription.endDate) > new Date() ? (
                 <div className="space-y-6">
                   {/* Current Plan Card */}
                   <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-6 rounded-xl">
@@ -416,8 +420,13 @@ const SettingsPage = () => {
                         </div>
                         <p className="text-purple-100">Premium features unlocked</p>
                       </div>
-                      <span className="px-3 py-1 bg-green-500 text-white text-sm font-semibold rounded-full">
-                        Active
+                      <span
+                        className={`px-3 py-1 text-white text-sm font-semibold rounded-full ${subscription.status === "ACTIVE"
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                          }`}
+                      >
+                        {subscription.status}
                       </span>
                     </div>
 
@@ -425,13 +434,13 @@ const SettingsPage = () => {
                       <div>
                         <p className="text-purple-200 text-sm">Amount</p>
                         <p className="text-white font-semibold text-lg">
-                          {formatCurrency(mockSubscription.amount, mockSubscription.currency)}/month
+                          {formatCurrency(subscription.amount)} ARS /month
                         </p>
                       </div>
                       <div>
-                        <p className="text-purple-200 text-sm">Next Billing</p>
+                        <p className="text-purple-200 text-sm">{subscription.status === "ACTIVE" ? "Next Billing": "Subscription End"}</p>
                         <p className="text-white font-semibold">
-                          {formatDate(mockSubscription.nextBillingDate)}
+                          {formatDate(subscription.endDate)}
                         </p>
                       </div>
                     </div>
@@ -443,16 +452,16 @@ const SettingsPage = () => {
                       <span className="text-gray-300">Status</span>
                       <span className="flex items-center gap-2 text-green-400 font-semibold">
                         <CheckCircle className="w-4 h-4" />
-                        {mockSubscription.status}
+                        {subscription.status}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-300">Started</span>
-                      <span className="text-white">{formatDate(mockSubscription.startDate)}</span>
+                      <span className="text-white">{formatDate(subscription.startDate)}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-300">Plan</span>
-                      <span className="text-white font-semibold">{mockSubscription.plan}</span>
+                      <span className="text-white font-semibold">{subscription.plan}</span>
                     </div>
                   </div>
 
@@ -462,11 +471,11 @@ const SettingsPage = () => {
                     <ul className="space-y-2">
                       <li className="flex items-center gap-2 text-gray-300">
                         <CheckCircle className="w-4 h-4 text-green-400" />
-                        Unlimited projects
+                        Hide your source code
                       </li>
                       <li className="flex items-center gap-2 text-gray-300">
                         <CheckCircle className="w-4 h-4 text-green-400" />
-                        Advanced editor themes
+                        More interactions in your posts
                       </li>
                       <li className="flex items-center gap-2 text-gray-300">
                         <CheckCircle className="w-4 h-4 text-green-400" />
@@ -481,7 +490,7 @@ const SettingsPage = () => {
 
                   {/* Actions */}
                   <div className="flex justify-end gap-3">
-                    <button className="px-4 py-2 cursor-pointer bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    <button onClick={handleCancelSubscription} className="px-4 py-2 cursor-pointer bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
                       Cancel Subscription
                     </button>
                   </div>
@@ -507,17 +516,17 @@ const SettingsPage = () => {
                 Payment History
               </h2>
 
-              {mockPayments.length > 0 ? (
+              {payments.length > 0 ? (
                 <div className="space-y-3">
-                  {mockPayments.map((payment) => (
+                  {payments.map((payment) => (
                     <div
                       key={payment.id}
                       className="bg-gray-700 p-4 rounded-lg flex items-center justify-between hover:bg-gray-600 transition-colors"
                     >
                       <div className="flex items-center gap-4">
-                        <div className={`p-2 rounded-full ${payment.status === 'completed' ? 'bg-green-600' : 'bg-red-600'
+                        <div className={`p-2 rounded-full ${payment.status === 'COMPLETED' ? 'bg-green-600' : 'bg-red-600'
                           }`}>
-                          {payment.status === 'completed' ? (
+                          {payment.status === 'COMPLETED' ? (
                             <CheckCircle className="w-5 h-5 text-white" />
                           ) : (
                             <XCircle className="w-5 h-5 text-white" />
@@ -525,12 +534,12 @@ const SettingsPage = () => {
                         </div>
                         <div>
                           <p className="text-white font-semibold">{payment.plan}</p>
-                          <p className="text-gray-400 text-sm">{formatDate(payment.date)}</p>
+                          <p className="text-gray-400 text-sm">{formatDate(payment.created_at)}</p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-white font-semibold">{formatCurrency(payment.amount)}</p>
-                        <span className={`text-sm ${payment.status === 'completed' ? 'text-green-400' : 'text-red-400'
+                        <span className={`text-sm ${payment.status === 'COMPLETED' ? 'text-green-400' : 'text-red-400'
                           }`}>
                           {payment.status}
                         </span>
@@ -547,32 +556,32 @@ const SettingsPage = () => {
               )}
 
               {/* Summary Card */}
-              {mockPayments.length > 0 && (
+              {payments.length > 0 && (
                 <div className="mt-6 bg-gray-700 p-4 rounded-lg">
                   <h4 className="text-white font-semibold mb-3">Summary</h4>
                   <div className="space-y-2">
                     <div className="flex justify-between text-gray-300">
                       <span>Total Payments</span>
-                      <span className="text-white font-semibold">{mockPayments.length}</span>
+                      <span className="text-white font-semibold">{payments.length}</span>
                     </div>
                     <div className="flex justify-between text-gray-300">
                       <span>Successful</span>
                       <span className="text-green-400 font-semibold">
-                        {mockPayments.filter(p => p.status === 'completed').length}
+                        {payments.filter(p => p.status === 'COMPLETED').length}
                       </span>
                     </div>
                     <div className="flex justify-between text-gray-300">
                       <span>Failed</span>
                       <span className="text-red-400 font-semibold">
-                        {mockPayments.filter(p => p.status === 'failed').length}
+                        {payments.filter(p => p.status === 'FAILED').length}
                       </span>
                     </div>
                     <div className="border-t border-gray-600 pt-2 mt-2 flex justify-between">
                       <span className="text-white font-semibold">Total Spent</span>
                       <span className="text-white font-bold">
                         {formatCurrency(
-                          mockPayments
-                            .filter(p => p.status === 'completed')
+                          payments
+                            .filter(p => p.status === 'COMPLETED')
                             .reduce((sum, p) => sum + p.amount, 0)
                         )}
                       </span>

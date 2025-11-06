@@ -1,16 +1,18 @@
 import { useUser } from '../hooks/user';
 import { PostGallery } from '../components/postgallery';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 //import { useAuthStore } from '../store/useAuthStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PaintSidebar from "../components/paintsidebar";
 import useInfiniteScroll from '../hooks/infinetescroll';
+import { Crown } from 'lucide-react';
 
 const UserPage = () => {
     const { id } = useParams<{ id: string }>();
     //const auth = useAuthStore();
     //const loggedId = auth.user?.id;
     const { user, loading } = useUser(id || "");
+    const navigate = useNavigate();
     const scrollableContainerRef = useRef<HTMLDivElement | null>(null);
     const [loadMoreFn, setLoadMoreFn] = useState<(() => void) | null>(null);
     const handleLoadMore = useCallback((fn: () => void) => {
@@ -66,7 +68,24 @@ const UserPage = () => {
                                 />
                             )}
                             <div>
-                                <h1 className="text-3xl font-bold text-white">{userName}</h1>
+                                {user?.nitro ? (
+                                    <div className="relative inline-block">
+
+
+                                        <div className="flex items-baseline gap-3">
+                                            <h1 className="text-3xl font-bold bg-gradient-to-r">
+                                                {userName}
+                                            </h1>
+                                            <div onClick={() => navigate("/comprar-nitro")} className="cursor-pointer px-2 py-1 -translate-y-1 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded text-white text-xs font-bold flex items-center gap-1">
+                                                <Crown className="w-3 h-3" />
+                                                NITRO
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                ) : (
+                                    <h1 className="text-3xl font-bold text-white">{userName}</h1>
+                                )}
                                 {user?.description ? (
                                     <p className="text-gray-400 mt-2">{user.description}</p>
                                 ) : (

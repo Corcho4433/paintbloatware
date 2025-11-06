@@ -21,7 +21,7 @@ const OAuthSuccessPopup = () => {
             // Cerrar el popup después de 2 segundos
             const timer = setTimeout(() => {
                 window.close();
-            }, 100000000);
+            }, 2000);
             
             return () => clearTimeout(timer);
         };
