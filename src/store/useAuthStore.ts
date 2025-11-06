@@ -7,6 +7,7 @@ export interface AuthStorageUser {
     id: string;
     pfp?: string;
     admin?: boolean;
+    nitro?: boolean;
 }
 
 interface AuthStore {

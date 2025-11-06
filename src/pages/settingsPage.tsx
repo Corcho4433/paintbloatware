@@ -2,13 +2,42 @@ import { useState, useEffect, useRef } from 'react';
 import PaintSidebar from '../components/paintsidebar';
 import { useAuthStore } from '../store/useAuthStore';
 import { deleteProfile } from '../hooks/user';
-import { User, Settings, Shield, Palette, Save, Eye, EyeOff, Upload } from 'lucide-react';
+import { User, Settings, Shield, Palette, Save, Eye, EyeOff, Upload, Crown, CreditCard, CheckCircle, XCircle } from 'lucide-react';
 import { useUserInfo, updateProfileInfo, uploadProfileImageFile } from '../hooks/user';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/prism';
 import { getAvailableThemes, getThemeFromString } from '../utils/theme';
 
+const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-AR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const formatCurrency = (amount: number, currency : string = 'ARS') => {
+    return new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: currency
+    }).format(amount);
+  };
+const mockPayments = [
+  { id: '1', date: '2024-11-01', amount: 999, status: 'completed', plan: 'PAINT_NITRO' },
+  { id: '2', date: '2024-10-01', amount: 999, status: 'completed', plan: 'PAINT_NITRO' },
+  { id: '3', date: '2024-09-01', amount: 999, status: 'failed', plan: 'PAINT_NITRO' },
+];
+
+const mockSubscription = {
+  active: true,
+  plan: 'PAINT_NITRO',
+  startDate: '2024-08-01',
+  nextBillingDate: '2024-12-01',
+  status: 'ACTIVE',
+  amount: 999,
+  currency: 'ARS'
+};
 const themes = getAvailableThemes();
 // Validation schema for profile form
 const profileValidationSchema = Yup.object({
@@ -168,6 +197,26 @@ const SettingsPage = () => {
                 Preferences
               </button>
               <button
+                onClick={() => setActiveSection('subscription')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${activeSection === 'subscription'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                  }`}
+              >
+                <Crown className="w-4 h-4" />
+                Subscription
+              </button>
+              <button
+                onClick={() => setActiveSection('payments')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${activeSection === 'payments'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                  }`}
+              >
+                <CreditCard className="w-4 h-4" />
+                Payments
+              </button>
+              <button
                 onClick={() => setActiveSection('account')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeSection === 'account'
                   ? '!bg-blue-600 text-white'
@@ -198,15 +247,15 @@ const SettingsPage = () => {
                     <div className="relative w-16 h-16">
                       {(uploadingImage || loading) ? (
                         <div className="absolute animate-pulse inset-0 flex items-center justify-center bg-gray-900 rounded-full z-10">
-  
+
                         </div>
-                      ): <img
-                        src={previewUrl}
+                      ) : <img
+                        src={previewUrl || `https://api.dicebear.com/8.x/pixel-art/svg?seed=${user?.id}`}
                         alt="Profile"
                         className="w-16 h-16 rounded-full border-2 border-gray-600 object-cover"
                         style={{ opacity: uploadingImage || loading ? 0.5 : 1 }}
                       />}
-                      
+
                     </div>
                     <div className="flex-1 space-y-3">
                       {/* File Upload */}
@@ -345,6 +394,192 @@ const SettingsPage = () => {
                   )}
                 </Formik>
               </div>
+            </div>
+          )}
+          {/* Subscription Section */}
+          {activeSection === 'subscription' && (
+            <div className="bg-gray-800 p-6 rounded-xl border-gray-700 border mb-6">
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <Crown className="w-5 h-5" />
+                Subscription Management
+              </h2>
+
+              {mockSubscription.active ? (
+                <div className="space-y-6">
+                  {/* Current Plan Card */}
+                  <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-6 rounded-xl">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Crown className="w-6 h-6 text-yellow-300" />
+                          <h3 className="text-2xl font-bold text-white">Paint Nitro</h3>
+                        </div>
+                        <p className="text-purple-100">Premium features unlocked</p>
+                      </div>
+                      <span className="px-3 py-1 bg-green-500 text-white text-sm font-semibold rounded-full">
+                        Active
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mt-6">
+                      <div>
+                        <p className="text-purple-200 text-sm">Amount</p>
+                        <p className="text-white font-semibold text-lg">
+                          {formatCurrency(mockSubscription.amount, mockSubscription.currency)}/month
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-purple-200 text-sm">Next Billing</p>
+                        <p className="text-white font-semibold">
+                          {formatDate(mockSubscription.nextBillingDate)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Subscription Details */}
+                  <div className="bg-gray-700 p-4 rounded-lg space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-300">Status</span>
+                      <span className="flex items-center gap-2 text-green-400 font-semibold">
+                        <CheckCircle className="w-4 h-4" />
+                        {mockSubscription.status}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-300">Started</span>
+                      <span className="text-white">{formatDate(mockSubscription.startDate)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-300">Plan</span>
+                      <span className="text-white font-semibold">{mockSubscription.plan}</span>
+                    </div>
+                  </div>
+
+                  {/* Features List */}
+                  <div className="bg-gray-700 p-4 rounded-lg">
+                    <h4 className="text-white font-semibold mb-3">Active Features</h4>
+                    <ul className="space-y-2">
+                      <li className="flex items-center gap-2 text-gray-300">
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                        Unlimited projects
+                      </li>
+                      <li className="flex items-center gap-2 text-gray-300">
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                        Advanced editor themes
+                      </li>
+                      <li className="flex items-center gap-2 text-gray-300">
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                        Priority support
+                      </li>
+                      <li className="flex items-center gap-2 text-gray-300">
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                        Early access to new features
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex justify-end gap-3">
+                    <button className="px-4 py-2 cursor-pointer bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                      Cancel Subscription
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Crown className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-white mb-2">No Active Subscription</h3>
+                  <p className="text-gray-400 mb-6">Upgrade to Paint Nitro for premium features</p>
+                  <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:opacity-90 transition-opacity">
+                    Upgrade to Nitro
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Payments Section */}
+          {activeSection === 'payments' && (
+            <div className="bg-gray-800 p-6 rounded-xl border-gray-700 border mb-6">
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <CreditCard className="w-5 h-5" />
+                Payment History
+              </h2>
+
+              {mockPayments.length > 0 ? (
+                <div className="space-y-3">
+                  {mockPayments.map((payment) => (
+                    <div
+                      key={payment.id}
+                      className="bg-gray-700 p-4 rounded-lg flex items-center justify-between hover:bg-gray-600 transition-colors"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`p-2 rounded-full ${payment.status === 'completed' ? 'bg-green-600' : 'bg-red-600'
+                          }`}>
+                          {payment.status === 'completed' ? (
+                            <CheckCircle className="w-5 h-5 text-white" />
+                          ) : (
+                            <XCircle className="w-5 h-5 text-white" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-white font-semibold">{payment.plan}</p>
+                          <p className="text-gray-400 text-sm">{formatDate(payment.date)}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-white font-semibold">{formatCurrency(payment.amount)}</p>
+                        <span className={`text-sm ${payment.status === 'completed' ? 'text-green-400' : 'text-red-400'
+                          }`}>
+                          {payment.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <CreditCard className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-white mb-2">No Payment History</h3>
+                  <p className="text-gray-400">Your payment history will appear here</p>
+                </div>
+              )}
+
+              {/* Summary Card */}
+              {mockPayments.length > 0 && (
+                <div className="mt-6 bg-gray-700 p-4 rounded-lg">
+                  <h4 className="text-white font-semibold mb-3">Summary</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-gray-300">
+                      <span>Total Payments</span>
+                      <span className="text-white font-semibold">{mockPayments.length}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-300">
+                      <span>Successful</span>
+                      <span className="text-green-400 font-semibold">
+                        {mockPayments.filter(p => p.status === 'completed').length}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-gray-300">
+                      <span>Failed</span>
+                      <span className="text-red-400 font-semibold">
+                        {mockPayments.filter(p => p.status === 'failed').length}
+                      </span>
+                    </div>
+                    <div className="border-t border-gray-600 pt-2 mt-2 flex justify-between">
+                      <span className="text-white font-semibold">Total Spent</span>
+                      <span className="text-white font-bold">
+                        {formatCurrency(
+                          mockPayments
+                            .filter(p => p.status === 'completed')
+                            .reduce((sum, p) => sum + p.amount, 0)
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

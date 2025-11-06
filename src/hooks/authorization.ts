@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { serverPath } from "../utils/servers";
 import { useAuthStore } from "../store/useAuthStore";
 import { LoginUserRequest, LoginUserResponse, RegisterUserRequest, RegisterUserResponse } from "../types/requests";
+import { fetchAuthMe } from "./user";
 
 const fetchWithRefresh = async (input: RequestInfo | URL, init?: RequestInit) => {
   
@@ -39,7 +40,6 @@ const fetchWithRefresh = async (input: RequestInfo | URL, init?: RequestInit) =>
 // Custom hook for user registration
 export const useRegisterMutation = () => {
   const navigate = useNavigate();
-  const setUser = useAuthStore((state) => state.setUser);
   
   return useMutation({
     mutationFn: async (newUser: RegisterUserRequest): Promise<RegisterUserResponse> => {
@@ -60,9 +60,9 @@ export const useRegisterMutation = () => {
       const responseJSON = await response.json();
       return responseJSON;
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       if (response.success) {
-        setUser({ id: response.data.id, pfp: response.data.pfp });
+        await fetchAuthMe();
         navigate("/");
       }
     },
@@ -72,7 +72,6 @@ export const useRegisterMutation = () => {
 // Custom hook for user login
 export const useLoginMutation = () => {
   const navigate = useNavigate();
-  const setUser = useAuthStore((state) => state.setUser);
 
   return useMutation({
     mutationFn: async (loginUser: LoginUserRequest): Promise<LoginUserResponse> => {
@@ -90,20 +89,11 @@ export const useLoginMutation = () => {
       }
       return response.json();
     },
-    onSuccess: (response) => {
-      console.log("Full response:", response);
-
+    onSuccess: async (response) => {
+      await fetchAuthMe();
       if (!response.success) {
         throw new Error("Login failed");
       }
-
-      // Create user object directly from response
-      const user = {
-        id: response.data.id,
-        pfp: response.data.pfp
-      };
-
-      setUser(user);
       navigate("/");
     },
   });

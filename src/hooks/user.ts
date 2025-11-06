@@ -2,6 +2,7 @@ import { serverPath } from "../utils/servers";
 import { useState, useEffect, useCallback } from "react";
 import fetchWithRefresh from "./authorization";
 import { type UserInfo, type UserResponse } from "../types/requests";
+import { useAuthStore } from "../store/useAuthStore";
 // Define the type for user response
 
 
@@ -154,4 +155,38 @@ export const LogoutUser = async (): Promise<boolean> => {
   }
 
   return true;
+};
+
+
+interface AuthMeResponse {
+  data:{id: string;
+  pfp?: string;
+  admin?: boolean;
+  nitro?: boolean;}
+}
+
+export const fetchAuthMe = async (): Promise<boolean> => {
+  try {
+    const response = await fetchWithRefresh(`${serverPath}/api/auth/me`, {
+      credentials: 'include',
+    });
+
+
+    const result: AuthMeResponse = await response.json();
+    // Actualizar el store
+    const data = result.data;
+    useAuthStore.getState().setUser({
+      id: data.id,
+      pfp: data.pfp,
+      admin: data.admin,
+      nitro: data.nitro,
+    });
+    console.log(useAuthStore.getState().user)
+
+    return true;
+  } catch (error) {
+    console.error('Failed to fetch auth me:', error);
+    useAuthStore.getState().setUser(null as any);
+    return false;
+  }
 };
