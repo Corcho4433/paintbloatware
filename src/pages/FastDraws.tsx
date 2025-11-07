@@ -52,19 +52,30 @@ const themes = {
   solarizedDarkAtom
 };
 
-const animations = {
-  in: "animate-slide-in",
-  out: "animate-slide-out",
-};
-
 const FastDraws = () => {
   const loggedUser = useAuthStore((state) => state.user);
-  const { posts, loading, error, loadMore, isLoadingMore, setPosts } = useRandomizedPosts({userId: loggedUser?.id});
+  const { posts, loading, error, loadMore, isLoadingMore, setPosts } = useRandomizedPosts({ userId: loggedUser?.id });
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPostIndex, setCurrentPostIndex] = useState<number | null>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const editorTheme = useAuthStore((state) => state.editorTheme);
+  const [animationState, setAnimationState] = useState<{
+    isAnimating: boolean;
+    direction: 'forward' | 'backward';
+  }>({
+    isAnimating: false,
+    direction: 'forward'
+  });
 
+  const editorTheme = useAuthStore((state) => state.editorTheme);
+  const getAnimationClass = () => {
+    if (animationState.isAnimating) {
+      return animationState.direction === 'forward'
+        ? 'animate-slide-out-forward'
+        : 'animate-slide-out-backward';
+    }
+    return animationState.direction === 'forward'
+      ? 'animate-slide-in-forward'
+      : 'animate-slide-in-backward';
+  };
   // UI States
   const [showComments, setShowComments] = useState(false);
   const [eyeOpen, setEyeOpen] = useState(true);
@@ -91,15 +102,7 @@ const FastDraws = () => {
     rootMargin: '200px',
   });
 
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (e.deltaY > 0) {
-        handleReactionClick();
-      }
-    };
-    window.addEventListener('wheel', handleWheel, { passive: true });
-    return () => window.removeEventListener('wheel', handleWheel);
-  }, [currentPostIndex, posts, isAnimating]);
+
 
   // Close share menu on outside click
   useEffect(() => {
@@ -158,38 +161,60 @@ const FastDraws = () => {
     }
   }, [postId, loading, posts, currentPostIndex, setSearchParams]);
 
-  const handleReactionClick = async () => {
-    if (isAnimating || !posts?.posts?.length || currentPostIndex === null) return;
+  const handleReactionClick = async (direction: 'next' | 'prev' = 'next') => {
+    if (animationState.isAnimating || !posts?.posts?.length || currentPostIndex === null) return;
 
     const currentPost = posts.posts[currentPostIndex];
     if (!currentPost) return;
 
-    // Trigger animation based on value
-    setIsAnimating(true);
+    // Don't go back if we're at the first post
+    if (direction === 'prev' && currentPostIndex === 0) return;
 
-
+    // Set animation state with direction
+    setAnimationState({
+      isAnimating: true,
+      direction: direction === 'next' ? 'forward' : 'backward'
+    });
 
     setTimeout(() => {
-      const isLastPost = currentPostIndex === posts.posts.length - 2;
-      if (isLastPost) {
-        if (!isLoadingMore) {
+      if (direction === 'next') {
+        const isLastPost = currentPostIndex === posts.posts.length - 2;
+        if (isLastPost && !isLoadingMore) {
           loadMore();
         }
+        setCurrentPostIndex((prev) => (prev !== null ? prev + 1 : 0));
+      } else {
+        setCurrentPostIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : 0));
       }
 
-      setCurrentPostIndex((prev) =>
-        prev !== null ? (prev + 1) : 0
-      );
-      setIsAnimating(false);
+      setAnimationState({
+        isAnimating: false,
+        direction: direction === 'next' ? 'forward' : 'backward'
+      });
     }, 500);
   };
 
   useEffect(() => {
-    if (isAnimating) {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 0) {
+        // Scrolling down - next post
+        handleReactionClick('next');
+      } else if (e.deltaY < 0) {
+        // Scrolling up - previous post
+        handleReactionClick('prev');
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    return () => window.removeEventListener('wheel', handleWheel);
+  }, [currentPostIndex, posts, animationState.isAnimating]);
+
+  useEffect(() => {
+    if (animationState.isAnimating) {
       const buttons = document.querySelectorAll('button');
       buttons.forEach(button => button.blur());
     }
-  }, [isAnimating]);
+  }, [animationState.isAnimating]);
 
   const handleReply = (commentId: string) => {
     setReplyingTo(replyingTo === commentId ? null : commentId);
@@ -215,7 +240,7 @@ const FastDraws = () => {
   const renderContent = () => {
     if (postId && postLoading) {
       return (
-        <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700">
+        <div className="bg-gradient-to-br from-gray-900 to-black  w-[300px] h-[300px] md:w-[512px] md:h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700">
           <div className="w-full h-full flex items-center justify-center text-white">
             Loading post...
           </div>
@@ -225,7 +250,7 @@ const FastDraws = () => {
 
     if (postId && postError) {
       return (
-        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
+        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black  w-[300px] h-[300px] md:w-[512px] md:h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
           Failed to load post: {postError.message}
         </div>
       );
@@ -233,7 +258,7 @@ const FastDraws = () => {
 
     if (loading) {
       return (
-        <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700">
+        <div className="bg-gradient-to-br from-gray-900 to-black  w-[300px] h-[300px] md:w-[512px] md:h-[512px] flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700">
           <div className="w-full h-full flex items-center justify-center text-white">
             Loading...
           </div>
@@ -243,7 +268,7 @@ const FastDraws = () => {
 
     if (error) {
       return (
-        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
+        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black  w-[300px] h-[300px] md:w-[512px] md:h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
           {error instanceof Error ? error.message : "An error occurred while loading posts"}
         </div>
       );
@@ -251,7 +276,7 @@ const FastDraws = () => {
 
     if (currentPostIndex === null || !posts?.posts?.length) {
       return (
-        <div className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white">
+        <div className="bg-gradient-to-br from-gray-900 to-black  w-[300px] h-[300px] md:w-[512px] md:h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white">
           Loading post...
         </div>
       );
@@ -260,7 +285,7 @@ const FastDraws = () => {
     const currentPost = posts.posts[currentPostIndex];
     if (!currentPost) {
       return (
-        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black w-[512px] h-[512px] flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
+        <div className="bg-gradient-to-br from-red-500 via-red-700 to-black  w-[300px] h-[300px] md:w-[512px] md:h-[512px] flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 text-white font-bold">
           Post not found
         </div>
       );
@@ -310,44 +335,46 @@ const FastDraws = () => {
     <div className="flex overflow-y-hidden">
       <PaintSidebar selectedPage="fastdraws" />
 
-      <section className="flex-1 ml-0 min-h-screen w-full h-full bg-gray-900 flex items-center justify-center px-6 flex-col space-y-4">
+      <section className="flex-1 ml-0 min-h-screen w-full h-full bg-gray-900 flex items-center md:ml-20  md:items-start 2xl:items-center  justify-center px-6 flex-col space-y-4">
         <div className="flex relative gap-4">
-          <div className={`flex flex-col ${animations[isAnimating ? 'out' : 'in']}`}>
-            <section className="bg-gradient-to-br from-gray-900 to-black w-[512px] h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hocus:border-gray-500 transition-all duration-300">
+          <div className={`flex flex-col ${getAnimationClass()}`}>
+            <section className="bg-gradient-to-br from-gray-900 to-black  w-[300px] h-[300px] md:w-[512px] md:h-[512px]  flex items-center justify-center relative shadow-2xl overflow-hidden border-2 border-gray-700 hocus:border-gray-500 transition-all duration-300">
               <div className="w-full h-full">
                 {renderContent()}
               </div>
             </section>
 
-            <div className="flex w-[30%] mt-3 gap-2 bg-gray-700  rounded-xl justify-center mx-auto">
+            <div className="flex w-[50%] md:w-[30%] mt-3 gap-2 bg-gray-700  rounded-xl justify-center mx-auto">
               <LikeButtons
+                key={currentPost?.id}
                 postId={currentPost?.id || ''}
                 ratingValue={currentPost?.ratingValue || 0}
-                onReactionClick={handleReactionClick}
-                isAnimating={isAnimating}
+                onReactionClick={() => handleReactionClick("next")}
+                isAnimating={animationState.isAnimating}
                 photoIcon={photoIcon}
               />
             </div>
           </div>
 
-          <section className="absolute right-[0px] translate-x-3/2 translate-y-2/4 h-[200px] justify-around flex flex-col bg-gray-800 p-2 rounded-xl">
+          {!showComments &&
+            <section className="translate-y-3/2 absolute md:right-0 right-1/2 translate-x-1/2  md:translate-x-3/2 md:translate-y-1/2 bottom-4 md:bottom-auto md:h-[200px] h-auto md:flex-col flex-row justify-around flex bg-gray-800 p-2 rounded-xl gap-2">
             <Button
               onClick={() => setShowComments(!showComments)}
-              className="focus:!border-white hocus:!border-white cursor-pointer group focus:outline-none focus:ring-0 !bg-black !border-2 border-gray-500 aspect-square !p-0 h-12"
+              className="focus:!border-white hocus:!border-white cursor-pointer group focus:outline-none focus:ring-0 !bg-black !border-2 border-gray-500 aspect-square !p-0 h-12 w-12"
             >
               <MessageCircle className={photoIcon} />
             </Button>
-            {!showComments && (
-              <>
+            
+              
                 <div ref={shareRef} className="relative">
                   <Button
                     onClick={() => setShowShareMenu(o => !o)}
-                    className="cursor-pointer group focus:outline-none border-gray-500  !bg-black !border-2 focus:ring-0 focus:!border-white hocus:!border-white aspect-square !p-0 h-12"
+                    className="cursor-pointer group focus:outline-none border-gray-500 !bg-black !border-2 focus:ring-0 focus:!border-white hocus:!border-white aspect-square !p-0 h-12 w-12"
                   >
                     <Send color={"white"} className={photoIcon} />
                   </Button>
                   {(showShareMenu || copyMsg) && currentPost && (
-                    <div className="absolute left-full bottom-0 ml-2 w-40 bg-gray-800 border border-gray-600 rounded shadow-lg z-20 text-xs text-white">
+                    <div className="absolute md:left-full md:bottom-0 md:ml-2 bottom-full left-1/2 -translate-x-1/2 md:translate-x-0 mb-2 md:mb-0 w-40 bg-gray-800 border border-gray-600 rounded shadow-lg z-20 text-xs text-white">
                       <button
                         className="w-full text-left px-3 py-2 hocus:bg-gray-700"
                         onClick={() =>
@@ -377,7 +404,7 @@ const FastDraws = () => {
                 </div>
                 <Button
                   onClick={() => setEyeOpen(o => !o)}
-                  className="cursor-pointer border-gray-500 group focus:outline-none !bg-black !border-2 focus:ring-0 focus:!border-white hocus:!border-white aspect-square !p-0 h-12"
+                  className="cursor-pointer border-gray-500 group focus:outline-none !bg-black !border-2 focus:ring-0 focus:!border-white hocus:!border-white aspect-square !p-0 h-12 w-12"
                 >
                   {eyeOpen ? (
                     <Eye className={photoIcon} />
@@ -385,14 +412,13 @@ const FastDraws = () => {
                     <EyeOff className={photoIcon} />
                   )}
                 </Button>
-              </>
-            )}
-
-          </section>
+              
+            
+          </section>}
 
           {/* Comments Panel */}
           {showComments && currentPost && (
-            <div className="absolute left-full ml-4 w-[400px] h-[512px] bg-gray-800 border-2 border-gray-700 rounded-lg flex flex-col">
+            <div className="absolute md:left-full md:ml-4 left-0 right-0 top-0 bottom-0 md:top-auto md:bottom-auto md:right-auto md:w-[400px] w-full md:h-[512px] h-full bg-gray-800 border-2 border-gray-700 md:rounded-lg flex flex-col z-30">
               {/* User info and description header */}
               <div className="p-4 border-b border-gray-700">
                 <div className="flex items-center space-x-3 mb-2">
@@ -409,17 +435,17 @@ const FastDraws = () => {
                       className="w-10 h-10 rounded-full border border-white"
                     />
                   )}
-                  <div className="flex-1">
-                    <h3 className="font-bold text-white">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-white truncate">
                       <Link className='!text-white hocus:!underline' to={"/user/" + currentPost.user?.id}>
                         {currentPost.user?.name || 'Unknown User'}
                       </Link>
                     </h3>
                     {currentPost.description && (
-                      <p className="text-gray-400 text-sm">{currentPost.description}</p>
+                      <p className="text-gray-400 text-sm line-clamp-2">{currentPost.description}</p>
                     )}
                   </div>
-                  <p className="text-gray-400 text-xs">{new Date(currentPost.created_at).toLocaleDateString()}</p>
+                  <p className="text-gray-400 text-xs whitespace-nowrap">{new Date(currentPost.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
 
@@ -469,79 +495,77 @@ const FastDraws = () => {
               </div>
 
               <div className="p-4 border-t border-gray-700">
-                <div className="flex items-center">
-                  <div className="flex flex-col gap-2">
-                    {showComments && (
-                      <div className="flex flex-row gap-2 mb-2">
-                        <div ref={shareRef} className="relative">
-                          <button
-                            onClick={() => setShowShareMenu(o => !o)}
-                            className="p-2 rounded cursor-pointer  text-white hocus:text-gray-400  transition-colors"
-                          >
-                            <Send className={photoIcon} />
-                          </button>
-                          {(showShareMenu || copyMsg) && currentPost && (
-                            <div className="absolute left-full bottom-0 ml-2 w-40 bg-gray-800 border border-gray-600 rounded shadow-lg z-20 text-xs text-white">
-                              <button
-                                className="w-full text-left px-3 py-2 hocus:bg-gray-700"
-                                onClick={() =>
-                                  handleCopy(
-                                    `${window.location.origin}/post/${currentPost.id}`,
-                                    'Link'
-                                  )
-                                }
-                              >
-                                Copy link
-                              </button>
-                              <button
-                                className="w-full text-left px-3 py-2 hocus:bg-gray-700"
-                                onClick={() =>
-                                  handleCopy(currentPost.content || '', 'Post code')
-                                }
-                              >
-                                Copy post code
-                              </button>
-                              {copyMsg && (
-                                <div className="px-3 py-2 text-green-400 border-t border-gray-700">
-                                  {copyMsg}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
+                <div className="flex items-start flex-col gap-2">
+                  {showComments && (
+                    <div className="flex flex-row gap-2">
+                      <div ref={shareRef} className="relative">
                         <button
-                          onClick={() => setEyeOpen(o => !o)}
-                          className="cursor-pointer p-2  text-white hocus:text-gray-400  transition-colors"
+                          onClick={() => setShowShareMenu(o => !o)}
+                          className="p-2 rounded cursor-pointer text-white hocus:text-gray-400 transition-colors"
                         >
-                          {eyeOpen ? (
-                            <Eye className={photoIcon} />
-                          ) : (
-                            <EyeOff className={photoIcon} />
-                          )}
+                          <Send className={photoIcon} />
                         </button>
+                        {(showShareMenu || copyMsg) && currentPost && (
+                          <div className="absolute left-0 bottom-full mb-2 w-40 bg-gray-800 border border-gray-600 rounded shadow-lg z-20 text-xs text-white">
+                            <button
+                              className="w-full text-left px-3 py-2 hocus:bg-gray-700"
+                              onClick={() =>
+                                handleCopy(
+                                  `${window.location.origin}/post/${currentPost.id}`,
+                                  'Link'
+                                )
+                              }
+                            >
+                              Copy link
+                            </button>
+                            <button
+                              className="w-full text-left px-3 py-2 hocus:bg-gray-700"
+                              onClick={() =>
+                                handleCopy(currentPost.content || '', 'Post code')
+                              }
+                            >
+                              Copy post code
+                            </button>
+                            {copyMsg && (
+                              <div className="px-3 py-2 text-green-400 border-t border-gray-700">
+                                {copyMsg}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    )}
-                    <div className="w-full">
-                      <input
-                        type="text"
-                        placeholder="Add a comment..."
-                        className="flex-1 bg-gray-700 text-white p-2 rounded-l focus:outline-none text-sm"
-                        id="comment-input"
-                        autoComplete="off"
-                      />
                       <button
-                        onClick={async () => {
-                          const input = document.getElementById('comment-input') as HTMLInputElement;
-                          if (input && input.value.trim()) {
-                            await addComment(input.value.trim());
-                            input.value = '';
-                          }
-                        }}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-r hocus:bg-blue-600 transition-colors text-sm font-medium"
+                        onClick={() => setEyeOpen(o => !o)}
+                        className="cursor-pointer p-2 text-white hocus:text-gray-400 transition-colors"
                       >
-                        Post
+                        {eyeOpen ? (
+                          <Eye className={photoIcon} />
+                        ) : (
+                          <EyeOff className={photoIcon} />
+                        )}
                       </button>
                     </div>
+                  )}
+                  <div className="flex w-full">
+                    <input
+                      type="text"
+                      placeholder="Add a comment..."
+                      className="flex-1 bg-gray-700 text-white p-2 rounded-l focus:outline-none text-sm"
+                      id="comment-input"
+                      autoComplete="off"
+                    />
+                    <button
+                      onClick={async () => {
+                        const input = document.getElementById('comment-input') as HTMLInputElement;
+                        if (input && input.value.trim()) {
+                          await addComment(input.value.trim());
+                          input.value = '';
+                        }
+                      }}
+                      className="bg-blue-500 text-white px-4 py-2 rounded-r hocus:bg-blue-600 transition-colors text-sm font-medium"
+                    >
+                      Post
+                    </button>
                   </div>
                 </div>
               </div>

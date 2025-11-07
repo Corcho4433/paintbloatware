@@ -169,15 +169,17 @@ const NitroPage = () => {
   return (
     <div className="relative min-h-screen bg-black text-white overflow-hidden">
       {/* Background con texto random y máscara */}
-
+      <button
+    onClick={() => navigate(-1)}
+    className="fixed top-5 left-5 z-50 p-2 rounded-lg  transition-colors cursor-pointer"
+    aria-label="Go back"
+  >
+    <ArrowLeft className="text-gray-300 hover:text-white w-10 h-10" />
+  </button>
       <div id="scroll-container" className="h-screen overflow-y-auto">
         <div className="fixed inset-0 pointer-events-none select-none bg-black z-0">
           {/* Máscara circular que sigue el mouse */}
-          <div className="absolute  pointer-events-auto top-5 left-5 ">
-            <ArrowLeft onClick={() => navigate(-1)} className="text-gray-300 hocus:text-white w-10 h-10 cursor-pointer z-40">
-
-            </ArrowLeft>
-          </div>
+          
           <div
             className="absolute w-96 h-96 rounded-full -translate-x-1/2 -translate-y-1/2 z-20"
             style={{

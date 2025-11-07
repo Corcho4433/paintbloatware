@@ -130,9 +130,9 @@ export default function Upload() {
     };
 
     return (
-        <div className="bg-gray-900 text-gray-100 min-h-screen flex">
+        <div className="bg-gray-900 text-gray-100 min-h-screen w-full flex">
             <PaintSidebar />
-            <div className="flex flex-1 gap-6 p-6">
+            <div className="flex w-full flex-1 gap-6 p-6 lg:items-center">
                 {/* Nitro Upsell Card */}
                 {showNitroCard && !hasNitro && (
                     <div
@@ -140,7 +140,7 @@ export default function Upload() {
                         onClick={() => setShowNitroCard(false)}
                     >
                         {/* Glow effect background */}
-                        
+
                         <div
                             className="relative max-w-lg w-full mx-4 animate-slideUp"
                             onClick={(e) => e.stopPropagation()}
@@ -148,7 +148,7 @@ export default function Upload() {
 
                             <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-purple-600 opacity-30 rounded-3xl blur-2xl animate-pulse" />
                             {/* Main card */}
-                            <div className={` relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl border-2 border-violet-500/30 overflow-hidden shadow-2xl`}>
+                            <div className={` relative bg-gradient-to-br from-black via-gray-800 to-black rounded-3xl border-2 border-violet-500/50 overflow-hidden shadow-2xl`}>
                                 {/* Animated border gradient */}
                                 <div className="absolute inset-0 rounded-3xl overflow-hidden">
                                     <div className="absolute inset-0 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-purple-500 animate-spin-slow opacity-20"
@@ -230,7 +230,7 @@ export default function Upload() {
 
                                     {/* Price tag */}
                                     <p className="mt-4 text-gray-400 text-sm animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
-                                        Solo $100 ARS/mes
+                                        Solo $15 ARS/mes
                                     </p>
                                 </div>
 
@@ -243,15 +243,16 @@ export default function Upload() {
                 )}
 
 
-                {/* Left column: Preview & Source */}
-                <div className="flex flex-col w-full">
+
+                <div className="flex flex-col w-full ">
                     <div className="flex-col md:flex-row flex gap-3  w-full">
-                        <div className="flex-1 flex flex-col bg-gray-800 rounded-lg border border-gray-700">
-                            <div className="mx-6 mt-6">
+                        {/* Left column: Preview & Source */}
+                        <div className="flex-1 flex md:w-[45%] flex-col bg-gray-800 rounded-lg border border-gray-700 p-6">
+                            <div className="mb-2">
                                 <h2 className="text-2xl font-bold text-white mb-2">Preview & Source</h2>
                                 <p className="text-gray-400 text-sm">Preview your image and source code before posting</p>
                             </div>
-                            <div className="flex-1 aspect-square bg-gray-900 mx-6 mt-6 rounded-lg relative overflow-hidden flex items-center justify-center">
+                            <div className="flex-1 aspect-square bg-gray-900  rounded-lg relative overflow-hidden flex items-center justify-center">
                                 <div className="flex justify-center items-center  w-[300px] h-[300px] md:w-[512px] md:h-[512px] m-3">
                                     <div className="relative w-[300px] h-[300px] md:w-[512px] md:h-[512px] aspect-square flex items-center justify-center">
                                         <img
@@ -303,69 +304,80 @@ export default function Upload() {
                             </div>
                         </div>
                         {/* Right column: Description & Tags */}
-                        <div className="flex-1 flex flex-col bg-gray-800 rounded-lg border border-gray-700 p-6">
+                        <div className="flex-1 flex md:w-[10vw] flex-col bg-gray-800 rounded-lg border border-gray-700 p-6 min-w-0 overflow-hidden">
                             <h2 className="text-lg font-bold text-white mb-2">Source Code</h2>
-                            <div className=" mb-4 max-h-[55vh] w-[50vw] overflow-auto">
-
-                                <SyntaxHighlighter language="lua" className="!bg-gray-900 rounded-xl" style={getThemeFromString(editorTheme)} customStyle={{
-                                    margin: 0,
-                                    padding: '1.5rem',
-                                    fontSize: '0.875rem',
-                                    lineHeight: '1.5',
-                                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                                }}
+                            <div className="mb-4 overflow-auto  max-h-[55vh] ">
+                                <SyntaxHighlighter
+                                    language="lua"
+                                    className="!bg-gray-900 rounded-xl !w-auto !min-w-0"
+                                    style={getThemeFromString(editorTheme)}
+                                    customStyle={{
+                                        margin: 0,
+                                        padding: '1.5rem',
+                                        fontSize: '0.875rem',
+                                        lineHeight: '1.5',
+                                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                                        width: 'fit-content',
+                                        height: "40vh"
+                                        
+                                    }}
                                     codeTagProps={{
                                         style: {
                                             fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
                                             fontSize: '0.875rem',
                                             lineHeight: '1.5',
+                                            display: 'block',
+                                            width: "10%"
+                                            
                                         }
                                     }}
+                                    wrapLongLines={false}
+                                    PreTag="div"
                                 >
                                     {sourceCode}
                                 </SyntaxHighlighter>
-
-
                             </div>
-                            <div className="mb-4">
-                                <h2 className="text-xl font-bold text-white mb-2">Description</h2>
-                                <textarea
-                                    className="w-full min-h-[80px] bg-gray-900 text-gray-100 rounded-lg p-3 border border-gray-700 focus:border-blue-500 focus:outline-none mb-2"
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    placeholder="Describe tu dibujo..."
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <h2 className="text-xl font-bold text-white mb-2">Tags</h2>
-                                <div className="flex flex-wrap gap-2 mb-2">
-                                    {availableTags.length === 0
-                                        ? [...Array(6)].map((_, i) => (
-                                            <div
-                                                key={i}
-                                                className="h-8 w-20 bg-gray-700 rounded-lg animate-pulse border border-gray-700"
-                                            />
-                                        ))
-                                        : availableTags.map(tag => (
-                                            <button
-                                                key={tag.name}
-                                                className={`px-4 py-2 rounded-lg border border-gray-700 text-sm font-medium transition-all duration-150 shadow-lg max-w-full
+                        
+
+                        <div className="mb-4">
+                            <h2 className="text-xl font-bold text-white mb-2">Description</h2>
+                            <textarea
+                                className="w-full min-h-[80px] bg-gray-900 text-gray-100 rounded-lg p-3 border border-gray-700 focus:border-blue-500 focus:outline-none mb-2"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                placeholder="Describe tu dibujo..."
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <h2 className="text-xl font-bold text-white mb-2">Tags</h2>
+                            <div className="flex flex-wrap gap-2 mb-2">
+                                {availableTags.length === 0
+                                    ? [...Array(6)].map((_, i) => (
+                                        <div
+                                            key={i}
+                                            className="h-8 w-20 bg-gray-700 rounded-lg animate-pulse border border-gray-700"
+                                        />
+                                    ))
+                                    : availableTags.map(tag => (
+                                        <button
+                                            key={tag.name}
+                                            className={`px-4 py-2 rounded-lg border border-gray-700 text-sm font-medium transition-all duration-150 shadow-lg max-w-full
                                                     ${selectedTags.includes(tag.name)
-                                                        ? 'bg-gray-900 text-blue-400 !border-blue-400 shadow-blue-600/25'
-                                                        : 'bg-gray-800 text-gray-300 hocus:bg-gray-700 hocus:text-white hocus:border-gray-600'}
+                                                    ? 'bg-gray-900 text-blue-400 !border-blue-400 shadow-blue-600/25'
+                                                    : 'bg-gray-800 text-gray-300 hocus:bg-gray-700 hocus:text-white hocus:border-gray-600'}
                                                 `}
-                                                onClick={() => toggleTag(tag.name)}
-                                                type="button"
-                                            >
-                                                {tag.name}
-                                            </button>
-                                        ))}
-                                </div>
+                                            onClick={() => toggleTag(tag.name)}
+                                            type="button"
+                                        >
+                                            {tag.name}
+                                        </button>
+                                    ))}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        </div >
     );
 }

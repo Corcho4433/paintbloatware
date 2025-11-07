@@ -8,7 +8,7 @@ interface LikeButtonsProps {
   postId: string;
   ratingValue: number;
   onReactionClick: (value: 1 | -1) => void;
-  isAnimating: boolean;
+  isAnimating: boolean | string;
   photoIcon: string;
 }
 

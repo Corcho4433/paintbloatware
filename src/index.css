@@ -68,52 +68,84 @@
 
 @layer utilities {
   @layer utilities {
-    @keyframes slide-in {
-      0% { 
-        transform: translateY(100%); 
-        opacity: 0; 
-        pointer-events: none; /* prevent interaction during animation */
-        box-shadow: none; /* remove focus/active shadow */
-        outline: none; /* remove focus outline */
-        hover: none; /* remove hover effect */
-        focus: none; /* remove focus effect */
-      }
-      100% { 
-        transform: translateY(0); 
-        opacity: 1; 
-        pointer-events: auto; /* enable interaction when done */
-      }
+  @keyframes slide-in-forward {
+    0% { 
+      transform: translateY(100%); 
+      opacity: 0; 
+      pointer-events: none;
     }
-
-    @keyframes slide-out {
-      0% { 
-        transform: translateY(0); 
-        opacity: 1; 
-        pointer-events: auto;
-      }
-      100% { 
-        transform: translateY(-100%); 
-        opacity: 0;  
-        pointer-events: none; /* prevent interaction during slide-out */
-      }
+    100% { 
+      transform: translateY(0); 
+      opacity: 1; 
+      pointer-events: auto;
     }
-
-    .animate-slide-in {
-      animation: slide-in 0.5s ease-in-out forwards;
+  }
+  
+  @keyframes slide-out-forward {
+    0% { 
+      transform: translateY(0); 
+      opacity: 1; 
+      pointer-events: auto;
     }
-
-    .animate-slide-out {
-      animation: slide-out 0.5s ease-in-out forwards;
+    100% { 
+      transform: translateY(-100%); 
+      opacity: 0;  
+      pointer-events: none;
     }
-  } 
+  }
 
-  .animate-slide-in *[disabled],
-  .animate-slide-out *[disabled] {
-    opacity: 1 ;
+  @keyframes slide-in-backward {
+    0% { 
+      transform: translateY(-100%); 
+      opacity: 0; 
+      pointer-events: none;
+    }
+    100% { 
+      transform: translateY(0); 
+      opacity: 1; 
+      pointer-events: auto;
+    }
+  }
+  
+  @keyframes slide-out-backward {
+    0% { 
+      transform: translateY(0); 
+      opacity: 1; 
+      pointer-events: auto;
+    }
+    100% { 
+      transform: translateY(100%); 
+      opacity: 0;  
+      pointer-events: none;
+    }
+  }
+
+  .animate-slide-in-forward {
+    animation: slide-in-forward 0.5s ease-in-out forwards;
+  }
+  
+  .animate-slide-out-forward {
+    animation: slide-out-forward 0.5s ease-in-out forwards;
+  }
+
+  .animate-slide-in-backward {
+    animation: slide-in-backward 0.5s ease-in-out forwards;
+  }
+  
+  .animate-slide-out-backward {
+    animation: slide-out-backward 0.5s ease-in-out forwards;
+  }
+
+  .animate-slide-in-forward *[disabled],
+  .animate-slide-out-forward *[disabled],
+  .animate-slide-in-backward *[disabled],
+  .animate-slide-out-backward *[disabled] {
+    opacity: 1;
     cursor: pointer;
     filter: none;
     background-color: inherit;
   }
+}
 }
 
 

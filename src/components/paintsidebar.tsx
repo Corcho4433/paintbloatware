@@ -197,7 +197,7 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
           {/* Comprar nitro */}
           
           <SidebarItem
-            onClick={() =>{ !current_user ? navigate("/comprar-nitro") : null}}
+            onClick={() =>{ !current_user?.nitro ? navigate("/comprar-nitro") : null}}
             className={`
             ${isDesktopSidebarCollapsed ? "md:aspect-square md:w-12 md:justify-center" : ""} 
             rounded-lg 
