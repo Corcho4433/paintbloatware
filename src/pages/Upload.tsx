@@ -230,7 +230,7 @@ export default function Upload() {
 
                                     {/* Price tag */}
                                     <p className="mt-4 text-gray-400 text-sm animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
-                                        Solo $15 ARS/mes
+                                        Solo $100 ARS/mes
                                     </p>
                                 </div>
 

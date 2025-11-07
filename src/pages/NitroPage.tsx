@@ -89,7 +89,7 @@ const NitroPage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           plan: "PAINT_NITRO",
-          amount: 15,
+          amount: 100,
           email: "test_user_1844090774305363860@testuser.com"
         }),
       });
@@ -226,7 +226,7 @@ const NitroPage = () => {
                 <div className="absolute inset-0 bg-purple-500 blur-xl opacity-40"></div>
                 <div className="relative border-4 border-purple-500 rounded-none p-12 bg-black font-mono">
                   <div className="text-7xl font-black mb-2 text-white">
-                    $15<span className="text-2xl text-gray-500">/MES</span>
+                    $100<span className="text-2xl text-gray-500">/MES</span>
                   </div>
                   <div className="text-purple-400 text-sm font-bold tracking-widest">
                     ► CANCELÁ CUANDO QUIERAS ◄
