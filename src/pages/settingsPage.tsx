@@ -327,7 +327,7 @@ const SettingsPage = () => {
                     email: user?.email || '',
                     description: user?.description || ''
                   }}
-                  validationSchema={validateProfile}
+                  validate={validateProfile}
                   enableReinitialize={true}
                   onSubmit={async (values, { setSubmitting, setStatus }) => {
                     try {
@@ -524,7 +524,7 @@ const SettingsPage = () => {
                   <Crown className="w-16 h-16 text-gray-600 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-white mb-2">No Active Subscription</h3>
                   <p className="text-gray-400 mb-6">Upgrade to Paint Nitro for premium features</p>
-                  <button onClick={()=> navigate("/comprar-nitro")} className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:opacity-90 transition-opacity">
+                  <button onClick={()=> navigate("/comprar-nitro")} className="cursor-pointer px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:opacity-90 transition-opacity">
                     Upgrade to Nitro
                   </button>
                 </div>
