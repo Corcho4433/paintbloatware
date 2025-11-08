@@ -5,8 +5,9 @@ import { deleteProfile } from '../hooks/user';
 import { User, Settings, Shield, Palette, Save, Eye, EyeOff, Upload, Crown, CreditCard, CheckCircle, XCircle } from 'lucide-react';
 import { useUserInfo, updateProfileInfo, uploadProfileImageFile } from '../hooks/user';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/prism';
+import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
+import lua from 'react-syntax-highlighter/dist/esm/languages/prism/lua'
+SyntaxHighlighter.registerLanguage('lua', lua)
 import { usePaymentHistory, useSubscription, cancelSubscription } from '../hooks/payments';
 import { getAvailableThemes, getThemeFromString } from '../utils/theme';
 import { useNavigate } from 'react-router-dom';
@@ -26,21 +27,42 @@ const formatCurrency = (amount: number, currency: string = 'ARS') => {
   }).format(amount);
 };
 
+interface ProfileFormValues {
+  name: string;
+  email: string;
+  description: string;
+}
 
+const validateProfile = (values: ProfileFormValues) => {
+  const errors: Partial<Record<keyof ProfileFormValues, string>> = {};
+
+  // Name validation
+  if (!values.name) {
+    errors.name = 'Name is required';
+  } else if (values.name.length < 2) {
+    errors.name = 'Name must be at least 2 characters';
+  } else if (values.name.length > 50) {
+    errors.name = 'Name must be less than 50 characters';
+  }
+
+  // Email validation
+  if (!values.email) {
+    errors.email = 'Email is required';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+    errors.email = 'Invalid email address';
+  }
+
+  // Description validation
+  if (values.description && values.description.length > 500) {
+    errors.description = 'Description must be less than 500 characters';
+  }
+
+  return errors;
+};
 
 const themes = getAvailableThemes();
 // Validation schema for profile form
-const profileValidationSchema = Yup.object({
-  name: Yup.string()
-    .min(2, 'Name must be at least 2 characters')
-    .max(50, 'Name must be less than 50 characters')
-    .required('Name is required'),
-  email: Yup.string()
-    .email('Invalid email address')
-    .required('Email is required'),
-  description: Yup.string()
-    .max(500, 'Description must be less than 500 characters')
-});
+
 
 const callDeleteProfile = (userId: string) => {
   const navigate = useNavigate();
@@ -68,6 +90,7 @@ const SettingsPage = () => {
   const { payments } = usePaymentHistory();
   const { subscription, refetch } = useSubscription();
   const { user, loading } = useUserInfo(authUser?.id);
+  const navigate = useNavigate();
   const editorTheme = useAuthStore((state) => state.editorTheme);
   const setEditorTheme = useAuthStore((state) => state.setEditorTheme);
 
@@ -304,7 +327,7 @@ const SettingsPage = () => {
                     email: user?.email || '',
                     description: user?.description || ''
                   }}
-                  validationSchema={profileValidationSchema}
+                  validationSchema={validateProfile}
                   enableReinitialize={true}
                   onSubmit={async (values, { setSubmitting, setStatus }) => {
                     try {
@@ -501,7 +524,7 @@ const SettingsPage = () => {
                   <Crown className="w-16 h-16 text-gray-600 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-white mb-2">No Active Subscription</h3>
                   <p className="text-gray-400 mb-6">Upgrade to Paint Nitro for premium features</p>
-                  <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:opacity-90 transition-opacity">
+                  <button onClick={()=> navigate("/comprar-nitro")} className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:opacity-90 transition-opacity">
                     Upgrade to Nitro
                   </button>
                 </div>

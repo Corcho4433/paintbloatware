@@ -3,7 +3,9 @@ import { BookOpen, Menu, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import dracula from "react-syntax-highlighter/dist/esm/styles/prism/dracula";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
+import lua from 'react-syntax-highlighter/dist/esm/languages/prism/lua'
+SyntaxHighlighter.registerLanguage('lua', lua)
 import { useAuthStore } from "../store/useAuthStore";
 import { getThemeFromString } from "../utils/theme";
 const articleImports = import.meta.glob("../wiki-articles/*.md", {

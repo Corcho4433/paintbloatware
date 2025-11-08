@@ -1,6 +1,6 @@
 import FastDraws from './pages/FastDraws'
 import './App.css'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import RegisterPage from './pages/Login'
 import HomePage from './pages/Home'
@@ -8,21 +8,24 @@ import Drawing from './pages/Drawing'
 import UserPage from './pages/UserPage';
 import Upload from './pages/Upload';
 import WikiPage from './pages/wiki';
+import { lazy } from 'react'
 import OAuthSuccessPopup from './pages/OAuthSuccess';
 import SinglePost from './pages/singlePost';
-import SettingsPage from './pages/settingsPage';
 import LogoutPage from './pages/Logout';
-import AdminDashboard from './pages/Dashboard';
+const AdminDashboard = lazy(()=> import('./pages/Dashboard'))
+const SettingsPage = lazy(()=> import('./pages/settingsPage'))
+
 import NitroPage from './pages/NitroPage';
 
+
 function App() {
-  const PaintQueryClient = new QueryClient();
+ 
 
 
   return (
     <>
       <div id='page-container' className="page-container bg-gray-900">
-        <QueryClientProvider client={PaintQueryClient}>
+        
           <BrowserRouter>
             <Routes>
               <Route path='/' element={<Navigate to="/home" replace />} />
@@ -43,7 +46,7 @@ function App() {
 
           </BrowserRouter>
 
-        </QueryClientProvider>
+        
 
       </div>
     </>

@@ -50,12 +50,56 @@ const handleOAuth = (providerId: string) => {
   );
 };
 
+
+
+interface RegisterFormValues {
+  name: string;
+  email: string;
+  password: string;
+}
+
+const validateRegister = (values: RegisterFormValues) => {
+  const errors: Partial<Record<keyof RegisterFormValues, string>> = {};
+
+  // Name validation
+  if (!values.name) {
+    errors.name = 'Name is required';
+  } else if (values.name.length < 2) {
+    errors.name = 'Name must be at least 2 characters';
+  } else if (values.name.length > 50) {
+    errors.name = 'Name must be less than 50 characters';
+  }
+
+  // Email validation
+  if (!values.email) {
+    errors.email = 'Email is required';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+    errors.email = 'Invalid email address';
+  }
+
+  // Password validation
+  if (!values.password) {
+    errors.password = 'Password is required';
+  } else if (values.password.length < 8) {
+    errors.password = 'Password must be at least 8 characters';
+  } else if (values.password.length > 100) {
+    errors.password = 'Password must be less than 100 characters';
+  }
+  // Optional: Add password strength requirements
+  // else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(values.password)) {
+  //   errors.password = 'Password must contain uppercase, lowercase, and number';
+  // }
+
+  return errors;
+};
+
 const RegisterForm = () => {
   const registerMutation = useRegisterMutation();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   return (
     <Formik
       initialValues={{ name: "", email: "", password: "" }}
+      validate={validateRegister}
       onSubmit={async (values, { setSubmitting }) => {
         try {
           await registerMutation.mutateAsync(values);
@@ -69,7 +113,7 @@ const RegisterForm = () => {
         }
       }}
     >
-      {({ isSubmitting }) => (
+      {({ isSubmitting, errors, touched }) => (
         <Form className="space-y-4 md:space-y-6 text-left">
           <div>
             <label
@@ -86,6 +130,9 @@ const RegisterForm = () => {
               placeholder="Lisandro"
               required
             />
+            {errors.name && touched.name && (
+              <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+            )}
           </div>
 
           <div>
@@ -103,6 +150,9 @@ const RegisterForm = () => {
               placeholder="paint@mail.com"
               required
             />
+            {errors.email && touched.email && (
+              <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+            )}
           </div>
 
           <div>
@@ -120,6 +170,9 @@ const RegisterForm = () => {
               placeholder="••••••••"
               required
             />
+            {errors.password && touched.password && (
+              <p className="mt-1 text-sm text-red-500">{errors.password}</p>
+            )}
           </div>
 
           <button

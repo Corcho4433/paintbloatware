@@ -6,7 +6,9 @@ import { Heart, MessageCircle, Share2, Eye, EyeOff, HeartCrack, X, ArrowRight, S
 import { useState, useRef, useEffect } from "react";
 import useInfiniteScroll from "../hooks/infinetescroll";
 import { CommentWithThreads } from "./CommentWithThreads";
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
+import lua from 'react-syntax-highlighter/dist/esm/languages/prism/lua'
+SyntaxHighlighter.registerLanguage('lua', lua)
 import { useAuthStore } from "../store/useAuthStore";
 // Import all themes
 import {

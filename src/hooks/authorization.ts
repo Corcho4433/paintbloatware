@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation } from "./useMutation";
 import { serverPath } from "../utils/servers";
 import { useAuthStore } from "../store/useAuthStore";
 import { LoginUserRequest, LoginUserResponse, RegisterUserRequest, RegisterUserResponse } from "../types/requests";

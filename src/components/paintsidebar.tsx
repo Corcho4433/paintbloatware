@@ -3,11 +3,11 @@ import { useAuthStore } from "../store/useAuthStore";
 import {
   LogInIcon,
   LogOutIcon,
-  House,
+  Home,
   Cat,
   PencilIcon,
   Menu,
-  CircleUser,
+  UserCircle2,
   LibraryIcon,
   Settings,
   Compass,
@@ -82,7 +82,7 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
             `}
           >
             <div className="flex items-center">
-              <House className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
+              <Home className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
               {!isDesktopSidebarCollapsed && (
                 <span className="text-md font-semibold">Home</span>
               )}
@@ -151,7 +151,7 @@ const PaintSidebar = ({ selectedPage }: PaintSidebarProps) => {
               `}
             >
               <div className="flex items-center">
-                <CircleUser className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
+                <UserCircle2 className={`${isDesktopSidebarCollapsed ? "md:w-7 md:h-7" : "w-7 h-7 mr-4"}`} />
                 {!isDesktopSidebarCollapsed && (
                   <span className="text-md font-semibold">Profile</span>
                 )}
