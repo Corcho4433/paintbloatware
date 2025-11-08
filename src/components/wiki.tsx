@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { BookOpen, Menu, X } from "lucide-react";
-import ReactMarkdown from "react-markdown";
+import { lazy } from "react";
+const ReactMarkdown = lazy(()=> import("react-markdown"))
 import remarkGfm from "remark-gfm";
 import dracula from "react-syntax-highlighter/dist/esm/styles/prism/dracula";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";

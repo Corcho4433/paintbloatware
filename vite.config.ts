@@ -10,6 +10,16 @@ export default defineConfig({
       open: true,
       gzipSize: true,
     })],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom"],
+          syntax: ["react-syntax-highlighter"],
+        },
+      },
+    },
+  },
   
   server: {
     port: 60015,

@@ -35,6 +35,7 @@
   
   "overrides": {
     "tailwind-merge": "3.0.1",
+    "tailwind-merge-v2": "npm:tailwind-merge@3.0.1",
     "lodash": "npm:lodash-es@^4.17.21"
   },
 

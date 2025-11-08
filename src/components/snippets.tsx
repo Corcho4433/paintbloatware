@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
+import { lazy } from "react";
+const ReactMarkdown = lazy(()=> import("react-markdown"))
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import lua from 'react-syntax-highlighter/dist/esm/languages/prism/lua'
 SyntaxHighlighter.registerLanguage('lua', lua)
