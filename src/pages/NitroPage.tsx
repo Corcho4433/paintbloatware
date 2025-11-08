@@ -3,11 +3,12 @@ import { Crown, Sparkles, Zap, Palette, Users, Star, ArrowLeft } from "lucide-re
 import fetchWithRefresh from "../hooks/authorization";
 import { useNavigate } from "react-router-dom";
 import { fetchAuthMe } from "../hooks/user";
+import { useAuthStore } from "../store/useAuthStore";
 
 const NitroPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+  const user = useAuthStore(state => state.user)
   const [randomText, setRandomText] = useState("");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
@@ -17,11 +18,13 @@ const NitroPage = () => {
 
   useEffect(() => {
   const checkAuth = async () => {
+    if (user ){ 
       await fetchAuthMe();
+    }
   };
   
   checkAuth();
-}, []);
+}, [user]);
   useEffect(() => {
     const container = document.getElementById('scroll-container');
     if (!container) return;
