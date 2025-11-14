@@ -3,9 +3,9 @@ import { BookOpen, Menu, X } from "lucide-react";
 import { lazy } from "react";
 const ReactMarkdown = lazy(()=> import("react-markdown"))
 import remarkGfm from "remark-gfm";
-import dracula from "react-syntax-highlighter/dist/esm/styles/prism/dracula";
+import atomOneDark from "react-syntax-highlighter/dist/esm/styles/hljs/dracula";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
-import lua from 'react-syntax-highlighter/dist/esm/languages/prism/lua'
+import lua from 'react-syntax-highlighter/dist/esm/languages/hljs/lua'
 SyntaxHighlighter.registerLanguage('lua', lua)
 import { useAuthStore } from "../store/useAuthStore";
 import { getThemeFromString } from "../utils/theme";
@@ -100,7 +100,7 @@ const Wiki = () => {
   const [articles, setArticles] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
   const useAuthTheme = useAuthStore((state) => state.editorTheme);
-  const theme = getThemeFromString(useAuthTheme) || dracula;
+  const theme = getThemeFromString(useAuthTheme) || atomOneDark;
   const [isOpen, setIsOpen] = useState(false);
 
 

@@ -18,41 +18,34 @@ import { useAuthStore } from "../store/useAuthStore";
 import { useComments } from "../hooks/comments";
 import { CommentWithThreads } from "../components/CommentWithThreads";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
-import lua from 'react-syntax-highlighter/dist/esm/languages/prism/lua'
+import lua from 'react-syntax-highlighter/dist/esm/languages/hljs/lua'
 SyntaxHighlighter.registerLanguage('lua', lua)
 import useInfiniteScroll from "../hooks/infinetescroll";
 import {
-  dracula,
-  vscDarkPlus,
-  oneDark,
-  atomDark,
-  tomorrow,
-  okaidia,
-  darcula,
-  materialDark,
+  atomOneDark,
+  atomOneLight,
+  github,
+  githubGist,
+  monokai,
   nord,
-  nightOwl,
-  coldarkDark,
-  duotoneDark,
-  solarizedDarkAtom
-} from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { LikeButtons } from "../components/likeButtons";
+  vs2015,
+  xt256
+} from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 const themes = {
-  dracula,
-  vscDarkPlus,
-  oneDark,
-  atomDark,
-  tomorrow,
-  okaidia,
-  darcula,
-  materialDark,
+  atomOneDark,
+  atomOneLight,
+  github,
+  monokai,
   nord,
-  nightOwl,
-  coldarkDark,
-  duotoneDark,
-  solarizedDarkAtom
+  vs2015,
+  xt256,
+  githubGist
 };
+
+import { LikeButtons } from "../components/likeButtons";
+
+
 
 const FastDraws = () => {
   const loggedUser = useAuthStore((state) => state.user);
@@ -315,7 +308,7 @@ const FastDraws = () => {
           <div className="w-full h-full bg-gray-900 flex justify-left overflow-y-auto">
             <SyntaxHighlighter
               language="lua"
-              style={themes[editorTheme as keyof typeof themes] || themes.dracula}
+              style={themes[editorTheme as keyof typeof themes] || themes.atomOneDark}
               customStyle={{
                 margin: 0,
                 padding: '1rem',

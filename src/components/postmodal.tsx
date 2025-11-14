@@ -7,41 +7,30 @@ import { useState, useRef, useEffect } from "react";
 import useInfiniteScroll from "../hooks/infinetescroll";
 import { CommentWithThreads } from "./CommentWithThreads";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
-import lua from 'react-syntax-highlighter/dist/esm/languages/prism/lua'
+import lua from 'react-syntax-highlighter/dist/esm/languages/hljs/lua'
 SyntaxHighlighter.registerLanguage('lua', lua)
 import { useAuthStore } from "../store/useAuthStore";
 // Import all themes
 import {
-  dracula,
-  vscDarkPlus,
-  oneDark,
-  atomDark,
-  tomorrow,
-  okaidia,
-  darcula,
-  materialDark,
+  atomOneDark,
+  atomOneLight,
+  github,
+  githubGist,
+  monokai,
   nord,
-  nightOwl,
-  coldarkDark,
-  duotoneDark,
-  solarizedDarkAtom
-} from 'react-syntax-highlighter/dist/esm/styles/prism';
+  vs2015,
+  xt256
+} from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
-// Available themes
 const themes = {
-  dracula,
-  vscDarkPlus,
-  oneDark,
-  atomDark,
-  tomorrow,
-  okaidia,
-  darcula,
-  materialDark,
+  atomOneDark,
+  atomOneLight,
+  github,
+  monokai,
   nord,
-  nightOwl,
-  coldarkDark,
-  duotoneDark,
-  solarizedDarkAtom
+  vs2015,
+  xt256,
+  githubGist
 };
 
 export const PostModal = (
@@ -168,7 +157,7 @@ export const PostModal = (
               {post.content ? (
                 <SyntaxHighlighter
                   language="lua"
-                  style={themes[editorTheme as keyof typeof themes] || themes.dracula}
+                  style={themes[editorTheme as keyof typeof themes] || themes.atomOneDark}
                   customStyle={{
                     margin: 0,
                     padding: '1rem',

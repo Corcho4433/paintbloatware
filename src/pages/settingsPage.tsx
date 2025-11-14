@@ -6,7 +6,7 @@ import { User, Settings, Shield, Palette, Save, Eye, EyeOff, Upload, Crown, Cred
 import { useUserInfo, updateProfileInfo, uploadProfileImageFile } from '../hooks/user';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
-import lua from 'react-syntax-highlighter/dist/esm/languages/prism/lua'
+import lua from 'react-syntax-highlighter/dist/esm/languages/hljs/lua'
 SyntaxHighlighter.registerLanguage('lua', lua)
 import { usePaymentHistory, useSubscription, cancelSubscription } from '../hooks/payments';
 import { getAvailableThemes, getThemeFromString } from '../utils/theme';
@@ -65,7 +65,7 @@ const themes = getAvailableThemes();
 
 
 const callDeleteProfile = (userId: string) => {
-  const navigate = useNavigate();
+
   if (!userId) {
     alert('User ID is missing. Cannot delete profile.');
   }
@@ -74,8 +74,9 @@ const callDeleteProfile = (userId: string) => {
       .then(() => {
         alert('Profile deleted successfully.');
         // Optionally, redirect to homepage or login page
-        
-        navigate('/')
+        const logout = useAuthStore(state => state.logout)
+        logout()
+        window.location.href = '/'
       })
       .catch((error) => {
         console.error('Error deleting profile:', error);
@@ -770,7 +771,7 @@ end`}
                   <h3 className="text-lg font-medium text-red-400 mb-3">Danger Zone</h3>
                   <div className="space-y-3">
 
-                    <button onClick={() => callDeleteProfile(user!.id)} className="w-full px-4 py-2 !bg-red-700 text-white rounded-lg hocus:!bg-red-800 transition-colors">
+                    <button onClick={() => callDeleteProfile(user!.id)} className="cursor-pointer w-full px-4 py-2 !bg-red-700 text-white rounded-lg hocus:!bg-red-800 transition-colors">
                       Delete Account
                     </button>
                   </div>

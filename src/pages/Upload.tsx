@@ -6,7 +6,7 @@ import { Crown, Gem, Rocket, Sparkles } from 'lucide-react';
 import { createPost } from '../hooks/posts';
 import { fetchAllTags } from '../hooks/trending';
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
-import lua from 'react-syntax-highlighter/dist/esm/languages/prism/lua'
+import lua from 'react-syntax-highlighter/dist/esm/languages/hljs/lua'
 SyntaxHighlighter.registerLanguage('lua', lua)
 import { useAuthStore } from '../store/useAuthStore';
 import { getThemeFromString } from '../utils/theme';

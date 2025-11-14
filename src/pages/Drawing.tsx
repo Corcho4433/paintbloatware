@@ -4,7 +4,7 @@ import { processorResponse, processorAction, Frame } from "../types/draw";
 import CodeSnippets from "../components/snippets";
 import { useAuthStore } from "../store/useAuthStore";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
-import lua from 'react-syntax-highlighter/dist/esm/languages/prism/lua'
+import lua from 'react-syntax-highlighter/dist/esm/languages/hljs/lua'
 SyntaxHighlighter.registerLanguage('lua', lua)
 import { getAvailableThemes, getThemeFromString } from "../utils/theme";
 import GeminiInput from "../components/GeminiInput";

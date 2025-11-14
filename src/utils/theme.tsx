@@ -1,35 +1,25 @@
-
 import {
-  dracula,
-  vscDarkPlus,
-  oneDark,
-  atomDark,
-  tomorrow,
-  okaidia,
-  darcula,
-  materialDark,
+  atomOneDark,
+  atomOneLight,
+  github,
+  githubGist,
+  monokai,
   nord,
-  nightOwl,
-  coldarkDark,
-  duotoneDark,
-  solarizedDarkAtom
-} from 'react-syntax-highlighter/dist/esm/styles/prism';
+  vs2015,
+  xt256
+} from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 const themes = {
-  dracula,
-  vscDarkPlus,
-  oneDark,
-  atomDark,
-  tomorrow,
-  okaidia,
-  darcula,
-  materialDark,
+  atomOneDark,
+  atomOneLight,
+  github,
+  monokai,
   nord,
-  nightOwl,
-  coldarkDark,
-  duotoneDark,
-  solarizedDarkAtom
+  vs2015,
+  xt256,
+  githubGist
 };
+
 
 export const getThemeFromString = (theme: string) : { [key: string]: React.CSSProperties } => {
     return themes[theme as keyof typeof themes] || undefined;
