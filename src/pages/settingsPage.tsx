@@ -65,17 +65,17 @@ const themes = getAvailableThemes();
 
 
 const callDeleteProfile = (userId: string) => {
-
+  
   if (!userId) {
-    alert('User ID is missing. Cannot delete profile.');
+    console.error('User ID is missing. Cannot delete profile.');
+    return;
   }
   if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
     deleteProfile(userId!)
       .then(() => {
         alert('Profile deleted successfully.');
         // Optionally, redirect to homepage or login page
-        const logout = useAuthStore(state => state.logout)
-        logout()
+        useAuthStore.getState().logout();
         window.location.href = '/'
       })
       .catch((error) => {
