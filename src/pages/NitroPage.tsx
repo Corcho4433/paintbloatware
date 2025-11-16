@@ -18,7 +18,7 @@ const NitroPage = () => {
 
   useEffect(() => {
   const checkAuth = async () => {
-    if (user ){ 
+    if (!user){ 
       await fetchAuthMe();
     }
   };
@@ -93,7 +93,7 @@ const NitroPage = () => {
         body: JSON.stringify({
           plan: "PAINT_NITRO",
           amount: 100,
-          email: "test_user_1844090774305363860@testuser.com"
+          id_user: user!.id
         }),
       });
 
