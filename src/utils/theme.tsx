@@ -21,8 +21,10 @@ const themes = {
 };
 
 
-export const getThemeFromString = (theme: string) : { [key: string]: React.CSSProperties } => {
-    return themes[theme as keyof typeof themes] || undefined;
+export const getThemeFromString = (
+  theme: string
+): { [key: string]: React.CSSProperties } => {
+  return themes[theme as keyof typeof themes] || atomOneDark;
 };
 
 export const getAvailableThemes = () : string[] => {
